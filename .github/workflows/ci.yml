@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Valores de CI: la base es un servicio efímero, no hay secretos reales involucrados.
+  DATABASE_URL: postgresql://partops_app:partops_app@localhost:5432/partops_test
+  DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/partops_test
+  BETTER_AUTH_SECRET: ci-only-secret-that-is-long-enough-to-pass-validation
+  NODE_ENV: test
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: partops_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # gitleaks necesita el historial para revisar algo más que el último commit.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Escanear secretos
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Crear rol de aplicación (sin BYPASSRLS)
+        run: |
+          psql "postgresql://postgres:postgres@localhost:5432/partops_test" -v ON_ERROR_STOP=1 -c "
+            CREATE ROLE partops_app LOGIN PASSWORD 'partops_app' NOSUPERUSER NOBYPASSRLS;
+            GRANT USAGE ON SCHEMA public TO partops_app;
+            ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO partops_app;
+            ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO partops_app;"
+
+      - name: Migrar base de datos
+        run: pnpm --filter @partops/db migrate:deploy
+
+      - name: Lint y formato
+        run: pnpm lint
+
+      - name: Tipos
+        run: pnpm typecheck
+
+      - name: Tests (incluye aislamiento RLS y concurrencia de inventario)
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

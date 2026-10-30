@@ -1,0 +1,31 @@
+node_modules/
+dist/
+.next/
+.turbo/
+out/
+coverage/
+test-results/
+playwright-report/
+
+.env
+.env.local
+.env.*.local
+*.log
+
+.DS_Store
+Thumbs.db
+
+# Android / Capacitor
+apps/mobile/android/app/build/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/.capacitor/
+*.keystore
+*.jks
+
+# Artefactos de respaldo y claves
+*.pem
+*.p8
+service-account*.json
+firebase-service-account.json
+uploads/

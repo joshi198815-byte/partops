@@ -1,0 +1,37 @@
+{
+  "name": "partops",
+  "private": true,
+  "description": "PartOps - SaaS multi-tenant de inventario, venta y despacho de repuestos automotrices",
+  "packageManager": "pnpm@11.0.9",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "db:up": "docker compose -f infra/docker-compose.yml up -d",
+    "db:down": "docker compose -f infra/docker-compose.yml down",
+    "db:migrate": "pnpm --filter @partops/db migrate:dev",
+    "db:deploy": "pnpm --filter @partops/db migrate:deploy",
+    "db:seed": "pnpm --filter @partops/db seed",
+    "db:studio": "pnpm --filter @partops/db studio",
+    "brand": "node scripts/render-brand.mjs",
+    "secrets:check": "node scripts/check-secrets.mjs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.0",
+    "sharp": "0.35.5",
+    "turbo": "2.11.10",
+    "typescript": "5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css}": "biome check --write --no-errors-on-unmatched"
+  }
+}

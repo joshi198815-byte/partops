@@ -1,0 +1,4 @@
+#!/bin/sh
+# Verificación local antes de cada commit. Rápida a propósito: si tarda, la gente la salta.
+node scripts/check-secrets.mjs || exit 1
+pnpm exec biome check --staged --no-errors-on-unmatched

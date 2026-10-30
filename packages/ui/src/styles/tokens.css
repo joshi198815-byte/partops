@@ -1,0 +1,118 @@
+/* PartOps — tokens de diseño.
+ *
+ * Identidad: azul de taller y cobre de la pieza. El cobre es un filete, nunca una superficie.
+ * Nada de violeta, nada de vidrio, nada de glow: esto es una herramienta de bodega que se usa
+ * con las manos sucias a las 7 de la mañana.
+ *
+ * Todos los pares texto/fondo están verificados a AA (4.5:1) y se comprueban en test.
+ */
+
+@theme {
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
+
+  /* Azul taller: la base de toda la interfaz.
+     Escala derivada de #16324F en OKLCH, con pasos perceptualmente parejos. */
+  --color-steel-50: oklch(97.8% 0.006 240);
+  --color-steel-100: oklch(94.6% 0.012 240);
+  --color-steel-200: oklch(89.2% 0.022 240);
+  --color-steel-300: oklch(80.1% 0.036 241);
+  --color-steel-400: oklch(68.4% 0.052 242);
+  --color-steel-500: oklch(55.6% 0.068 243);
+  --color-steel-600: oklch(44.8% 0.078 244);
+  --color-steel-700: oklch(36.2% 0.078 245);
+  --color-steel-800: oklch(27.2% 0.068 246);
+  --color-steel-900: oklch(21.4% 0.052 246);
+  --color-steel-950: oklch(15.8% 0.038 247);
+
+  /* Cobre: acento gráfico. Filetes, la muesca del logo, la serie destacada de una gráfica.
+     --color-copper-700 es el que se usa para TEXTO sobre fondo claro (AA); el 500 no alcanza. */
+  --color-copper-100: oklch(94.2% 0.028 62);
+  --color-copper-200: oklch(88.6% 0.052 60);
+  --color-copper-300: oklch(80.4% 0.086 58);
+  --color-copper-400: oklch(70.2% 0.108 55);
+  --color-copper-500: oklch(61.8% 0.116 52);
+  --color-copper-600: oklch(52.4% 0.104 50);
+  --color-copper-700: oklch(43.6% 0.086 48);
+  --color-copper-800: oklch(35.2% 0.068 47);
+  --color-copper-900: oklch(27.4% 0.05 46);
+
+  /* Estados de existencia. El color nunca va solo: siempre con texto o forma. */
+  --color-stock-ok: oklch(48.2% 0.098 155);
+  --color-stock-low: oklch(64.4% 0.132 78);
+  --color-stock-out: oklch(48.6% 0.152 26);
+
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Una sola elevación. Sin sombras decorativas: la jerarquía la da el borde y el peso tipográfico. */
+  --shadow-card: 0 1px 2px oklch(20% 0.02 245 / 0.06), 0 4px 12px -6px oklch(20% 0.04 245 / 0.12);
+}
+
+:root {
+  --background: oklch(97.2% 0.004 240);
+  --surface: oklch(100% 0 0);
+  --surface-sunken: oklch(95.4% 0.006 240);
+  --foreground: oklch(22.4% 0.028 246);
+  --foreground-muted: oklch(48.6% 0.018 245);
+  --border: oklch(89.4% 0.012 240);
+  --border-strong: oklch(80.2% 0.018 241);
+
+  --primary: var(--color-steel-800);
+  --primary-foreground: oklch(99% 0 0);
+  --primary-hover: var(--color-steel-900);
+  --accent: var(--color-copper-600);
+  --accent-foreground: oklch(99% 0 0);
+
+  --focus-ring: var(--color-copper-600);
+  --selection: oklch(88.6% 0.052 60);
+}
+
+[data-theme="dark"] {
+  --background: oklch(16.8% 0.014 246);
+  --surface: oklch(20.4% 0.018 246);
+  --surface-sunken: oklch(18.2% 0.016 246);
+  --foreground: oklch(95.6% 0.008 240);
+  --foreground-muted: oklch(70.2% 0.014 242);
+  --border: oklch(29.4% 0.02 245);
+  --border-strong: oklch(38.2% 0.026 245);
+
+  --primary: oklch(89.2% 0.022 240);
+  --primary-foreground: oklch(18.4% 0.024 246);
+  --primary-hover: oklch(94.6% 0.012 240);
+  --accent: var(--color-copper-400);
+  --accent-foreground: oklch(18.4% 0.024 246);
+
+  --focus-ring: var(--color-copper-400);
+  --selection: oklch(35.2% 0.068 47);
+}
+
+/* Trama de muesca a 45°: el motivo de la marca en cabeceras y estados vacíos.
+   Se aplica como fondo, nunca sobre texto. */
+.partops-hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    color-mix(in oklch, var(--border) 55%, transparent) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* Toda cifra se alinea: precios, cantidades y folios se comparan de un vistazo. */
+.partops-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* El foco es cobre y siempre visible: se navega con teclado en bodega y con guantes. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--selection);
+}

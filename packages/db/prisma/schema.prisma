@@ -1,0 +1,938 @@
+// PartOps — esquema multitenant de inventario, venta y despacho de repuestos.
+//
+// Reglas que este archivo hace cumplir:
+//  - Toda tabla de negocio lleva `tenantId` y queda protegida por Row Level Security (ver la
+//    migración `0002_rls`). No hay excepción: si una tabla nueva no entra ahí, se filtra entre
+//    negocios.
+//  - El dinero es `Int` en centavos. Nunca Decimal, nunca Float: los totales tienen que cuadrar.
+//  - Las existencias no se escriben directo: se mueven por `StockMovement` (ledger inmutable) y
+//    `InventoryLevel` es la proyección con `onHand`/`reserved`.
+//  - El costo se congela en la línea de venta (`unitCostCents`) para que la utilidad histórica no
+//    cambie cuando cambie el costo del proveedor.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Auth (Better Auth) ─────────────────────────────
+// Tablas administradas por Better Auth. `user` es global (una persona puede pertenecer a varios
+// negocios), `member` es la relación con cada tenant.
+
+model User {
+  id                 String    @id
+  name               String
+  email              String    @unique
+  emailVerified      Boolean   @default(false)
+  image              String?
+  phone              String?
+  role               String?   @default("user")
+  banned             Boolean?  @default(false)
+  banReason          String?
+  banExpires         DateTime?
+  twoFactorEnabled   Boolean?  @default(false)
+  mustChangePassword Boolean   @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  sessions    Session[]
+  accounts    Account[]
+  members     Member[]
+  invitations Invitation[]
+  twoFactors  TwoFactor[]
+  passkeys    Passkey[]
+
+  @@map("user")
+}
+
+model Session {
+  id                   String   @id
+  expiresAt            DateTime
+  token                String   @unique
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  ipAddress            String?
+  userAgent            String?
+  userId               String
+  activeOrganizationId String?
+  impersonatedBy       String?
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+model Passkey {
+  id           String    @id
+  name         String?
+  publicKey    String
+  userId       String
+  credentialID String
+  counter      Int
+  deviceType   String
+  backedUp     Boolean
+  transports   String?
+  aaguid       String?
+  createdAt    DateTime? @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([credentialID])
+  @@map("passkey")
+}
+
+// ───────────────────────────── Tenant ─────────────────────────────
+
+model Tenant {
+  id        String   @id @default(uuid(7))
+  slug      String   @unique
+  name      String
+  legalName String?
+  taxId     String?
+  country   String   @default("GT")
+  currency  String   @default("GTQ")
+  locale    String   @default("es-GT")
+  timezone  String   @default("America/Guatemala")
+  phone     String?
+  whatsapp  String?
+  address   String?
+  logoUrl   String?
+
+  brandPrimary   String  @default("#16324F")
+  brandAccent    String  @default("#B4703A")
+
+  /** IVA en puntos base (1200 = 12%). Los precios publicados ya lo incluyen. */
+  taxRateBps      Int     @default(1200)
+  pricesIncludeTax Boolean @default(true)
+
+  /** Secuencias por negocio: se incrementan con FOR UPDATE dentro de la transacción de la venta. */
+  orderPrefix  String @default("PD")
+  orderSeq     Int    @default(0)
+  receiptPrefix String @default("R")
+  receiptSeq   Int    @default(0)
+
+  catalogEnabled Boolean @default(false)
+  catalogTagline String?
+  suspended      Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members        Member[]
+  invitations    Invitation[]
+  roles          Role[]
+  warehouses     Warehouse[]
+  customers      Customer[]
+  parts          Part[]
+  categoryParts  PartCategory[]
+  orders         SalesOrder[]
+  expenses       Expense[]
+  expenseCats    ExpenseCategory[]
+  metrics        DailyMetric[]
+  searchEvents   SearchEvent[]
+  demandDaily    DemandDaily[]
+  stockWatches   StockWatch[]
+  importJobs     ImportJob[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  receipts       Receipt[]
+
+  @@map("tenant")
+}
+
+model Member {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  userId    String
+  roleId    String
+  /** Bodegas asignadas. Vacío = todas las del negocio (propietario y administrador). */
+  warehouseIds String[] @default([])
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id])
+
+  @@unique([tenantId, userId])
+  @@index([userId])
+  @@map("member")
+}
+
+model Role {
+  id          String   @id @default(uuid(7))
+  tenantId    String
+  key         String
+  name        String
+  description String?
+  permissions String[]
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  members     Member[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+  @@map("role")
+}
+
+model Invitation {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  email     String
+  roleId    String
+  warehouseIds String[] @default([])
+  token     String   @unique
+  status    String   @default("PENDIENTE")
+  expiresAt DateTime
+  invitedById String
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invitedBy User     @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, email])
+  @@map("invitation")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ip        String?
+  createdAt DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, entity, entityId])
+  @@map("audit_log")
+}
+
+model Notification {
+  id        String    @id @default(uuid(7))
+  tenantId  String
+  userId    String?
+  type      String
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, readAt])
+  @@map("notification")
+}
+
+model PushToken {
+  id        String   @id @default(uuid(7))
+  userId    String
+  tenantId  String
+  token     String   @unique
+  platform  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId, userId])
+  @@map("push_token")
+}
+
+/** Cola durable en Postgres. Sin Redis: en el plan gratis no hay y no hace falta. */
+model BackgroundJob {
+  id          String    @id @default(uuid(7))
+  queue       String
+  data        Json
+  status      String    @default("PENDING")
+  runAt       DateTime  @default(now())
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(4)
+  singletonKey String?
+  lockedAt    DateTime?
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([queue, singletonKey])
+  @@index([status, runAt])
+  @@map("background_job")
+}
+
+// ───────────────────── Referencia vehicular (global, curada) ─────────────────────
+// Sin tenantId a propósito: es conocimiento compartido del parque vehicular. La escribe la
+// plataforma, no cada negocio.
+
+model VehicleBrand {
+  id      String         @id @default(uuid(7))
+  name    String         @unique
+  country String?
+  models  VehicleModel[]
+
+  @@map("vehicle_brand")
+}
+
+model VehicleModel {
+  id       String   @id @default(uuid(7))
+  brandId  String
+  name     String
+  bodyType String?
+  brand    VehicleBrand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+
+  @@unique([brandId, name])
+  @@map("vehicle_model")
+}
+
+/** Aplicación concreta: modelo + años + motor. Es lo que se liga a una pieza. */
+model Vehicle {
+  id        String   @id @default(uuid(7))
+  modelId   String
+  yearStart Int
+  yearEnd   Int
+  engine    String?
+  bodyStyle String?
+  trim      String?
+  model     VehicleModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  parts     PartCompatibility[]
+
+  @@unique([modelId, yearStart, yearEnd, engine, bodyStyle])
+  @@index([yearStart, yearEnd])
+  @@map("vehicle")
+}
+
+/** Sinónimos y términos del habla local, para que "cubierta" encuentre "capó". */
+model PartTerm {
+  id       String @id @default(uuid(7))
+  term     String @unique
+  canonical String
+  locale   String @default("es-GT")
+
+  @@index([canonical])
+  @@map("part_term")
+}
+
+// ───────────────────────────── Bodegas e inventario ─────────────────────────────
+
+model Warehouse {
+  id          String   @id @default(uuid(7))
+  tenantId    String
+  code        String
+  name        String
+  address     String?
+  phone       String?
+  isDefault   Boolean  @default(false)
+  sellsOnline Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  levels      InventoryLevel[]
+  movements   StockMovement[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@map("warehouse")
+}
+
+model InventoryLevel {
+  tenantId     String
+  variantId    String
+  warehouseId  String
+  onHand       Int      @default(0)
+  reserved     Int      @default(0)
+  reorderPoint Int?
+  /** Pasillo/estante: lo que el bodeguero necesita para no caminar a ciegas. */
+  binLocation  String?
+  updatedAt    DateTime @updatedAt
+  variant      PartVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  warehouse    Warehouse   @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, warehouseId])
+  @@index([tenantId, warehouseId])
+  @@index([tenantId, binLocation])
+  @@map("inventory_level")
+}
+
+enum MovementType {
+  COMPRA
+  VENTA
+  DEVOLUCION
+  AJUSTE
+  IMPORTACION
+  TRASLADO_ENTRADA
+  TRASLADO_SALIDA
+  RESERVA
+  LIBERACION
+  INVENTARIO_FISICO
+}
+
+model StockMovement {
+  id           String       @id @default(uuid(7))
+  tenantId     String
+  variantId    String
+  warehouseId  String
+  delta        Int
+  balanceAfter Int
+  type         MovementType
+  reason       String?
+  refType      String?
+  refId        String?
+  userId       String?
+  createdAt    DateTime     @default(now())
+  variant      PartVariant  @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  warehouse    Warehouse    @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, variantId, createdAt])
+  @@index([tenantId, warehouseId, createdAt])
+  @@index([tenantId, refType, refId])
+  @@map("stock_movement")
+}
+
+enum TransferStatus {
+  SOLICITADO
+  ENVIADO
+  RECIBIDO
+  CANCELADO
+}
+
+model StockTransfer {
+  id              String         @id @default(uuid(7))
+  tenantId        String
+  number          Int
+  fromWarehouseId String
+  toWarehouseId   String
+  status          TransferStatus @default(SOLICITADO)
+  notes           String?
+  createdById     String?
+  createdAt       DateTime       @default(now())
+  sentAt          DateTime?
+  receivedAt      DateTime?
+  items           StockTransferItem[]
+
+  @@unique([tenantId, number])
+  @@index([tenantId, status])
+  @@map("stock_transfer")
+}
+
+model StockTransferItem {
+  id         String   @id @default(uuid(7))
+  tenantId   String
+  transferId String
+  variantId  String
+  quantity   Int
+  transfer   StockTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, transferId])
+  @@map("stock_transfer_item")
+}
+
+// ───────────────────────────── Catálogo de piezas ─────────────────────────────
+
+model PartCategory {
+  id       String   @id @default(uuid(7))
+  tenantId String
+  name     String
+  slug     String
+  parentId String?
+  position Int      @default(0)
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  parts    Part[]
+
+  @@unique([tenantId, slug])
+  @@map("part_category")
+}
+
+enum PartCondition {
+  NUEVO
+  USADO
+  REMANUFACTURADO
+}
+
+enum PartStatus {
+  ACTIVO
+  ARCHIVADO
+}
+
+model Part {
+  id          String        @id @default(uuid(7))
+  tenantId    String
+  name        String
+  slug        String
+  categoryId  String?
+  brand       String?
+  condition   PartCondition @default(NUEVO)
+  unit        String        @default("UNIDAD")
+  warrantyDays Int?
+  description String?
+  isUniversal Boolean       @default(false)
+  status      PartStatus    @default(ACTIVO)
+  tags        String[]      @default([])
+  /** Columna generada en la migración: nombre + OEM + vehículos, para trigram y tsvector. */
+  searchText  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category      PartCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants      PartVariant[]
+  images        PartImage[]
+  compatibilities PartCompatibility[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, status])
+  @@index([tenantId, categoryId])
+  @@map("part")
+}
+
+model PartVariant {
+  id          String   @id @default(uuid(7))
+  tenantId    String
+  partId      String
+  sku         String
+  partNumber  String?
+  /** Códigos OEM del fabricante del vehículo. Se buscan con GIN. */
+  oemNumbers  String[] @default([])
+  barcode     String?
+  title       String
+  priceCents  Int
+  costCents   Int      @default(0)
+  position    Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  part    Part             @relation(fields: [partId], references: [id], onDelete: Cascade)
+  levels  InventoryLevel[]
+  movements StockMovement[]
+
+  @@unique([tenantId, sku])
+  @@unique([tenantId, barcode])
+  @@index([partId])
+  @@index([tenantId, partNumber])
+  @@map("part_variant")
+}
+
+model PartImage {
+  id       String  @id @default(uuid(7))
+  tenantId String
+  partId   String
+  url      String
+  alt      String?
+  position Int     @default(0)
+  part     Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
+
+  @@index([partId])
+  @@map("part_image")
+}
+
+/** Pieza ↔ aplicación concreta (modelo + años + motor). */
+model PartCompatibility {
+  id        String  @id @default(uuid(7))
+  tenantId  String
+  partId    String
+  vehicleId String
+  notes     String?
+  part      Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([partId, vehicleId])
+  @@index([tenantId, vehicleId])
+  @@map("part_compatibility")
+}
+
+// ───────────────────────────── Importación ─────────────────────────────
+
+enum ImportStatus {
+  PENDIENTE
+  PROCESANDO
+  COMPLETADA
+  PARCIAL
+  FALLIDA
+}
+
+model ImportJob {
+  id           String       @id @default(uuid(7))
+  tenantId     String
+  fileName     String
+  status       ImportStatus @default(PENDIENTE)
+  mapping      Json
+  payload      Json?
+  warehouseId  String?
+  totalRows    Int          @default(0)
+  processedRows Int         @default(0)
+  successRows  Int          @default(0)
+  errorRows    Int          @default(0)
+  createdParts Int          @default(0)
+  createdVariants Int       @default(0)
+  updatedVariants Int       @default(0)
+  error        String?
+  createdById  String
+  createdAt    DateTime     @default(now())
+  finishedAt   DateTime?
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rowErrors    ImportRowError[]
+
+  @@index([tenantId, createdAt])
+  @@map("import_job")
+}
+
+model ImportRowError {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  jobId     String
+  rowNumber Int
+  field     String?
+  message   String
+  raw       Json?
+  job       ImportJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, rowNumber])
+  @@map("import_row_error")
+}
+
+// ───────────────────────────── Clientes, ventas, recibos ─────────────────────────────
+
+model Customer {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  name      String
+  phone     String?
+  email     String?
+  taxId     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  orders    SalesOrder[]
+
+  @@index([tenantId, name])
+  @@index([tenantId, phone])
+  @@map("customer")
+}
+
+enum OrderStatus {
+  ABIERTO
+  EN_PREPARACION
+  LISTO
+  ENTREGADO
+  PARCIAL
+  CANCELADO
+}
+
+enum LineStatus {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+  ENTREGADO
+  SIN_STOCK
+  CANCELADO
+}
+
+enum OrderChannel {
+  MOSTRADOR
+  TELEFONO
+  WHATSAPP
+  CATALOGO
+  MOVIL
+}
+
+model SalesOrder {
+  id             String       @id @default(uuid(7))
+  tenantId       String
+  number         Int
+  customerId     String?
+  customerName   String
+  customerPhone  String?
+  customerTaxId  String?
+  channel        OrderChannel @default(MOSTRADOR)
+  status         OrderStatus  @default(ABIERTO)
+  sellerId       String
+  warehouseId    String
+  /** Total con impuesto incluido, en centavos. Suma exacta de las líneas. */
+  subtotalCents  Int          @default(0)
+  taxCents       Int          @default(0)
+  discountCents  Int          @default(0)
+  totalCents     Int          @default(0)
+  notes          String?
+  /** Clave del cliente para que un reintento no cree dos pedidos. */
+  idempotencyKey String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  closedAt       DateTime?
+
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer  Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items     SalesOrderItem[]
+  events    OrderEvent[]
+  payments  Payment[]
+  receipts  Receipt[]
+
+  @@unique([tenantId, number])
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, sellerId])
+  @@map("sales_order")
+}
+
+model SalesOrderItem {
+  id           String     @id @default(uuid(7))
+  tenantId     String
+  orderId      String
+  variantId    String
+  /** Bodega de la que físicamente sale la pieza; puede no ser la del pedido. */
+  warehouseId  String
+  sku          String
+  name         String
+  quantity     Int
+  unitPriceCents Int
+  /** Costo congelado: la utilidad histórica no se mueve cuando cambia el costo del proveedor. */
+  unitCostCents Int       @default(0)
+  discountCents Int       @default(0)
+  totalCents   Int
+  status       LineStatus @default(PENDIENTE)
+  /** Reserva: vence y se libera sola si el bodeguero nunca prepara la pieza. */
+  reservedUntil DateTime?
+  preparedAt   DateTime?
+  deliveredAt  DateTime?
+  order        SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, orderId])
+  @@index([tenantId, status])
+  @@map("sales_order_item")
+}
+
+model OrderEvent {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  orderId   String
+  itemId    String?
+  type      String
+  detail    Json?
+  actorId   String?
+  createdAt DateTime @default(now())
+  order     SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, orderId, createdAt])
+  @@map("order_event")
+}
+
+enum PaymentMethod {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  CREDITO
+  MIXTO
+}
+
+model Payment {
+  id        String        @id @default(uuid(7))
+  tenantId  String
+  orderId   String
+  method    PaymentMethod
+  amountCents Int
+  reference String?
+  receivedCents Int?
+  changeCents   Int?
+  createdAt DateTime      @default(now())
+  order     SalesOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, orderId])
+  @@map("payment")
+}
+
+/** Recibo inmutable. Se genera una vez y no se regenera: si se reenvía, es el mismo archivo. */
+model Receipt {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  orderId   String
+  folio     String
+  /** Token público de 128 bits: el cliente abre /r/<token> sin cuenta y sin filtrar nada más. */
+  token     String   @unique
+  pdfKey    String?
+  snapshot  Json
+  totalCents Int
+  createdAt DateTime @default(now())
+  order     SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, folio])
+  @@index([tenantId, orderId])
+  @@map("receipt")
+}
+
+// ───────────────────────────── Finanzas ─────────────────────────────
+
+model ExpenseCategory {
+  id       String    @id @default(uuid(7))
+  tenantId String
+  name     String
+  isSystem Boolean   @default(false)
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+
+  @@unique([tenantId, name])
+  @@map("expense_category")
+}
+
+model Expense {
+  id          String   @id @default(uuid(7))
+  tenantId    String
+  categoryId  String?
+  title       String
+  amountCents Int
+  paidAt      DateTime @default(now())
+  notes       String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category    ExpenseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, paidAt])
+  @@map("expense")
+}
+
+/** Agregado diario: el tablero lee de aquí en vez de sumar pedidos de todo el historial. */
+model DailyMetric {
+  tenantId       String
+  day            DateTime @db.Date
+  salesCents     Int      @default(0)
+  cogsCents      Int      @default(0)
+  expensesCents  Int      @default(0)
+  ordersCount    Int      @default(0)
+  itemsCount     Int      @default(0)
+  /** Búsquedas sin resultado: la señal de qué importar. */
+  missedSearches Int      @default(0)
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, day])
+  @@map("daily_metric")
+}
+
+// ───────────────────────────── Demanda ─────────────────────────────
+
+model SearchEvent {
+  id           String   @id @default(uuid(7))
+  tenantId     String
+  /** Texto tal como lo escribió la persona. */
+  rawQuery     String
+  /** Texto normalizado + término canónico: agrupa "capó" y "capo". */
+  normalized   String
+  brand        String?
+  model        String?
+  year         Int?
+  resultCount  Int      @default(0)
+  /** MOSTRADOR, MOVIL, CATALOGO: de dónde vino la búsqueda. */
+  source       String   @default("MOSTRADOR")
+  createdAt    DateTime @default(now())
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, normalized])
+  @@map("search_event")
+}
+
+model DemandDaily {
+  tenantId    String
+  day         DateTime @db.Date
+  term        String
+  brand       String?
+  model       String?
+  year        Int?
+  searches    Int      @default(0)
+  withResults Int      @default(0)
+  missedCount Int      @default(0)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, day, term])
+  @@index([tenantId, day])
+  @@map("demand_daily")
+}
+
+/** "Avísame cuando llegue": la lista de WhatsApp que se genera sola al entrar existencias. */
+model StockWatch {
+  id         String    @id @default(uuid(7))
+  tenantId   String
+  partId     String?
+  variantId  String?
+  rawQuery   String
+  customerName  String
+  customerPhone String
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, notifiedAt])
+  @@index([tenantId, variantId])
+  @@map("stock_watch")
+}
+
+// ───────────────────────────── Plataforma ─────────────────────────────
+
+/** Plan concedido a mano (v1 sin pasarela de pago). */
+model PlanGrant {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  tier      String   @default("FREE")
+  expiresAt DateTime?
+  note      String?
+  grantedById String
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@map("plan_grant")
+}

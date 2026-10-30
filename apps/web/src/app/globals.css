@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "../../../../packages/ui/src/styles/tokens.css";
+
+/* Next inyecta la tipografía con next/font y expone las variables; aquí solo se conectan. */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* El foco nunca se esconde. Se navega con teclado en bodega. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "PartOps",
+  "short_name": "PartOps",
+  "description": "Inventario, venta y despacho de repuestos automotrices.",
+  "lang": "es-GT",
+  "dir": "ltr",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0E2233",
+  "theme_color": "#16324F",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/brand/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Buscar pieza", "url": "/app/buscar" },
+    { "name": "Despacho", "url": "/app/despacho" }
+  ]
+}
