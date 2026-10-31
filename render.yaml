@@ -20,7 +20,7 @@ services:
   - type: web
     name: partops-api
     runtime: docker
-    plan: starter
+    plan: free
     # Región de la costa este: la base Neon y R2 quedan cerca, y la diferencia de latencia hacia
     # Guatemala es de ~20 ms, menor que el costo de una región lejana.
     region: virginia
@@ -94,6 +94,11 @@ services:
   - type: worker
     name: partops-worker
     runtime: docker
+    # El plan `free` de Render NO ofrece background workers: solo web services, static sites,
+    # Postgres y Key Value. Sin tarjeta, este servicio no se puede crear (la API responde 402).
+    # Mientras no haya pago, el mantenimiento diario se dispara desde el Worker de Cloudflare
+    # (`infra/keepalive`), que ya llama a `POST /api/maintenance/run` a las 06:10 de Guatemala.
+    # El servicio queda declarado porque es la forma correcta cuando haya plan de pago.
     plan: starter
     region: virginia
     dockerfilePath: ./apps/api/Dockerfile
@@ -147,7 +152,7 @@ services:
   - type: web
     name: partops-web
     runtime: docker
-    plan: starter
+    plan: free
     region: virginia
     dockerfilePath: ./apps/web/Dockerfile
     dockerContext: .
