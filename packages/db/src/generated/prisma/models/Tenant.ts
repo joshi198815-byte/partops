@@ -30,12 +30,14 @@ export type TenantAvgAggregateOutputType = {
   taxRateBps: number | null
   orderSeq: number | null
   receiptSeq: number | null
+  transferSeq: number | null
 }
 
 export type TenantSumAggregateOutputType = {
   taxRateBps: number | null
   orderSeq: number | null
   receiptSeq: number | null
+  transferSeq: number | null
 }
 
 export type TenantMinAggregateOutputType = {
@@ -60,6 +62,7 @@ export type TenantMinAggregateOutputType = {
   orderSeq: number | null
   receiptPrefix: string | null
   receiptSeq: number | null
+  transferSeq: number | null
   catalogEnabled: boolean | null
   catalogTagline: string | null
   suspended: boolean | null
@@ -89,6 +92,7 @@ export type TenantMaxAggregateOutputType = {
   orderSeq: number | null
   receiptPrefix: string | null
   receiptSeq: number | null
+  transferSeq: number | null
   catalogEnabled: boolean | null
   catalogTagline: string | null
   suspended: boolean | null
@@ -118,6 +122,7 @@ export type TenantCountAggregateOutputType = {
   orderSeq: number
   receiptPrefix: number
   receiptSeq: number
+  transferSeq: number
   catalogEnabled: number
   catalogTagline: number
   suspended: number
@@ -131,12 +136,14 @@ export type TenantAvgAggregateInputType = {
   taxRateBps?: true
   orderSeq?: true
   receiptSeq?: true
+  transferSeq?: true
 }
 
 export type TenantSumAggregateInputType = {
   taxRateBps?: true
   orderSeq?: true
   receiptSeq?: true
+  transferSeq?: true
 }
 
 export type TenantMinAggregateInputType = {
@@ -161,6 +168,7 @@ export type TenantMinAggregateInputType = {
   orderSeq?: true
   receiptPrefix?: true
   receiptSeq?: true
+  transferSeq?: true
   catalogEnabled?: true
   catalogTagline?: true
   suspended?: true
@@ -190,6 +198,7 @@ export type TenantMaxAggregateInputType = {
   orderSeq?: true
   receiptPrefix?: true
   receiptSeq?: true
+  transferSeq?: true
   catalogEnabled?: true
   catalogTagline?: true
   suspended?: true
@@ -219,6 +228,7 @@ export type TenantCountAggregateInputType = {
   orderSeq?: true
   receiptPrefix?: true
   receiptSeq?: true
+  transferSeq?: true
   catalogEnabled?: true
   catalogTagline?: true
   suspended?: true
@@ -335,6 +345,7 @@ export type TenantGroupByOutputType = {
   orderSeq: number
   receiptPrefix: string
   receiptSeq: number
+  transferSeq: number
   catalogEnabled: boolean
   catalogTagline: string | null
   suspended: boolean
@@ -387,6 +398,7 @@ export type TenantWhereInput = {
   orderSeq?: Prisma.IntFilter<"Tenant"> | number
   receiptPrefix?: Prisma.StringFilter<"Tenant"> | string
   receiptSeq?: Prisma.IntFilter<"Tenant"> | number
+  transferSeq?: Prisma.IntFilter<"Tenant"> | number
   catalogEnabled?: Prisma.BoolFilter<"Tenant"> | boolean
   catalogTagline?: Prisma.StringNullableFilter<"Tenant"> | string | null
   suspended?: Prisma.BoolFilter<"Tenant"> | boolean
@@ -402,6 +414,7 @@ export type TenantWhereInput = {
   orders?: Prisma.SalesOrderListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
   expenseCats?: Prisma.ExpenseCategoryListRelationFilter
+  recurringExpenses?: Prisma.RecurringExpenseListRelationFilter
   metrics?: Prisma.DailyMetricListRelationFilter
   searchEvents?: Prisma.SearchEventListRelationFilter
   demandDaily?: Prisma.DemandDailyListRelationFilter
@@ -434,6 +447,7 @@ export type TenantOrderByWithRelationInput = {
   orderSeq?: Prisma.SortOrder
   receiptPrefix?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
   catalogEnabled?: Prisma.SortOrder
   catalogTagline?: Prisma.SortOrderInput | Prisma.SortOrder
   suspended?: Prisma.SortOrder
@@ -449,6 +463,7 @@ export type TenantOrderByWithRelationInput = {
   orders?: Prisma.SalesOrderOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
   expenseCats?: Prisma.ExpenseCategoryOrderByRelationAggregateInput
+  recurringExpenses?: Prisma.RecurringExpenseOrderByRelationAggregateInput
   metrics?: Prisma.DailyMetricOrderByRelationAggregateInput
   searchEvents?: Prisma.SearchEventOrderByRelationAggregateInput
   demandDaily?: Prisma.DemandDailyOrderByRelationAggregateInput
@@ -484,6 +499,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   orderSeq?: Prisma.IntFilter<"Tenant"> | number
   receiptPrefix?: Prisma.StringFilter<"Tenant"> | string
   receiptSeq?: Prisma.IntFilter<"Tenant"> | number
+  transferSeq?: Prisma.IntFilter<"Tenant"> | number
   catalogEnabled?: Prisma.BoolFilter<"Tenant"> | boolean
   catalogTagline?: Prisma.StringNullableFilter<"Tenant"> | string | null
   suspended?: Prisma.BoolFilter<"Tenant"> | boolean
@@ -499,6 +515,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   orders?: Prisma.SalesOrderListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
   expenseCats?: Prisma.ExpenseCategoryListRelationFilter
+  recurringExpenses?: Prisma.RecurringExpenseListRelationFilter
   metrics?: Prisma.DailyMetricListRelationFilter
   searchEvents?: Prisma.SearchEventListRelationFilter
   demandDaily?: Prisma.DemandDailyListRelationFilter
@@ -531,6 +548,7 @@ export type TenantOrderByWithAggregationInput = {
   orderSeq?: Prisma.SortOrder
   receiptPrefix?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
   catalogEnabled?: Prisma.SortOrder
   catalogTagline?: Prisma.SortOrderInput | Prisma.SortOrder
   suspended?: Prisma.SortOrder
@@ -568,6 +586,7 @@ export type TenantScalarWhereWithAggregatesInput = {
   orderSeq?: Prisma.IntWithAggregatesFilter<"Tenant"> | number
   receiptPrefix?: Prisma.StringWithAggregatesFilter<"Tenant"> | string
   receiptSeq?: Prisma.IntWithAggregatesFilter<"Tenant"> | number
+  transferSeq?: Prisma.IntWithAggregatesFilter<"Tenant"> | number
   catalogEnabled?: Prisma.BoolWithAggregatesFilter<"Tenant"> | boolean
   catalogTagline?: Prisma.StringNullableWithAggregatesFilter<"Tenant"> | string | null
   suspended?: Prisma.BoolWithAggregatesFilter<"Tenant"> | boolean
@@ -597,6 +616,7 @@ export type TenantCreateInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -612,6 +632,7 @@ export type TenantCreateInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -644,6 +665,7 @@ export type TenantUncheckedCreateInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -659,6 +681,7 @@ export type TenantUncheckedCreateInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -691,6 +714,7 @@ export type TenantUpdateInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -706,6 +730,7 @@ export type TenantUpdateInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -738,6 +763,7 @@ export type TenantUncheckedUpdateInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -753,6 +779,7 @@ export type TenantUncheckedUpdateInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -785,6 +812,7 @@ export type TenantCreateManyInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -814,6 +842,7 @@ export type TenantUpdateManyMutationInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -843,6 +872,7 @@ export type TenantUncheckedUpdateManyInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -872,6 +902,7 @@ export type TenantCountOrderByAggregateInput = {
   orderSeq?: Prisma.SortOrder
   receiptPrefix?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
   catalogEnabled?: Prisma.SortOrder
   catalogTagline?: Prisma.SortOrder
   suspended?: Prisma.SortOrder
@@ -883,6 +914,7 @@ export type TenantAvgOrderByAggregateInput = {
   taxRateBps?: Prisma.SortOrder
   orderSeq?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
 }
 
 export type TenantMaxOrderByAggregateInput = {
@@ -907,6 +939,7 @@ export type TenantMaxOrderByAggregateInput = {
   orderSeq?: Prisma.SortOrder
   receiptPrefix?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
   catalogEnabled?: Prisma.SortOrder
   catalogTagline?: Prisma.SortOrder
   suspended?: Prisma.SortOrder
@@ -936,6 +969,7 @@ export type TenantMinOrderByAggregateInput = {
   orderSeq?: Prisma.SortOrder
   receiptPrefix?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
   catalogEnabled?: Prisma.SortOrder
   catalogTagline?: Prisma.SortOrder
   suspended?: Prisma.SortOrder
@@ -947,6 +981,7 @@ export type TenantSumOrderByAggregateInput = {
   taxRateBps?: Prisma.SortOrder
   orderSeq?: Prisma.SortOrder
   receiptSeq?: Prisma.SortOrder
+  transferSeq?: Prisma.SortOrder
 }
 
 export type TenantScalarRelationFilter = {
@@ -1150,6 +1185,20 @@ export type TenantUpdateOneRequiredWithoutExpensesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutExpensesInput, Prisma.TenantUpdateWithoutExpensesInput>, Prisma.TenantUncheckedUpdateWithoutExpensesInput>
 }
 
+export type TenantCreateNestedOneWithoutRecurringExpensesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRecurringExpensesInput, Prisma.TenantUncheckedCreateWithoutRecurringExpensesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRecurringExpensesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutRecurringExpensesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRecurringExpensesInput, Prisma.TenantUncheckedCreateWithoutRecurringExpensesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRecurringExpensesInput
+  upsert?: Prisma.TenantUpsertWithoutRecurringExpensesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutRecurringExpensesInput, Prisma.TenantUpdateWithoutRecurringExpensesInput>, Prisma.TenantUncheckedUpdateWithoutRecurringExpensesInput>
+}
+
 export type TenantCreateNestedOneWithoutMetricsInput = {
   create?: Prisma.XOR<Prisma.TenantCreateWithoutMetricsInput, Prisma.TenantUncheckedCreateWithoutMetricsInput>
   connectOrCreate?: Prisma.TenantCreateOrConnectWithoutMetricsInput
@@ -1228,6 +1277,7 @@ export type TenantCreateWithoutMembersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1242,6 +1292,7 @@ export type TenantCreateWithoutMembersInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -1274,6 +1325,7 @@ export type TenantUncheckedCreateWithoutMembersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1288,6 +1340,7 @@ export type TenantUncheckedCreateWithoutMembersInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -1336,6 +1389,7 @@ export type TenantUpdateWithoutMembersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1350,6 +1404,7 @@ export type TenantUpdateWithoutMembersInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -1382,6 +1437,7 @@ export type TenantUncheckedUpdateWithoutMembersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1396,6 +1452,7 @@ export type TenantUncheckedUpdateWithoutMembersInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -1428,6 +1485,7 @@ export type TenantCreateWithoutRolesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1442,6 +1500,7 @@ export type TenantCreateWithoutRolesInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -1474,6 +1533,7 @@ export type TenantUncheckedCreateWithoutRolesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1488,6 +1548,7 @@ export type TenantUncheckedCreateWithoutRolesInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -1536,6 +1597,7 @@ export type TenantUpdateWithoutRolesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1550,6 +1612,7 @@ export type TenantUpdateWithoutRolesInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -1582,6 +1645,7 @@ export type TenantUncheckedUpdateWithoutRolesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1596,6 +1660,7 @@ export type TenantUncheckedUpdateWithoutRolesInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -1628,6 +1693,7 @@ export type TenantCreateWithoutInvitationsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1642,6 +1708,7 @@ export type TenantCreateWithoutInvitationsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -1674,6 +1741,7 @@ export type TenantUncheckedCreateWithoutInvitationsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1688,6 +1756,7 @@ export type TenantUncheckedCreateWithoutInvitationsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -1736,6 +1805,7 @@ export type TenantUpdateWithoutInvitationsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1750,6 +1820,7 @@ export type TenantUpdateWithoutInvitationsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -1782,6 +1853,7 @@ export type TenantUncheckedUpdateWithoutInvitationsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1796,6 +1868,7 @@ export type TenantUncheckedUpdateWithoutInvitationsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -1828,6 +1901,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1843,6 +1917,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -1874,6 +1949,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -1889,6 +1965,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -1936,6 +2013,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1951,6 +2029,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -1982,6 +2061,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1997,6 +2077,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -2028,6 +2109,7 @@ export type TenantCreateWithoutNotificationsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2043,6 +2125,7 @@ export type TenantCreateWithoutNotificationsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -2074,6 +2157,7 @@ export type TenantUncheckedCreateWithoutNotificationsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2089,6 +2173,7 @@ export type TenantUncheckedCreateWithoutNotificationsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -2136,6 +2221,7 @@ export type TenantUpdateWithoutNotificationsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2151,6 +2237,7 @@ export type TenantUpdateWithoutNotificationsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -2182,6 +2269,7 @@ export type TenantUncheckedUpdateWithoutNotificationsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2197,6 +2285,7 @@ export type TenantUncheckedUpdateWithoutNotificationsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -2228,6 +2317,7 @@ export type TenantCreateWithoutWarehousesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2242,6 +2332,7 @@ export type TenantCreateWithoutWarehousesInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -2274,6 +2365,7 @@ export type TenantUncheckedCreateWithoutWarehousesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2288,6 +2380,7 @@ export type TenantUncheckedCreateWithoutWarehousesInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -2336,6 +2429,7 @@ export type TenantUpdateWithoutWarehousesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2350,6 +2444,7 @@ export type TenantUpdateWithoutWarehousesInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -2382,6 +2477,7 @@ export type TenantUncheckedUpdateWithoutWarehousesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2396,6 +2492,7 @@ export type TenantUncheckedUpdateWithoutWarehousesInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -2428,6 +2525,7 @@ export type TenantCreateWithoutCategoryPartsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2442,6 +2540,7 @@ export type TenantCreateWithoutCategoryPartsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -2474,6 +2573,7 @@ export type TenantUncheckedCreateWithoutCategoryPartsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2488,6 +2588,7 @@ export type TenantUncheckedCreateWithoutCategoryPartsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -2536,6 +2637,7 @@ export type TenantUpdateWithoutCategoryPartsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2550,6 +2652,7 @@ export type TenantUpdateWithoutCategoryPartsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -2582,6 +2685,7 @@ export type TenantUncheckedUpdateWithoutCategoryPartsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2596,6 +2700,7 @@ export type TenantUncheckedUpdateWithoutCategoryPartsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -2628,6 +2733,7 @@ export type TenantCreateWithoutPartsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2642,6 +2748,7 @@ export type TenantCreateWithoutPartsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -2674,6 +2781,7 @@ export type TenantUncheckedCreateWithoutPartsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2688,6 +2796,7 @@ export type TenantUncheckedCreateWithoutPartsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -2736,6 +2845,7 @@ export type TenantUpdateWithoutPartsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2750,6 +2860,7 @@ export type TenantUpdateWithoutPartsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -2782,6 +2893,7 @@ export type TenantUncheckedUpdateWithoutPartsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2796,6 +2908,7 @@ export type TenantUncheckedUpdateWithoutPartsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -2828,6 +2941,7 @@ export type TenantCreateWithoutImportJobsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2843,6 +2957,7 @@ export type TenantCreateWithoutImportJobsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -2874,6 +2989,7 @@ export type TenantUncheckedCreateWithoutImportJobsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -2889,6 +3005,7 @@ export type TenantUncheckedCreateWithoutImportJobsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -2936,6 +3053,7 @@ export type TenantUpdateWithoutImportJobsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2951,6 +3069,7 @@ export type TenantUpdateWithoutImportJobsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -2982,6 +3101,7 @@ export type TenantUncheckedUpdateWithoutImportJobsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2997,6 +3117,7 @@ export type TenantUncheckedUpdateWithoutImportJobsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -3028,6 +3149,7 @@ export type TenantCreateWithoutCustomersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3042,6 +3164,7 @@ export type TenantCreateWithoutCustomersInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -3074,6 +3197,7 @@ export type TenantUncheckedCreateWithoutCustomersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3088,6 +3212,7 @@ export type TenantUncheckedCreateWithoutCustomersInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -3136,6 +3261,7 @@ export type TenantUpdateWithoutCustomersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3150,6 +3276,7 @@ export type TenantUpdateWithoutCustomersInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -3182,6 +3309,7 @@ export type TenantUncheckedUpdateWithoutCustomersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3196,6 +3324,7 @@ export type TenantUncheckedUpdateWithoutCustomersInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -3228,6 +3357,7 @@ export type TenantCreateWithoutOrdersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3242,6 +3372,7 @@ export type TenantCreateWithoutOrdersInput = {
   categoryParts?: Prisma.PartCategoryCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -3274,6 +3405,7 @@ export type TenantUncheckedCreateWithoutOrdersInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3288,6 +3420,7 @@ export type TenantUncheckedCreateWithoutOrdersInput = {
   categoryParts?: Prisma.PartCategoryUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -3336,6 +3469,7 @@ export type TenantUpdateWithoutOrdersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3350,6 +3484,7 @@ export type TenantUpdateWithoutOrdersInput = {
   categoryParts?: Prisma.PartCategoryUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -3382,6 +3517,7 @@ export type TenantUncheckedUpdateWithoutOrdersInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3396,6 +3532,7 @@ export type TenantUncheckedUpdateWithoutOrdersInput = {
   categoryParts?: Prisma.PartCategoryUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -3428,6 +3565,7 @@ export type TenantCreateWithoutReceiptsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3443,6 +3581,7 @@ export type TenantCreateWithoutReceiptsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -3474,6 +3613,7 @@ export type TenantUncheckedCreateWithoutReceiptsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3489,6 +3629,7 @@ export type TenantUncheckedCreateWithoutReceiptsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -3536,6 +3677,7 @@ export type TenantUpdateWithoutReceiptsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3551,6 +3693,7 @@ export type TenantUpdateWithoutReceiptsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -3582,6 +3725,7 @@ export type TenantUncheckedUpdateWithoutReceiptsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3597,6 +3741,7 @@ export type TenantUncheckedUpdateWithoutReceiptsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -3628,6 +3773,7 @@ export type TenantCreateWithoutExpenseCatsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3642,6 +3788,7 @@ export type TenantCreateWithoutExpenseCatsInput = {
   categoryParts?: Prisma.PartCategoryCreateNestedManyWithoutTenantInput
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -3674,6 +3821,7 @@ export type TenantUncheckedCreateWithoutExpenseCatsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3688,6 +3836,7 @@ export type TenantUncheckedCreateWithoutExpenseCatsInput = {
   categoryParts?: Prisma.PartCategoryUncheckedCreateNestedManyWithoutTenantInput
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -3736,6 +3885,7 @@ export type TenantUpdateWithoutExpenseCatsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3750,6 +3900,7 @@ export type TenantUpdateWithoutExpenseCatsInput = {
   categoryParts?: Prisma.PartCategoryUpdateManyWithoutTenantNestedInput
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -3782,6 +3933,7 @@ export type TenantUncheckedUpdateWithoutExpenseCatsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3796,6 +3948,7 @@ export type TenantUncheckedUpdateWithoutExpenseCatsInput = {
   categoryParts?: Prisma.PartCategoryUncheckedUpdateManyWithoutTenantNestedInput
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -3828,6 +3981,7 @@ export type TenantCreateWithoutExpensesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3842,6 +3996,7 @@ export type TenantCreateWithoutExpensesInput = {
   categoryParts?: Prisma.PartCategoryCreateNestedManyWithoutTenantInput
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -3874,6 +4029,7 @@ export type TenantUncheckedCreateWithoutExpensesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -3888,6 +4044,7 @@ export type TenantUncheckedCreateWithoutExpensesInput = {
   categoryParts?: Prisma.PartCategoryUncheckedCreateNestedManyWithoutTenantInput
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -3936,6 +4093,7 @@ export type TenantUpdateWithoutExpensesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3950,6 +4108,7 @@ export type TenantUpdateWithoutExpensesInput = {
   categoryParts?: Prisma.PartCategoryUpdateManyWithoutTenantNestedInput
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -3982,6 +4141,7 @@ export type TenantUncheckedUpdateWithoutExpensesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3995,6 +4155,215 @@ export type TenantUncheckedUpdateWithoutExpensesInput = {
   parts?: Prisma.PartUncheckedUpdateManyWithoutTenantNestedInput
   categoryParts?: Prisma.PartCategoryUncheckedUpdateManyWithoutTenantNestedInput
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
+  expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
+  metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
+  searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
+  demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
+  stockWatches?: Prisma.StockWatchUncheckedUpdateManyWithoutTenantNestedInput
+  importJobs?: Prisma.ImportJobUncheckedUpdateManyWithoutTenantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  receipts?: Prisma.ReceiptUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutRecurringExpensesInput = {
+  id?: string
+  slug: string
+  name: string
+  legalName?: string | null
+  taxId?: string | null
+  country?: string
+  currency?: string
+  locale?: string
+  timezone?: string
+  phone?: string | null
+  whatsapp?: string | null
+  address?: string | null
+  logoUrl?: string | null
+  brandPrimary?: string
+  brandAccent?: string
+  taxRateBps?: number
+  pricesIncludeTax?: boolean
+  orderPrefix?: string
+  orderSeq?: number
+  receiptPrefix?: string
+  receiptSeq?: number
+  transferSeq?: number
+  catalogEnabled?: boolean
+  catalogTagline?: string | null
+  suspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.MemberCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
+  warehouses?: Prisma.WarehouseCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  parts?: Prisma.PartCreateNestedManyWithoutTenantInput
+  categoryParts?: Prisma.PartCategoryCreateNestedManyWithoutTenantInput
+  orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
+  expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
+  searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
+  demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
+  stockWatches?: Prisma.StockWatchCreateNestedManyWithoutTenantInput
+  importJobs?: Prisma.ImportJobCreateNestedManyWithoutTenantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  receipts?: Prisma.ReceiptCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutRecurringExpensesInput = {
+  id?: string
+  slug: string
+  name: string
+  legalName?: string | null
+  taxId?: string | null
+  country?: string
+  currency?: string
+  locale?: string
+  timezone?: string
+  phone?: string | null
+  whatsapp?: string | null
+  address?: string | null
+  logoUrl?: string | null
+  brandPrimary?: string
+  brandAccent?: string
+  taxRateBps?: number
+  pricesIncludeTax?: boolean
+  orderPrefix?: string
+  orderSeq?: number
+  receiptPrefix?: string
+  receiptSeq?: number
+  transferSeq?: number
+  catalogEnabled?: boolean
+  catalogTagline?: string | null
+  suspended?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
+  warehouses?: Prisma.WarehouseUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  parts?: Prisma.PartUncheckedCreateNestedManyWithoutTenantInput
+  categoryParts?: Prisma.PartCategoryUncheckedCreateNestedManyWithoutTenantInput
+  orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
+  expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
+  searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
+  demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
+  stockWatches?: Prisma.StockWatchUncheckedCreateNestedManyWithoutTenantInput
+  importJobs?: Prisma.ImportJobUncheckedCreateNestedManyWithoutTenantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  receipts?: Prisma.ReceiptUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutRecurringExpensesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRecurringExpensesInput, Prisma.TenantUncheckedCreateWithoutRecurringExpensesInput>
+}
+
+export type TenantUpsertWithoutRecurringExpensesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutRecurringExpensesInput, Prisma.TenantUncheckedUpdateWithoutRecurringExpensesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRecurringExpensesInput, Prisma.TenantUncheckedCreateWithoutRecurringExpensesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutRecurringExpensesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutRecurringExpensesInput, Prisma.TenantUncheckedUpdateWithoutRecurringExpensesInput>
+}
+
+export type TenantUpdateWithoutRecurringExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  locale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brandPrimary?: Prisma.StringFieldUpdateOperationsInput | string
+  brandAccent?: Prisma.StringFieldUpdateOperationsInput | string
+  taxRateBps?: Prisma.IntFieldUpdateOperationsInput | number
+  pricesIncludeTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
+  warehouses?: Prisma.WarehouseUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  parts?: Prisma.PartUpdateManyWithoutTenantNestedInput
+  categoryParts?: Prisma.PartCategoryUpdateManyWithoutTenantNestedInput
+  orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
+  expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
+  searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
+  demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
+  stockWatches?: Prisma.StockWatchUpdateManyWithoutTenantNestedInput
+  importJobs?: Prisma.ImportJobUpdateManyWithoutTenantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  receipts?: Prisma.ReceiptUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutRecurringExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  locale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brandPrimary?: Prisma.StringFieldUpdateOperationsInput | string
+  brandAccent?: Prisma.StringFieldUpdateOperationsInput | string
+  taxRateBps?: Prisma.IntFieldUpdateOperationsInput | number
+  pricesIncludeTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  orderPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
+  receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.MemberUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
+  warehouses?: Prisma.WarehouseUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  parts?: Prisma.PartUncheckedUpdateManyWithoutTenantNestedInput
+  categoryParts?: Prisma.PartCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
@@ -4028,6 +4397,7 @@ export type TenantCreateWithoutMetricsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4043,6 +4413,7 @@ export type TenantCreateWithoutMetricsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchCreateNestedManyWithoutTenantInput
@@ -4074,6 +4445,7 @@ export type TenantUncheckedCreateWithoutMetricsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4089,6 +4461,7 @@ export type TenantUncheckedCreateWithoutMetricsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchUncheckedCreateNestedManyWithoutTenantInput
@@ -4136,6 +4509,7 @@ export type TenantUpdateWithoutMetricsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4151,6 +4525,7 @@ export type TenantUpdateWithoutMetricsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUpdateManyWithoutTenantNestedInput
@@ -4182,6 +4557,7 @@ export type TenantUncheckedUpdateWithoutMetricsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4197,6 +4573,7 @@ export type TenantUncheckedUpdateWithoutMetricsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUncheckedUpdateManyWithoutTenantNestedInput
@@ -4228,6 +4605,7 @@ export type TenantCreateWithoutSearchEventsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4243,6 +4621,7 @@ export type TenantCreateWithoutSearchEventsInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchCreateNestedManyWithoutTenantInput
@@ -4274,6 +4653,7 @@ export type TenantUncheckedCreateWithoutSearchEventsInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4289,6 +4669,7 @@ export type TenantUncheckedCreateWithoutSearchEventsInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchUncheckedCreateNestedManyWithoutTenantInput
@@ -4336,6 +4717,7 @@ export type TenantUpdateWithoutSearchEventsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4351,6 +4733,7 @@ export type TenantUpdateWithoutSearchEventsInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUpdateManyWithoutTenantNestedInput
@@ -4382,6 +4765,7 @@ export type TenantUncheckedUpdateWithoutSearchEventsInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4397,6 +4781,7 @@ export type TenantUncheckedUpdateWithoutSearchEventsInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUncheckedUpdateManyWithoutTenantNestedInput
@@ -4428,6 +4813,7 @@ export type TenantCreateWithoutDemandDailyInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4443,6 +4829,7 @@ export type TenantCreateWithoutDemandDailyInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchCreateNestedManyWithoutTenantInput
@@ -4474,6 +4861,7 @@ export type TenantUncheckedCreateWithoutDemandDailyInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4489,6 +4877,7 @@ export type TenantUncheckedCreateWithoutDemandDailyInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   stockWatches?: Prisma.StockWatchUncheckedCreateNestedManyWithoutTenantInput
@@ -4536,6 +4925,7 @@ export type TenantUpdateWithoutDemandDailyInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4551,6 +4941,7 @@ export type TenantUpdateWithoutDemandDailyInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUpdateManyWithoutTenantNestedInput
@@ -4582,6 +4973,7 @@ export type TenantUncheckedUpdateWithoutDemandDailyInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4597,6 +4989,7 @@ export type TenantUncheckedUpdateWithoutDemandDailyInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   stockWatches?: Prisma.StockWatchUncheckedUpdateManyWithoutTenantNestedInput
@@ -4628,6 +5021,7 @@ export type TenantCreateWithoutStockWatchesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4643,6 +5037,7 @@ export type TenantCreateWithoutStockWatchesInput = {
   orders?: Prisma.SalesOrderCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyCreateNestedManyWithoutTenantInput
@@ -4674,6 +5069,7 @@ export type TenantUncheckedCreateWithoutStockWatchesInput = {
   orderSeq?: number
   receiptPrefix?: string
   receiptSeq?: number
+  transferSeq?: number
   catalogEnabled?: boolean
   catalogTagline?: string | null
   suspended?: boolean
@@ -4689,6 +5085,7 @@ export type TenantUncheckedCreateWithoutStockWatchesInput = {
   orders?: Prisma.SalesOrderUncheckedCreateNestedManyWithoutTenantInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTenantInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedCreateNestedManyWithoutTenantInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutTenantInput
   metrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutTenantInput
   searchEvents?: Prisma.SearchEventUncheckedCreateNestedManyWithoutTenantInput
   demandDaily?: Prisma.DemandDailyUncheckedCreateNestedManyWithoutTenantInput
@@ -4736,6 +5133,7 @@ export type TenantUpdateWithoutStockWatchesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4751,6 +5149,7 @@ export type TenantUpdateWithoutStockWatchesInput = {
   orders?: Prisma.SalesOrderUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUpdateManyWithoutTenantNestedInput
@@ -4782,6 +5181,7 @@ export type TenantUncheckedUpdateWithoutStockWatchesInput = {
   orderSeq?: Prisma.IntFieldUpdateOperationsInput | number
   receiptPrefix?: Prisma.StringFieldUpdateOperationsInput | string
   receiptSeq?: Prisma.IntFieldUpdateOperationsInput | number
+  transferSeq?: Prisma.IntFieldUpdateOperationsInput | number
   catalogEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   catalogTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   suspended?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4797,6 +5197,7 @@ export type TenantUncheckedUpdateWithoutStockWatchesInput = {
   orders?: Prisma.SalesOrderUncheckedUpdateManyWithoutTenantNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTenantNestedInput
   expenseCats?: Prisma.ExpenseCategoryUncheckedUpdateManyWithoutTenantNestedInput
+  recurringExpenses?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutTenantNestedInput
   metrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutTenantNestedInput
   searchEvents?: Prisma.SearchEventUncheckedUpdateManyWithoutTenantNestedInput
   demandDaily?: Prisma.DemandDailyUncheckedUpdateManyWithoutTenantNestedInput
@@ -4822,6 +5223,7 @@ export type TenantCountOutputType = {
   orders: number
   expenses: number
   expenseCats: number
+  recurringExpenses: number
   metrics: number
   searchEvents: number
   demandDaily: number
@@ -4843,6 +5245,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   orders?: boolean | TenantCountOutputTypeCountOrdersArgs
   expenses?: boolean | TenantCountOutputTypeCountExpensesArgs
   expenseCats?: boolean | TenantCountOutputTypeCountExpenseCatsArgs
+  recurringExpenses?: boolean | TenantCountOutputTypeCountRecurringExpensesArgs
   metrics?: boolean | TenantCountOutputTypeCountMetricsArgs
   searchEvents?: boolean | TenantCountOutputTypeCountSearchEventsArgs
   demandDaily?: boolean | TenantCountOutputTypeCountDemandDailyArgs
@@ -4936,6 +5339,13 @@ export type TenantCountOutputTypeCountExpenseCatsArgs<ExtArgs extends runtime.Ty
 /**
  * TenantCountOutputType without action
  */
+export type TenantCountOutputTypeCountRecurringExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecurringExpenseWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
 export type TenantCountOutputTypeCountMetricsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DailyMetricWhereInput
 }
@@ -5012,6 +5422,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   orderSeq?: boolean
   receiptPrefix?: boolean
   receiptSeq?: boolean
+  transferSeq?: boolean
   catalogEnabled?: boolean
   catalogTagline?: boolean
   suspended?: boolean
@@ -5027,6 +5438,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   orders?: boolean | Prisma.Tenant$ordersArgs<ExtArgs>
   expenses?: boolean | Prisma.Tenant$expensesArgs<ExtArgs>
   expenseCats?: boolean | Prisma.Tenant$expenseCatsArgs<ExtArgs>
+  recurringExpenses?: boolean | Prisma.Tenant$recurringExpensesArgs<ExtArgs>
   metrics?: boolean | Prisma.Tenant$metricsArgs<ExtArgs>
   searchEvents?: boolean | Prisma.Tenant$searchEventsArgs<ExtArgs>
   demandDaily?: boolean | Prisma.Tenant$demandDailyArgs<ExtArgs>
@@ -5060,6 +5472,7 @@ export type TenantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   orderSeq?: boolean
   receiptPrefix?: boolean
   receiptSeq?: boolean
+  transferSeq?: boolean
   catalogEnabled?: boolean
   catalogTagline?: boolean
   suspended?: boolean
@@ -5089,6 +5502,7 @@ export type TenantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   orderSeq?: boolean
   receiptPrefix?: boolean
   receiptSeq?: boolean
+  transferSeq?: boolean
   catalogEnabled?: boolean
   catalogTagline?: boolean
   suspended?: boolean
@@ -5118,6 +5532,7 @@ export type TenantSelectScalar = {
   orderSeq?: boolean
   receiptPrefix?: boolean
   receiptSeq?: boolean
+  transferSeq?: boolean
   catalogEnabled?: boolean
   catalogTagline?: boolean
   suspended?: boolean
@@ -5125,7 +5540,7 @@ export type TenantSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "legalName" | "taxId" | "country" | "currency" | "locale" | "timezone" | "phone" | "whatsapp" | "address" | "logoUrl" | "brandPrimary" | "brandAccent" | "taxRateBps" | "pricesIncludeTax" | "orderPrefix" | "orderSeq" | "receiptPrefix" | "receiptSeq" | "catalogEnabled" | "catalogTagline" | "suspended" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
+export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "legalName" | "taxId" | "country" | "currency" | "locale" | "timezone" | "phone" | "whatsapp" | "address" | "logoUrl" | "brandPrimary" | "brandAccent" | "taxRateBps" | "pricesIncludeTax" | "orderPrefix" | "orderSeq" | "receiptPrefix" | "receiptSeq" | "transferSeq" | "catalogEnabled" | "catalogTagline" | "suspended" | "createdAt" | "updatedAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   members?: boolean | Prisma.Tenant$membersArgs<ExtArgs>
   invitations?: boolean | Prisma.Tenant$invitationsArgs<ExtArgs>
@@ -5137,6 +5552,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   orders?: boolean | Prisma.Tenant$ordersArgs<ExtArgs>
   expenses?: boolean | Prisma.Tenant$expensesArgs<ExtArgs>
   expenseCats?: boolean | Prisma.Tenant$expenseCatsArgs<ExtArgs>
+  recurringExpenses?: boolean | Prisma.Tenant$recurringExpensesArgs<ExtArgs>
   metrics?: boolean | Prisma.Tenant$metricsArgs<ExtArgs>
   searchEvents?: boolean | Prisma.Tenant$searchEventsArgs<ExtArgs>
   demandDaily?: boolean | Prisma.Tenant$demandDailyArgs<ExtArgs>
@@ -5163,6 +5579,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     orders: Prisma.$SalesOrderPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
     expenseCats: Prisma.$ExpenseCategoryPayload<ExtArgs>[]
+    recurringExpenses: Prisma.$RecurringExpensePayload<ExtArgs>[]
     metrics: Prisma.$DailyMetricPayload<ExtArgs>[]
     searchEvents: Prisma.$SearchEventPayload<ExtArgs>[]
     demandDaily: Prisma.$DemandDailyPayload<ExtArgs>[]
@@ -5200,6 +5617,10 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     orderSeq: number
     receiptPrefix: string
     receiptSeq: number
+    /**
+     * * Folio de traslados entre bodegas (`TR-0007`). Se incrementa con UPDATE atómico.
+     */
+    transferSeq: number
     catalogEnabled: boolean
     catalogTagline: string | null
     suspended: boolean
@@ -5609,6 +6030,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   orders<T extends Prisma.Tenant$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalesOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Tenant$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenseCats<T extends Prisma.Tenant$expenseCatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$expenseCatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpenseCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recurringExpenses<T extends Prisma.Tenant$recurringExpensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$recurringExpensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecurringExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   metrics<T extends Prisma.Tenant$metricsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$metricsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyMetricPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   searchEvents<T extends Prisma.Tenant$searchEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$searchEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   demandDaily<T extends Prisma.Tenant$demandDailyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$demandDailyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DemandDailyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5667,6 +6089,7 @@ export interface TenantFieldRefs {
   readonly orderSeq: Prisma.FieldRef<"Tenant", 'Int'>
   readonly receiptPrefix: Prisma.FieldRef<"Tenant", 'String'>
   readonly receiptSeq: Prisma.FieldRef<"Tenant", 'Int'>
+  readonly transferSeq: Prisma.FieldRef<"Tenant", 'Int'>
   readonly catalogEnabled: Prisma.FieldRef<"Tenant", 'Boolean'>
   readonly catalogTagline: Prisma.FieldRef<"Tenant", 'String'>
   readonly suspended: Prisma.FieldRef<"Tenant", 'Boolean'>
@@ -6302,6 +6725,30 @@ export type Tenant$expenseCatsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ExpenseCategoryScalarFieldEnum | Prisma.ExpenseCategoryScalarFieldEnum[]
+}
+
+/**
+ * Tenant.recurringExpenses
+ */
+export type Tenant$recurringExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecurringExpense
+   */
+  select?: Prisma.RecurringExpenseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecurringExpense
+   */
+  omit?: Prisma.RecurringExpenseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecurringExpenseInclude<ExtArgs> | null
+  where?: Prisma.RecurringExpenseWhereInput
+  orderBy?: Prisma.RecurringExpenseOrderByWithRelationInput | Prisma.RecurringExpenseOrderByWithRelationInput[]
+  cursor?: Prisma.RecurringExpenseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecurringExpenseScalarFieldEnum | Prisma.RecurringExpenseScalarFieldEnum[]
 }
 
 /**

@@ -41,6 +41,7 @@ export type ReceiptMinAggregateOutputType = {
   folio: string | null
   token: string | null
   pdfKey: string | null
+  ticketKey: string | null
   totalCents: number | null
   createdAt: Date | null
 }
@@ -52,6 +53,7 @@ export type ReceiptMaxAggregateOutputType = {
   folio: string | null
   token: string | null
   pdfKey: string | null
+  ticketKey: string | null
   totalCents: number | null
   createdAt: Date | null
 }
@@ -63,6 +65,7 @@ export type ReceiptCountAggregateOutputType = {
   folio: number
   token: number
   pdfKey: number
+  ticketKey: number
   snapshot: number
   totalCents: number
   createdAt: number
@@ -85,6 +88,7 @@ export type ReceiptMinAggregateInputType = {
   folio?: true
   token?: true
   pdfKey?: true
+  ticketKey?: true
   totalCents?: true
   createdAt?: true
 }
@@ -96,6 +100,7 @@ export type ReceiptMaxAggregateInputType = {
   folio?: true
   token?: true
   pdfKey?: true
+  ticketKey?: true
   totalCents?: true
   createdAt?: true
 }
@@ -107,6 +112,7 @@ export type ReceiptCountAggregateInputType = {
   folio?: true
   token?: true
   pdfKey?: true
+  ticketKey?: true
   snapshot?: true
   totalCents?: true
   createdAt?: true
@@ -206,6 +212,7 @@ export type ReceiptGroupByOutputType = {
   folio: string
   token: string
   pdfKey: string | null
+  ticketKey: string | null
   snapshot: runtime.JsonValue
   totalCents: number
   createdAt: Date
@@ -241,6 +248,7 @@ export type ReceiptWhereInput = {
   folio?: Prisma.StringFilter<"Receipt"> | string
   token?: Prisma.StringFilter<"Receipt"> | string
   pdfKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
+  ticketKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
   snapshot?: Prisma.JsonFilter<"Receipt">
   totalCents?: Prisma.IntFilter<"Receipt"> | number
   createdAt?: Prisma.DateTimeFilter<"Receipt"> | Date | string
@@ -255,6 +263,7 @@ export type ReceiptOrderByWithRelationInput = {
   folio?: Prisma.SortOrder
   token?: Prisma.SortOrder
   pdfKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketKey?: Prisma.SortOrderInput | Prisma.SortOrder
   snapshot?: Prisma.SortOrder
   totalCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -273,6 +282,7 @@ export type ReceiptWhereUniqueInput = Prisma.AtLeast<{
   orderId?: Prisma.StringFilter<"Receipt"> | string
   folio?: Prisma.StringFilter<"Receipt"> | string
   pdfKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
+  ticketKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
   snapshot?: Prisma.JsonFilter<"Receipt">
   totalCents?: Prisma.IntFilter<"Receipt"> | number
   createdAt?: Prisma.DateTimeFilter<"Receipt"> | Date | string
@@ -287,6 +297,7 @@ export type ReceiptOrderByWithAggregationInput = {
   folio?: Prisma.SortOrder
   token?: Prisma.SortOrder
   pdfKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketKey?: Prisma.SortOrderInput | Prisma.SortOrder
   snapshot?: Prisma.SortOrder
   totalCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -307,6 +318,7 @@ export type ReceiptScalarWhereWithAggregatesInput = {
   folio?: Prisma.StringWithAggregatesFilter<"Receipt"> | string
   token?: Prisma.StringWithAggregatesFilter<"Receipt"> | string
   pdfKey?: Prisma.StringNullableWithAggregatesFilter<"Receipt"> | string | null
+  ticketKey?: Prisma.StringNullableWithAggregatesFilter<"Receipt"> | string | null
   snapshot?: Prisma.JsonWithAggregatesFilter<"Receipt">
   totalCents?: Prisma.IntWithAggregatesFilter<"Receipt"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Receipt"> | Date | string
@@ -317,6 +329,7 @@ export type ReceiptCreateInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -331,6 +344,7 @@ export type ReceiptUncheckedCreateInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -341,6 +355,7 @@ export type ReceiptUpdateInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -355,6 +370,7 @@ export type ReceiptUncheckedUpdateInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,6 +383,7 @@ export type ReceiptCreateManyInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -377,6 +394,7 @@ export type ReceiptUpdateManyMutationInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -389,6 +407,7 @@ export type ReceiptUncheckedUpdateManyInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +435,7 @@ export type ReceiptCountOrderByAggregateInput = {
   folio?: Prisma.SortOrder
   token?: Prisma.SortOrder
   pdfKey?: Prisma.SortOrder
+  ticketKey?: Prisma.SortOrder
   snapshot?: Prisma.SortOrder
   totalCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -432,6 +452,7 @@ export type ReceiptMaxOrderByAggregateInput = {
   folio?: Prisma.SortOrder
   token?: Prisma.SortOrder
   pdfKey?: Prisma.SortOrder
+  ticketKey?: Prisma.SortOrder
   totalCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -443,6 +464,7 @@ export type ReceiptMinOrderByAggregateInput = {
   folio?: Prisma.SortOrder
   token?: Prisma.SortOrder
   pdfKey?: Prisma.SortOrder
+  ticketKey?: Prisma.SortOrder
   totalCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -540,6 +562,7 @@ export type ReceiptCreateWithoutTenantInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -552,6 +575,7 @@ export type ReceiptUncheckedCreateWithoutTenantInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -593,6 +617,7 @@ export type ReceiptScalarWhereInput = {
   folio?: Prisma.StringFilter<"Receipt"> | string
   token?: Prisma.StringFilter<"Receipt"> | string
   pdfKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
+  ticketKey?: Prisma.StringNullableFilter<"Receipt"> | string | null
   snapshot?: Prisma.JsonFilter<"Receipt">
   totalCents?: Prisma.IntFilter<"Receipt"> | number
   createdAt?: Prisma.DateTimeFilter<"Receipt"> | Date | string
@@ -603,6 +628,7 @@ export type ReceiptCreateWithoutOrderInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -615,6 +641,7 @@ export type ReceiptUncheckedCreateWithoutOrderInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -652,6 +679,7 @@ export type ReceiptCreateManyTenantInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -662,6 +690,7 @@ export type ReceiptUpdateWithoutTenantInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -674,6 +703,7 @@ export type ReceiptUncheckedUpdateWithoutTenantInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -685,6 +715,7 @@ export type ReceiptUncheckedUpdateManyWithoutTenantInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -696,6 +727,7 @@ export type ReceiptCreateManyOrderInput = {
   folio: string
   token: string
   pdfKey?: string | null
+  ticketKey?: string | null
   snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents: number
   createdAt?: Date | string
@@ -706,6 +738,7 @@ export type ReceiptUpdateWithoutOrderInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -718,6 +751,7 @@ export type ReceiptUncheckedUpdateWithoutOrderInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -729,6 +763,7 @@ export type ReceiptUncheckedUpdateManyWithoutOrderInput = {
   folio?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   pdfKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   totalCents?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -743,6 +778,7 @@ export type ReceiptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   folio?: boolean
   token?: boolean
   pdfKey?: boolean
+  ticketKey?: boolean
   snapshot?: boolean
   totalCents?: boolean
   createdAt?: boolean
@@ -757,6 +793,7 @@ export type ReceiptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   folio?: boolean
   token?: boolean
   pdfKey?: boolean
+  ticketKey?: boolean
   snapshot?: boolean
   totalCents?: boolean
   createdAt?: boolean
@@ -771,6 +808,7 @@ export type ReceiptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   folio?: boolean
   token?: boolean
   pdfKey?: boolean
+  ticketKey?: boolean
   snapshot?: boolean
   totalCents?: boolean
   createdAt?: boolean
@@ -785,12 +823,13 @@ export type ReceiptSelectScalar = {
   folio?: boolean
   token?: boolean
   pdfKey?: boolean
+  ticketKey?: boolean
   snapshot?: boolean
   totalCents?: boolean
   createdAt?: boolean
 }
 
-export type ReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "orderId" | "folio" | "token" | "pdfKey" | "snapshot" | "totalCents" | "createdAt", ExtArgs["result"]["receipt"]>
+export type ReceiptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "orderId" | "folio" | "token" | "pdfKey" | "ticketKey" | "snapshot" | "totalCents" | "createdAt", ExtArgs["result"]["receipt"]>
 export type ReceiptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.SalesOrderDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -819,7 +858,17 @@ export type $ReceiptPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
      * * Token público de 128 bits: el cliente abre /r/<token> sin cuenta y sin filtrar nada más.
      */
     token: string
+    /**
+     * * PDF de hoja carta. Se genera una vez y no se vuelve a tocar.
+     */
     pdfKey: string | null
+    /**
+     * * PDF de ticket 80 mm para la impresora térmica del mostrador.
+     */
+    ticketKey: string | null
+    /**
+     * * Lo que se imprimió ese día. Congelado: ni precios ni nombre del negocio cambian después.
+     */
     snapshot: runtime.JsonValue
     totalCents: number
     createdAt: Date
@@ -1254,6 +1303,7 @@ export interface ReceiptFieldRefs {
   readonly folio: Prisma.FieldRef<"Receipt", 'String'>
   readonly token: Prisma.FieldRef<"Receipt", 'String'>
   readonly pdfKey: Prisma.FieldRef<"Receipt", 'String'>
+  readonly ticketKey: Prisma.FieldRef<"Receipt", 'String'>
   readonly snapshot: Prisma.FieldRef<"Receipt", 'Json'>
   readonly totalCents: Prisma.FieldRef<"Receipt", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Receipt", 'DateTime'>

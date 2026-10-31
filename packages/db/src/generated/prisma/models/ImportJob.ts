@@ -31,6 +31,7 @@ export type ImportJobAvgAggregateOutputType = {
   processedRows: number | null
   successRows: number | null
   errorRows: number | null
+  skippedRows: number | null
   createdParts: number | null
   createdVariants: number | null
   updatedVariants: number | null
@@ -41,6 +42,7 @@ export type ImportJobSumAggregateOutputType = {
   processedRows: number | null
   successRows: number | null
   errorRows: number | null
+  skippedRows: number | null
   createdParts: number | null
   createdVariants: number | null
   updatedVariants: number | null
@@ -51,11 +53,13 @@ export type ImportJobMinAggregateOutputType = {
   tenantId: string | null
   fileName: string | null
   status: $Enums.ImportStatus | null
+  mode: $Enums.ImportMode | null
   warehouseId: string | null
   totalRows: number | null
   processedRows: number | null
   successRows: number | null
   errorRows: number | null
+  skippedRows: number | null
   createdParts: number | null
   createdVariants: number | null
   updatedVariants: number | null
@@ -70,11 +74,13 @@ export type ImportJobMaxAggregateOutputType = {
   tenantId: string | null
   fileName: string | null
   status: $Enums.ImportStatus | null
+  mode: $Enums.ImportMode | null
   warehouseId: string | null
   totalRows: number | null
   processedRows: number | null
   successRows: number | null
   errorRows: number | null
+  skippedRows: number | null
   createdParts: number | null
   createdVariants: number | null
   updatedVariants: number | null
@@ -89,6 +95,7 @@ export type ImportJobCountAggregateOutputType = {
   tenantId: number
   fileName: number
   status: number
+  mode: number
   mapping: number
   payload: number
   warehouseId: number
@@ -96,6 +103,7 @@ export type ImportJobCountAggregateOutputType = {
   processedRows: number
   successRows: number
   errorRows: number
+  skippedRows: number
   createdParts: number
   createdVariants: number
   updatedVariants: number
@@ -112,6 +120,7 @@ export type ImportJobAvgAggregateInputType = {
   processedRows?: true
   successRows?: true
   errorRows?: true
+  skippedRows?: true
   createdParts?: true
   createdVariants?: true
   updatedVariants?: true
@@ -122,6 +131,7 @@ export type ImportJobSumAggregateInputType = {
   processedRows?: true
   successRows?: true
   errorRows?: true
+  skippedRows?: true
   createdParts?: true
   createdVariants?: true
   updatedVariants?: true
@@ -132,11 +142,13 @@ export type ImportJobMinAggregateInputType = {
   tenantId?: true
   fileName?: true
   status?: true
+  mode?: true
   warehouseId?: true
   totalRows?: true
   processedRows?: true
   successRows?: true
   errorRows?: true
+  skippedRows?: true
   createdParts?: true
   createdVariants?: true
   updatedVariants?: true
@@ -151,11 +163,13 @@ export type ImportJobMaxAggregateInputType = {
   tenantId?: true
   fileName?: true
   status?: true
+  mode?: true
   warehouseId?: true
   totalRows?: true
   processedRows?: true
   successRows?: true
   errorRows?: true
+  skippedRows?: true
   createdParts?: true
   createdVariants?: true
   updatedVariants?: true
@@ -170,6 +184,7 @@ export type ImportJobCountAggregateInputType = {
   tenantId?: true
   fileName?: true
   status?: true
+  mode?: true
   mapping?: true
   payload?: true
   warehouseId?: true
@@ -177,6 +192,7 @@ export type ImportJobCountAggregateInputType = {
   processedRows?: true
   successRows?: true
   errorRows?: true
+  skippedRows?: true
   createdParts?: true
   createdVariants?: true
   updatedVariants?: true
@@ -278,6 +294,7 @@ export type ImportJobGroupByOutputType = {
   tenantId: string
   fileName: string
   status: $Enums.ImportStatus
+  mode: $Enums.ImportMode
   mapping: runtime.JsonValue
   payload: runtime.JsonValue | null
   warehouseId: string | null
@@ -285,6 +302,7 @@ export type ImportJobGroupByOutputType = {
   processedRows: number
   successRows: number
   errorRows: number
+  skippedRows: number
   createdParts: number
   createdVariants: number
   updatedVariants: number
@@ -322,6 +340,7 @@ export type ImportJobWhereInput = {
   tenantId?: Prisma.StringFilter<"ImportJob"> | string
   fileName?: Prisma.StringFilter<"ImportJob"> | string
   status?: Prisma.EnumImportStatusFilter<"ImportJob"> | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFilter<"ImportJob"> | $Enums.ImportMode
   mapping?: Prisma.JsonFilter<"ImportJob">
   payload?: Prisma.JsonNullableFilter<"ImportJob">
   warehouseId?: Prisma.StringNullableFilter<"ImportJob"> | string | null
@@ -329,6 +348,7 @@ export type ImportJobWhereInput = {
   processedRows?: Prisma.IntFilter<"ImportJob"> | number
   successRows?: Prisma.IntFilter<"ImportJob"> | number
   errorRows?: Prisma.IntFilter<"ImportJob"> | number
+  skippedRows?: Prisma.IntFilter<"ImportJob"> | number
   createdParts?: Prisma.IntFilter<"ImportJob"> | number
   createdVariants?: Prisma.IntFilter<"ImportJob"> | number
   updatedVariants?: Prisma.IntFilter<"ImportJob"> | number
@@ -345,6 +365,7 @@ export type ImportJobOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   payload?: Prisma.SortOrderInput | Prisma.SortOrder
   warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -352,6 +373,7 @@ export type ImportJobOrderByWithRelationInput = {
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -371,6 +393,7 @@ export type ImportJobWhereUniqueInput = Prisma.AtLeast<{
   tenantId?: Prisma.StringFilter<"ImportJob"> | string
   fileName?: Prisma.StringFilter<"ImportJob"> | string
   status?: Prisma.EnumImportStatusFilter<"ImportJob"> | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFilter<"ImportJob"> | $Enums.ImportMode
   mapping?: Prisma.JsonFilter<"ImportJob">
   payload?: Prisma.JsonNullableFilter<"ImportJob">
   warehouseId?: Prisma.StringNullableFilter<"ImportJob"> | string | null
@@ -378,6 +401,7 @@ export type ImportJobWhereUniqueInput = Prisma.AtLeast<{
   processedRows?: Prisma.IntFilter<"ImportJob"> | number
   successRows?: Prisma.IntFilter<"ImportJob"> | number
   errorRows?: Prisma.IntFilter<"ImportJob"> | number
+  skippedRows?: Prisma.IntFilter<"ImportJob"> | number
   createdParts?: Prisma.IntFilter<"ImportJob"> | number
   createdVariants?: Prisma.IntFilter<"ImportJob"> | number
   updatedVariants?: Prisma.IntFilter<"ImportJob"> | number
@@ -394,6 +418,7 @@ export type ImportJobOrderByWithAggregationInput = {
   tenantId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   payload?: Prisma.SortOrderInput | Prisma.SortOrder
   warehouseId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -401,6 +426,7 @@ export type ImportJobOrderByWithAggregationInput = {
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -423,6 +449,7 @@ export type ImportJobScalarWhereWithAggregatesInput = {
   tenantId?: Prisma.StringWithAggregatesFilter<"ImportJob"> | string
   fileName?: Prisma.StringWithAggregatesFilter<"ImportJob"> | string
   status?: Prisma.EnumImportStatusWithAggregatesFilter<"ImportJob"> | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeWithAggregatesFilter<"ImportJob"> | $Enums.ImportMode
   mapping?: Prisma.JsonWithAggregatesFilter<"ImportJob">
   payload?: Prisma.JsonNullableWithAggregatesFilter<"ImportJob">
   warehouseId?: Prisma.StringNullableWithAggregatesFilter<"ImportJob"> | string | null
@@ -430,6 +457,7 @@ export type ImportJobScalarWhereWithAggregatesInput = {
   processedRows?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
   successRows?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
   errorRows?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
+  skippedRows?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
   createdParts?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
   createdVariants?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
   updatedVariants?: Prisma.IntWithAggregatesFilter<"ImportJob"> | number
@@ -443,6 +471,7 @@ export type ImportJobCreateInput = {
   id?: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -450,6 +479,7 @@ export type ImportJobCreateInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -466,6 +496,7 @@ export type ImportJobUncheckedCreateInput = {
   tenantId: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -473,6 +504,7 @@ export type ImportJobUncheckedCreateInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -487,6 +519,7 @@ export type ImportJobUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -494,6 +527,7 @@ export type ImportJobUpdateInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -510,6 +544,7 @@ export type ImportJobUncheckedUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -517,6 +552,7 @@ export type ImportJobUncheckedUpdateInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -532,6 +568,7 @@ export type ImportJobCreateManyInput = {
   tenantId: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -539,6 +576,7 @@ export type ImportJobCreateManyInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -552,6 +590,7 @@ export type ImportJobUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -559,6 +598,7 @@ export type ImportJobUpdateManyMutationInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -573,6 +613,7 @@ export type ImportJobUncheckedUpdateManyInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -580,6 +621,7 @@ export type ImportJobUncheckedUpdateManyInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -604,6 +646,7 @@ export type ImportJobCountOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
   mapping?: Prisma.SortOrder
   payload?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
@@ -611,6 +654,7 @@ export type ImportJobCountOrderByAggregateInput = {
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -625,6 +669,7 @@ export type ImportJobAvgOrderByAggregateInput = {
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -635,11 +680,13 @@ export type ImportJobMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
   totalRows?: Prisma.SortOrder
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -654,11 +701,13 @@ export type ImportJobMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
   totalRows?: Prisma.SortOrder
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -673,6 +722,7 @@ export type ImportJobSumOrderByAggregateInput = {
   processedRows?: Prisma.SortOrder
   successRows?: Prisma.SortOrder
   errorRows?: Prisma.SortOrder
+  skippedRows?: Prisma.SortOrder
   createdParts?: Prisma.SortOrder
   createdVariants?: Prisma.SortOrder
   updatedVariants?: Prisma.SortOrder
@@ -729,6 +779,10 @@ export type EnumImportStatusFieldUpdateOperationsInput = {
   set?: $Enums.ImportStatus
 }
 
+export type EnumImportModeFieldUpdateOperationsInput = {
+  set?: $Enums.ImportMode
+}
+
 export type ImportJobCreateNestedOneWithoutRowErrorsInput = {
   create?: Prisma.XOR<Prisma.ImportJobCreateWithoutRowErrorsInput, Prisma.ImportJobUncheckedCreateWithoutRowErrorsInput>
   connectOrCreate?: Prisma.ImportJobCreateOrConnectWithoutRowErrorsInput
@@ -747,6 +801,7 @@ export type ImportJobCreateWithoutTenantInput = {
   id?: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -754,6 +809,7 @@ export type ImportJobCreateWithoutTenantInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -768,6 +824,7 @@ export type ImportJobUncheckedCreateWithoutTenantInput = {
   id?: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -775,6 +832,7 @@ export type ImportJobUncheckedCreateWithoutTenantInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -819,6 +877,7 @@ export type ImportJobScalarWhereInput = {
   tenantId?: Prisma.StringFilter<"ImportJob"> | string
   fileName?: Prisma.StringFilter<"ImportJob"> | string
   status?: Prisma.EnumImportStatusFilter<"ImportJob"> | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFilter<"ImportJob"> | $Enums.ImportMode
   mapping?: Prisma.JsonFilter<"ImportJob">
   payload?: Prisma.JsonNullableFilter<"ImportJob">
   warehouseId?: Prisma.StringNullableFilter<"ImportJob"> | string | null
@@ -826,6 +885,7 @@ export type ImportJobScalarWhereInput = {
   processedRows?: Prisma.IntFilter<"ImportJob"> | number
   successRows?: Prisma.IntFilter<"ImportJob"> | number
   errorRows?: Prisma.IntFilter<"ImportJob"> | number
+  skippedRows?: Prisma.IntFilter<"ImportJob"> | number
   createdParts?: Prisma.IntFilter<"ImportJob"> | number
   createdVariants?: Prisma.IntFilter<"ImportJob"> | number
   updatedVariants?: Prisma.IntFilter<"ImportJob"> | number
@@ -839,6 +899,7 @@ export type ImportJobCreateWithoutRowErrorsInput = {
   id?: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -846,6 +907,7 @@ export type ImportJobCreateWithoutRowErrorsInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -861,6 +923,7 @@ export type ImportJobUncheckedCreateWithoutRowErrorsInput = {
   tenantId: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -868,6 +931,7 @@ export type ImportJobUncheckedCreateWithoutRowErrorsInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -897,6 +961,7 @@ export type ImportJobUpdateWithoutRowErrorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -904,6 +969,7 @@ export type ImportJobUpdateWithoutRowErrorsInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -919,6 +985,7 @@ export type ImportJobUncheckedUpdateWithoutRowErrorsInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -926,6 +993,7 @@ export type ImportJobUncheckedUpdateWithoutRowErrorsInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -939,6 +1007,7 @@ export type ImportJobCreateManyTenantInput = {
   id?: string
   fileName: string
   status?: $Enums.ImportStatus
+  mode?: $Enums.ImportMode
   mapping: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: string | null
@@ -946,6 +1015,7 @@ export type ImportJobCreateManyTenantInput = {
   processedRows?: number
   successRows?: number
   errorRows?: number
+  skippedRows?: number
   createdParts?: number
   createdVariants?: number
   updatedVariants?: number
@@ -959,6 +1029,7 @@ export type ImportJobUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -966,6 +1037,7 @@ export type ImportJobUpdateWithoutTenantInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -980,6 +1052,7 @@ export type ImportJobUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -987,6 +1060,7 @@ export type ImportJobUncheckedUpdateWithoutTenantInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1001,6 +1075,7 @@ export type ImportJobUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumImportStatusFieldUpdateOperationsInput | $Enums.ImportStatus
+  mode?: Prisma.EnumImportModeFieldUpdateOperationsInput | $Enums.ImportMode
   mapping?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   payload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   warehouseId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1008,6 +1083,7 @@ export type ImportJobUncheckedUpdateManyWithoutTenantInput = {
   processedRows?: Prisma.IntFieldUpdateOperationsInput | number
   successRows?: Prisma.IntFieldUpdateOperationsInput | number
   errorRows?: Prisma.IntFieldUpdateOperationsInput | number
+  skippedRows?: Prisma.IntFieldUpdateOperationsInput | number
   createdParts?: Prisma.IntFieldUpdateOperationsInput | number
   createdVariants?: Prisma.IntFieldUpdateOperationsInput | number
   updatedVariants?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1053,6 +1129,7 @@ export type ImportJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tenantId?: boolean
   fileName?: boolean
   status?: boolean
+  mode?: boolean
   mapping?: boolean
   payload?: boolean
   warehouseId?: boolean
@@ -1060,6 +1137,7 @@ export type ImportJobSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   processedRows?: boolean
   successRows?: boolean
   errorRows?: boolean
+  skippedRows?: boolean
   createdParts?: boolean
   createdVariants?: boolean
   updatedVariants?: boolean
@@ -1077,6 +1155,7 @@ export type ImportJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   fileName?: boolean
   status?: boolean
+  mode?: boolean
   mapping?: boolean
   payload?: boolean
   warehouseId?: boolean
@@ -1084,6 +1163,7 @@ export type ImportJobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   processedRows?: boolean
   successRows?: boolean
   errorRows?: boolean
+  skippedRows?: boolean
   createdParts?: boolean
   createdVariants?: boolean
   updatedVariants?: boolean
@@ -1099,6 +1179,7 @@ export type ImportJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   fileName?: boolean
   status?: boolean
+  mode?: boolean
   mapping?: boolean
   payload?: boolean
   warehouseId?: boolean
@@ -1106,6 +1187,7 @@ export type ImportJobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   processedRows?: boolean
   successRows?: boolean
   errorRows?: boolean
+  skippedRows?: boolean
   createdParts?: boolean
   createdVariants?: boolean
   updatedVariants?: boolean
@@ -1121,6 +1203,7 @@ export type ImportJobSelectScalar = {
   tenantId?: boolean
   fileName?: boolean
   status?: boolean
+  mode?: boolean
   mapping?: boolean
   payload?: boolean
   warehouseId?: boolean
@@ -1128,6 +1211,7 @@ export type ImportJobSelectScalar = {
   processedRows?: boolean
   successRows?: boolean
   errorRows?: boolean
+  skippedRows?: boolean
   createdParts?: boolean
   createdVariants?: boolean
   updatedVariants?: boolean
@@ -1137,7 +1221,7 @@ export type ImportJobSelectScalar = {
   finishedAt?: boolean
 }
 
-export type ImportJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "fileName" | "status" | "mapping" | "payload" | "warehouseId" | "totalRows" | "processedRows" | "successRows" | "errorRows" | "createdParts" | "createdVariants" | "updatedVariants" | "error" | "createdById" | "createdAt" | "finishedAt", ExtArgs["result"]["importJob"]>
+export type ImportJobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "fileName" | "status" | "mode" | "mapping" | "payload" | "warehouseId" | "totalRows" | "processedRows" | "successRows" | "errorRows" | "skippedRows" | "createdParts" | "createdVariants" | "updatedVariants" | "error" | "createdById" | "createdAt" | "finishedAt", ExtArgs["result"]["importJob"]>
 export type ImportJobInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   rowErrors?: boolean | Prisma.ImportJob$rowErrorsArgs<ExtArgs>
@@ -1161,6 +1245,7 @@ export type $ImportJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tenantId: string
     fileName: string
     status: $Enums.ImportStatus
+    mode: $Enums.ImportMode
     mapping: runtime.JsonValue
     payload: runtime.JsonValue | null
     warehouseId: string | null
@@ -1168,6 +1253,10 @@ export type $ImportJobPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     processedRows: number
     successRows: number
     errorRows: number
+    /**
+     * * Filas válidas que se saltaron a propósito (`OMITIR_EXISTENTES`).
+     */
+    skippedRows: number
     createdParts: number
     createdVariants: number
     updatedVariants: number
@@ -1604,6 +1693,7 @@ export interface ImportJobFieldRefs {
   readonly tenantId: Prisma.FieldRef<"ImportJob", 'String'>
   readonly fileName: Prisma.FieldRef<"ImportJob", 'String'>
   readonly status: Prisma.FieldRef<"ImportJob", 'ImportStatus'>
+  readonly mode: Prisma.FieldRef<"ImportJob", 'ImportMode'>
   readonly mapping: Prisma.FieldRef<"ImportJob", 'Json'>
   readonly payload: Prisma.FieldRef<"ImportJob", 'Json'>
   readonly warehouseId: Prisma.FieldRef<"ImportJob", 'String'>
@@ -1611,6 +1701,7 @@ export interface ImportJobFieldRefs {
   readonly processedRows: Prisma.FieldRef<"ImportJob", 'Int'>
   readonly successRows: Prisma.FieldRef<"ImportJob", 'Int'>
   readonly errorRows: Prisma.FieldRef<"ImportJob", 'Int'>
+  readonly skippedRows: Prisma.FieldRef<"ImportJob", 'Int'>
   readonly createdParts: Prisma.FieldRef<"ImportJob", 'Int'>
   readonly createdVariants: Prisma.FieldRef<"ImportJob", 'Int'>
   readonly updatedVariants: Prisma.FieldRef<"ImportJob", 'Int'>

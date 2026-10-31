@@ -12,9 +12,23 @@
  * propio Excel y pedirles que lo rehagan es la razón por la que no usan el sistema.
  */
 
+import { z } from 'zod';
 import { toCents } from './money.js';
 import { normalizeQuery } from './search.js';
 import { parseYearRange } from './vehicles.js';
+
+/**
+ * Límites del archivo.
+ *
+ * 10 MB y 5.000 filas no son un capricho técnico: es el tamaño del Excel real de una bodega
+ * mediana. Shopify-imports acepta más y luego el usuario espera diez minutos sin saber si funcionó.
+ * Aquí, si el archivo es más grande, se dice de inmediato y se sugiere partirlo.
+ */
+export const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
+export const MAX_IMPORT_ROWS = 5000;
+
+/** Extensiones aceptadas. `.xls` (BIFF antiguo) se rechaza con instrucción, no con un error críptico. */
+export const IMPORT_EXTENSIONS = ['.xlsx', '.csv'] as const;
 
 /** Claves válidas del importador. Se declara antes que `IMPORT_FIELDS` para no auto-referenciarse. */
 export type ImportFieldKey =
@@ -238,6 +252,21 @@ export function autoMapColumns(headers: string[]): {
       used.add(hit.raw);
     }
   }
+
+  /**
+   * "Marca" sola es ambigua y en el Excel de una bodega casi siempre es la del vehículo: va al lado
+   * de Modelo y Año. Si quedó sin asignar y hay modelo o años, se toma para el vehículo; si no hay
+   * nada que la acompañe, es el fabricante de la pieza.
+   *
+   * Se resuelve después del bucle para no cambiar el orden de prioridad de los alias declarados.
+   */
+  const loose = headers.find((h) => !used.has(h) && normalizeHeader(h) === 'marca');
+  if (loose) {
+    const hasVehicleContext = Boolean(mapping.vehicleModel || mapping.vehicleYears);
+    mapping[hasVehicleContext ? 'vehicleBrand' : 'brand'] = loose;
+    used.add(loose);
+  }
+
   return { mapping, unmapped: headers.filter((h) => !used.has(h)) };
 }
 
@@ -480,6 +509,8 @@ export interface ImportPreview {
   errors: { rowNumber: number; errors: RowError[] }[];
   warnings: { rowNumber: number; warnings: RowError[] }[];
   unmappedHeaders: string[];
+  /** Primeras filas válidas ya interpretadas: es lo que la vista previa muestra como "esto se va a crear". */
+  sample: { rowNumber: number; row: ImportRow }[];
 }
 
 /** Resumen para la vista previa: qué va a pasar si se confirma. No escribe nada. */
@@ -529,5 +560,125 @@ export function buildPreview(
       .slice(0, 200)
       .map((v) => ({ rowNumber: v.rowNumber, warnings: v.warnings })),
     unmappedHeaders,
+    /**
+     * Solo las primeras ocho: la vista previa sirve para reconocer el archivo ("¿esto es lo que
+     * tengo?"), no para revisarlo entero. Las 3.000 filas se confirman con el resumen, no mirándolas.
+     */
+    sample: valid.slice(0, 8).map((v) => ({ rowNumber: v.rowNumber, row: v.data as ImportRow })),
   };
+}
+
+// ───────────────────────────── API del importador ─────────────────────────────
+
+/** Cómo se resuelve un SKU que ya existe en el catálogo. */
+export const IMPORT_MODES = ['CREAR', 'ACTUALIZAR', 'OMITIR_EXISTENTES'] as const;
+export type ImportMode = (typeof IMPORT_MODES)[number];
+
+export const IMPORT_MODE_LABEL: Record<ImportMode, string> = {
+  CREAR: 'Crear solo lo nuevo',
+  ACTUALIZAR: 'Actualizar existentes y crear nuevos',
+  OMITIR_EXISTENTES: 'Omitir los que ya existen',
+};
+
+export const IMPORT_MODE_HINT: Record<ImportMode, string> = {
+  CREAR: 'Los SKU que ya están en el catálogo se reportan y no se tocan. Es el modo prudente.',
+  ACTUALIZAR:
+    'Precio, costo, nombre y aplicaciones se sobrescriben con lo del archivo. La existencia NO se toca: entra como ajuste desde Inventario.',
+  OMITIR_EXISTENTES: 'Solo sirve para cargar piezas nuevas; lo existente se salta en silencio.',
+};
+
+export const importCommitSchema = z.object({
+  mode: z.enum(IMPORT_MODES).default('CREAR'),
+  /** Encabezado del archivo elegido para cada campo. Solo hace falta lo que se mapea. */
+  mapping: z.record(z.string(), z.string().min(1)),
+  /** Bodega por defecto para las filas que no traen código de bodega. */
+  warehouseId: z.string().uuid().nullish(),
+});
+export type ImportCommitData = z.output<typeof importCommitSchema>;
+
+/**
+ * Sin SKU, nombre y precio no hay nada que crear. Se comprueba aquí y no en la UI porque el mapeo
+ * también llega por API (y por la app móvil cuando exista).
+ */
+export function mappingProblems(mapping: ColumnMapping): string[] {
+  const problems: string[] = [];
+  if (!mapping.sku) problems.push('Falta elegir la columna del SKU');
+  if (!mapping.name) problems.push('Falta elegir la columna del nombre');
+  if (!mapping.price) problems.push('Falta elegir la columna del precio de venta');
+  return problems;
+}
+
+export type ImportStatusKey = 'PENDIENTE' | 'PROCESANDO' | 'COMPLETADA' | 'PARCIAL' | 'FALLIDA';
+
+export const IMPORT_STATUS_LABEL: Record<ImportStatusKey, string> = {
+  PENDIENTE: 'Por revisar',
+  PROCESANDO: 'Importando',
+  COMPLETADA: 'Completada',
+  PARCIAL: 'Completada con errores',
+  FALLIDA: 'Fallida',
+};
+
+export interface ImportJobSummary {
+  id: string;
+  fileName: string;
+  status: ImportStatusKey;
+  mode: ImportMode;
+  totalRows: number;
+  processedRows: number;
+  successRows: number;
+  errorRows: number;
+  createdParts: number;
+  createdVariants: number;
+  updatedVariants: number;
+  skippedRows: number;
+  createdAt: string;
+  finishedAt: string | null;
+  createdBy: string | null;
+  error: string | null;
+}
+
+export interface ImportSheet {
+  /** Encabezados tal cual vienen en el archivo, en su orden. */
+  headers: string[];
+  /** Filas ya normalizadas a texto. Las celdas vacías llegan como `null`, no como "". */
+  rows: Record<string, string | number | null>[];
+  /** Lo que el importador propone mapear sin intervención. */
+  mapping: ColumnMapping;
+  unmapped: string[];
+  /** Cuántas filas trae la hoja, incluidas las que se van a rechazar. */
+  rowCount: number;
+  /** Se avisa cuando el archivo trae más filas que el máximo: no se trunca en silencio. */
+  truncated: boolean;
+  /** Nombre de la hoja dentro del libro. `CSV` cuando es texto. */
+  sheetName: string;
+}
+
+export interface ImportUploadResponse {
+  job: ImportJobSummary;
+  sheet: ImportSheet;
+  /** Vista previa con el mapeo automático. Cambiar el mapeo la vuelve a pedir. */
+  preview: ImportPreview;
+}
+
+export interface ImportJobDetail extends ImportJobSummary {
+  rowErrors: { rowNumber: number; field: string | null; message: string }[];
+}
+
+/**
+ * Un error de fila se puede arreglar en el mismo Excel, así que siempre lleva fila y columna.
+ * `message` está escrito para alguien que está mirando la hoja, no para un log.
+ */
+export function importProblem(file: { size: number; originalname: string }): string | null {
+  if (file.size <= 0) return 'El archivo está vacío';
+  if (file.size > MAX_IMPORT_BYTES) {
+    return `El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)} MB. El máximo es 10 MB`;
+  }
+  const lower = file.originalname.toLowerCase();
+  if (lower.endsWith('.xls') || lower.endsWith('.xlsm')) {
+    return 'El formato .xls antiguo no se puede leer. Ábrelo en Excel y guárdalo como .xlsx';
+  }
+  if (!IMPORT_EXTENSIONS.some((ext) => lower.endsWith(ext))) {
+    return 'Solo se aceptan archivos .xlsx o .csv';
+  }
+  return null;
 }

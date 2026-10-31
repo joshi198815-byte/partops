@@ -14,7 +14,12 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model PushToken
- * 
+ * *
+ *  * Destino de un aviso.
+ *  *
+ *  * `token` es la dirección de entrega y es única en toda la base, no por negocio: dos negocios no
+ *  * pueden compartir el mismo teléfono suscrito, y si alguien cambia de bodega se reasigna la fila en
+ *  * vez de acumular avisos a una suscripción que ya no existe.
  */
 export type PushTokenModel = runtime.Types.Result.DefaultSelection<Prisma.$PushTokenPayload>
 
@@ -30,6 +35,9 @@ export type PushTokenMinAggregateOutputType = {
   tenantId: string | null
   token: string | null
   platform: string | null
+  p256dh: string | null
+  auth: string | null
+  userAgent: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -40,6 +48,9 @@ export type PushTokenMaxAggregateOutputType = {
   tenantId: string | null
   token: string | null
   platform: string | null
+  p256dh: string | null
+  auth: string | null
+  userAgent: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +61,9 @@ export type PushTokenCountAggregateOutputType = {
   tenantId: number
   token: number
   platform: number
+  p256dh: number
+  auth: number
+  userAgent: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -62,6 +76,9 @@ export type PushTokenMinAggregateInputType = {
   tenantId?: true
   token?: true
   platform?: true
+  p256dh?: true
+  auth?: true
+  userAgent?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -72,6 +89,9 @@ export type PushTokenMaxAggregateInputType = {
   tenantId?: true
   token?: true
   platform?: true
+  p256dh?: true
+  auth?: true
+  userAgent?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +102,9 @@ export type PushTokenCountAggregateInputType = {
   tenantId?: true
   token?: true
   platform?: true
+  p256dh?: true
+  auth?: true
+  userAgent?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -165,6 +188,9 @@ export type PushTokenGroupByOutputType = {
   tenantId: string
   token: string
   platform: string
+  p256dh: string | null
+  auth: string | null
+  userAgent: string | null
   createdAt: Date
   updatedAt: Date
   _count: PushTokenCountAggregateOutputType | null
@@ -196,6 +222,9 @@ export type PushTokenWhereInput = {
   tenantId?: Prisma.StringFilter<"PushToken"> | string
   token?: Prisma.StringFilter<"PushToken"> | string
   platform?: Prisma.StringFilter<"PushToken"> | string
+  p256dh?: Prisma.StringNullableFilter<"PushToken"> | string | null
+  auth?: Prisma.StringNullableFilter<"PushToken"> | string | null
+  userAgent?: Prisma.StringNullableFilter<"PushToken"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PushToken"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PushToken"> | Date | string
 }
@@ -206,6 +235,9 @@ export type PushTokenOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   token?: Prisma.SortOrder
   platform?: Prisma.SortOrder
+  p256dh?: Prisma.SortOrderInput | Prisma.SortOrder
+  auth?: Prisma.SortOrderInput | Prisma.SortOrder
+  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -219,6 +251,9 @@ export type PushTokenWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"PushToken"> | string
   tenantId?: Prisma.StringFilter<"PushToken"> | string
   platform?: Prisma.StringFilter<"PushToken"> | string
+  p256dh?: Prisma.StringNullableFilter<"PushToken"> | string | null
+  auth?: Prisma.StringNullableFilter<"PushToken"> | string | null
+  userAgent?: Prisma.StringNullableFilter<"PushToken"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PushToken"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PushToken"> | Date | string
 }, "id" | "token">
@@ -229,6 +264,9 @@ export type PushTokenOrderByWithAggregationInput = {
   tenantId?: Prisma.SortOrder
   token?: Prisma.SortOrder
   platform?: Prisma.SortOrder
+  p256dh?: Prisma.SortOrderInput | Prisma.SortOrder
+  auth?: Prisma.SortOrderInput | Prisma.SortOrder
+  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PushTokenCountOrderByAggregateInput
@@ -245,6 +283,9 @@ export type PushTokenScalarWhereWithAggregatesInput = {
   tenantId?: Prisma.StringWithAggregatesFilter<"PushToken"> | string
   token?: Prisma.StringWithAggregatesFilter<"PushToken"> | string
   platform?: Prisma.StringWithAggregatesFilter<"PushToken"> | string
+  p256dh?: Prisma.StringNullableWithAggregatesFilter<"PushToken"> | string | null
+  auth?: Prisma.StringNullableWithAggregatesFilter<"PushToken"> | string | null
+  userAgent?: Prisma.StringNullableWithAggregatesFilter<"PushToken"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PushToken"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PushToken"> | Date | string
 }
@@ -255,6 +296,9 @@ export type PushTokenCreateInput = {
   tenantId: string
   token: string
   platform: string
+  p256dh?: string | null
+  auth?: string | null
+  userAgent?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -265,6 +309,9 @@ export type PushTokenUncheckedCreateInput = {
   tenantId: string
   token: string
   platform: string
+  p256dh?: string | null
+  auth?: string | null
+  userAgent?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -275,6 +322,9 @@ export type PushTokenUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
+  p256dh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  auth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -285,6 +335,9 @@ export type PushTokenUncheckedUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
+  p256dh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  auth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -295,6 +348,9 @@ export type PushTokenCreateManyInput = {
   tenantId: string
   token: string
   platform: string
+  p256dh?: string | null
+  auth?: string | null
+  userAgent?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -305,6 +361,9 @@ export type PushTokenUpdateManyMutationInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
+  p256dh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  auth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -315,6 +374,9 @@ export type PushTokenUncheckedUpdateManyInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
+  p256dh?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  auth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -325,6 +387,9 @@ export type PushTokenCountOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   token?: Prisma.SortOrder
   platform?: Prisma.SortOrder
+  p256dh?: Prisma.SortOrder
+  auth?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -335,6 +400,9 @@ export type PushTokenMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   token?: Prisma.SortOrder
   platform?: Prisma.SortOrder
+  p256dh?: Prisma.SortOrder
+  auth?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -345,6 +413,9 @@ export type PushTokenMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   token?: Prisma.SortOrder
   platform?: Prisma.SortOrder
+  p256dh?: Prisma.SortOrder
+  auth?: Prisma.SortOrder
+  userAgent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -357,6 +428,9 @@ export type PushTokenSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tenantId?: boolean
   token?: boolean
   platform?: boolean
+  p256dh?: boolean
+  auth?: boolean
+  userAgent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["pushToken"]>
@@ -367,6 +441,9 @@ export type PushTokenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   token?: boolean
   platform?: boolean
+  p256dh?: boolean
+  auth?: boolean
+  userAgent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["pushToken"]>
@@ -377,6 +454,9 @@ export type PushTokenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   token?: boolean
   platform?: boolean
+  p256dh?: boolean
+  auth?: boolean
+  userAgent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["pushToken"]>
@@ -387,11 +467,14 @@ export type PushTokenSelectScalar = {
   tenantId?: boolean
   token?: boolean
   platform?: boolean
+  p256dh?: boolean
+  auth?: boolean
+  userAgent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PushTokenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tenantId" | "token" | "platform" | "createdAt" | "updatedAt", ExtArgs["result"]["pushToken"]>
+export type PushTokenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tenantId" | "token" | "platform" | "p256dh" | "auth" | "userAgent" | "createdAt" | "updatedAt", ExtArgs["result"]["pushToken"]>
 
 export type $PushTokenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PushToken"
@@ -400,8 +483,20 @@ export type $PushTokenPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: string
     userId: string
     tenantId: string
+    /**
+     * * Endpoint de Web Push o token de FCM. La dirección, no el secreto.
+     */
     token: string
+    /**
+     * * `web` o `fcm`. Determina por qué transporte sale el aviso.
+     */
     platform: string
+    /**
+     * * Claves de la suscripción Web Push (`aes128gcm`). Nulas en FCM.
+     */
+    p256dh: string | null
+    auth: string | null
+    userAgent: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["pushToken"]>
@@ -832,6 +927,9 @@ export interface PushTokenFieldRefs {
   readonly tenantId: Prisma.FieldRef<"PushToken", 'String'>
   readonly token: Prisma.FieldRef<"PushToken", 'String'>
   readonly platform: Prisma.FieldRef<"PushToken", 'String'>
+  readonly p256dh: Prisma.FieldRef<"PushToken", 'String'>
+  readonly auth: Prisma.FieldRef<"PushToken", 'String'>
+  readonly userAgent: Prisma.FieldRef<"PushToken", 'String'>
   readonly createdAt: Prisma.FieldRef<"PushToken", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PushToken", 'DateTime'>
 }

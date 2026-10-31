@@ -192,6 +192,26 @@ describe.skipIf(!canRun)('RLS: aislamiento entre negocios', () => {
     ).rejects.toThrow();
   });
 
+  it('toda tabla de negocio con tenantId tiene RLS forzado', async () => {
+    // `plan_grant` se coló sin política hasta que esta prueba existió: la lista de tablas de la
+    // migración es manual y una tabla nueva que alguien olvide ahí filtra datos entre negocios.
+    // Aquí se pregunta a la base, no a una lista: si aparece una tabla con `tenantId` sin RLS, falla.
+    const rows = await base.$queryRaw<{ tabla: string; rls: boolean; forzado: boolean }[]>`
+      SELECT c.relname AS "tabla", c.relrowsecurity AS "rls", c.relforcerowsecurity AS "forzado"
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public' AND c.relkind = 'r'
+        AND EXISTS (
+          SELECT 1 FROM information_schema.columns col
+          WHERE col.table_schema = 'public' AND col.table_name = c.relname
+            AND col.column_name = 'tenantId'
+        )
+        AND c.relname <> 'public_hit'`;
+    const sinRls = rows.filter((r) => !r.rls || !r.forzado).map((r) => r.tabla);
+    expect(sinRls).toEqual([]);
+    expect(rows.length).toBeGreaterThan(20);
+  });
+
   it('los años de una aplicación no pueden estar invertidos', async () => {
     await expect(
       systemTx(base, async (tx) => {

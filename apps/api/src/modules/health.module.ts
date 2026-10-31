@@ -1,13 +1,15 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Inject, Res } from '@nestjs/common';
 import type { Response } from 'express';
+import { Public } from '../common/context.js';
 import { DatabaseService } from '../infra/database.module.js';
 import { InventoryService } from './inventory/inventory.service.js';
 
 @Controller('health')
+@Public()
 export class HealthController {
   private readonly startedAt = Date.now();
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {}
 
   /** Liveness: Render lo usa para saber que el proceso responde. No toca la base. */
   @Get('live')

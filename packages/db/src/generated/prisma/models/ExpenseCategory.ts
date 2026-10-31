@@ -176,6 +176,7 @@ export type ExpenseCategoryWhereInput = {
   isSystem?: Prisma.BoolFilter<"ExpenseCategory"> | boolean
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   expenses?: Prisma.ExpenseListRelationFilter
+  recurring?: Prisma.RecurringExpenseListRelationFilter
 }
 
 export type ExpenseCategoryOrderByWithRelationInput = {
@@ -185,6 +186,7 @@ export type ExpenseCategoryOrderByWithRelationInput = {
   isSystem?: Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  recurring?: Prisma.RecurringExpenseOrderByRelationAggregateInput
 }
 
 export type ExpenseCategoryWhereUniqueInput = Prisma.AtLeast<{
@@ -198,6 +200,7 @@ export type ExpenseCategoryWhereUniqueInput = Prisma.AtLeast<{
   isSystem?: Prisma.BoolFilter<"ExpenseCategory"> | boolean
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   expenses?: Prisma.ExpenseListRelationFilter
+  recurring?: Prisma.RecurringExpenseListRelationFilter
 }, "id" | "tenantId_name">
 
 export type ExpenseCategoryOrderByWithAggregationInput = {
@@ -226,6 +229,7 @@ export type ExpenseCategoryCreateInput = {
   isSystem?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutExpenseCatsInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutCategoryInput
+  recurring?: Prisma.RecurringExpenseCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryUncheckedCreateInput = {
@@ -234,6 +238,7 @@ export type ExpenseCategoryUncheckedCreateInput = {
   name: string
   isSystem?: boolean
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCategoryInput
+  recurring?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryUpdateInput = {
@@ -242,6 +247,7 @@ export type ExpenseCategoryUpdateInput = {
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutExpenseCatsNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutCategoryNestedInput
+  recurring?: Prisma.RecurringExpenseUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryUncheckedUpdateInput = {
@@ -250,6 +256,7 @@ export type ExpenseCategoryUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCategoryNestedInput
+  recurring?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryCreateManyInput = {
@@ -371,11 +378,28 @@ export type ExpenseCategoryUpdateOneWithoutExpensesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ExpenseCategoryUpdateToOneWithWhereWithoutExpensesInput, Prisma.ExpenseCategoryUpdateWithoutExpensesInput>, Prisma.ExpenseCategoryUncheckedUpdateWithoutExpensesInput>
 }
 
+export type ExpenseCategoryCreateNestedOneWithoutRecurringInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCategoryCreateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedCreateWithoutRecurringInput>
+  connectOrCreate?: Prisma.ExpenseCategoryCreateOrConnectWithoutRecurringInput
+  connect?: Prisma.ExpenseCategoryWhereUniqueInput
+}
+
+export type ExpenseCategoryUpdateOneWithoutRecurringNestedInput = {
+  create?: Prisma.XOR<Prisma.ExpenseCategoryCreateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedCreateWithoutRecurringInput>
+  connectOrCreate?: Prisma.ExpenseCategoryCreateOrConnectWithoutRecurringInput
+  upsert?: Prisma.ExpenseCategoryUpsertWithoutRecurringInput
+  disconnect?: Prisma.ExpenseCategoryWhereInput | boolean
+  delete?: Prisma.ExpenseCategoryWhereInput | boolean
+  connect?: Prisma.ExpenseCategoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ExpenseCategoryUpdateToOneWithWhereWithoutRecurringInput, Prisma.ExpenseCategoryUpdateWithoutRecurringInput>, Prisma.ExpenseCategoryUncheckedUpdateWithoutRecurringInput>
+}
+
 export type ExpenseCategoryCreateWithoutTenantInput = {
   id?: string
   name: string
   isSystem?: boolean
   expenses?: Prisma.ExpenseCreateNestedManyWithoutCategoryInput
+  recurring?: Prisma.RecurringExpenseCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryUncheckedCreateWithoutTenantInput = {
@@ -383,6 +407,7 @@ export type ExpenseCategoryUncheckedCreateWithoutTenantInput = {
   name: string
   isSystem?: boolean
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCategoryInput
+  recurring?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryCreateOrConnectWithoutTenantInput = {
@@ -426,6 +451,7 @@ export type ExpenseCategoryCreateWithoutExpensesInput = {
   name: string
   isSystem?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutExpenseCatsInput
+  recurring?: Prisma.RecurringExpenseCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryUncheckedCreateWithoutExpensesInput = {
@@ -433,6 +459,7 @@ export type ExpenseCategoryUncheckedCreateWithoutExpensesInput = {
   tenantId: string
   name: string
   isSystem?: boolean
+  recurring?: Prisma.RecurringExpenseUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type ExpenseCategoryCreateOrConnectWithoutExpensesInput = {
@@ -456,6 +483,7 @@ export type ExpenseCategoryUpdateWithoutExpensesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutExpenseCatsNestedInput
+  recurring?: Prisma.RecurringExpenseUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryUncheckedUpdateWithoutExpensesInput = {
@@ -463,6 +491,55 @@ export type ExpenseCategoryUncheckedUpdateWithoutExpensesInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutCategoryNestedInput
+}
+
+export type ExpenseCategoryCreateWithoutRecurringInput = {
+  id?: string
+  name: string
+  isSystem?: boolean
+  tenant: Prisma.TenantCreateNestedOneWithoutExpenseCatsInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutCategoryInput
+}
+
+export type ExpenseCategoryUncheckedCreateWithoutRecurringInput = {
+  id?: string
+  tenantId: string
+  name: string
+  isSystem?: boolean
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCategoryInput
+}
+
+export type ExpenseCategoryCreateOrConnectWithoutRecurringInput = {
+  where: Prisma.ExpenseCategoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExpenseCategoryCreateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedCreateWithoutRecurringInput>
+}
+
+export type ExpenseCategoryUpsertWithoutRecurringInput = {
+  update: Prisma.XOR<Prisma.ExpenseCategoryUpdateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedUpdateWithoutRecurringInput>
+  create: Prisma.XOR<Prisma.ExpenseCategoryCreateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedCreateWithoutRecurringInput>
+  where?: Prisma.ExpenseCategoryWhereInput
+}
+
+export type ExpenseCategoryUpdateToOneWithWhereWithoutRecurringInput = {
+  where?: Prisma.ExpenseCategoryWhereInput
+  data: Prisma.XOR<Prisma.ExpenseCategoryUpdateWithoutRecurringInput, Prisma.ExpenseCategoryUncheckedUpdateWithoutRecurringInput>
+}
+
+export type ExpenseCategoryUpdateWithoutRecurringInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutExpenseCatsNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutCategoryNestedInput
+}
+
+export type ExpenseCategoryUncheckedUpdateWithoutRecurringInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryCreateManyTenantInput = {
@@ -476,6 +553,7 @@ export type ExpenseCategoryUpdateWithoutTenantInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   expenses?: Prisma.ExpenseUpdateManyWithoutCategoryNestedInput
+  recurring?: Prisma.RecurringExpenseUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryUncheckedUpdateWithoutTenantInput = {
@@ -483,6 +561,7 @@ export type ExpenseCategoryUncheckedUpdateWithoutTenantInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCategoryNestedInput
+  recurring?: Prisma.RecurringExpenseUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type ExpenseCategoryUncheckedUpdateManyWithoutTenantInput = {
@@ -498,10 +577,12 @@ export type ExpenseCategoryUncheckedUpdateManyWithoutTenantInput = {
 
 export type ExpenseCategoryCountOutputType = {
   expenses: number
+  recurring: number
 }
 
 export type ExpenseCategoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   expenses?: boolean | ExpenseCategoryCountOutputTypeCountExpensesArgs
+  recurring?: boolean | ExpenseCategoryCountOutputTypeCountRecurringArgs
 }
 
 /**
@@ -521,6 +602,13 @@ export type ExpenseCategoryCountOutputTypeCountExpensesArgs<ExtArgs extends runt
   where?: Prisma.ExpenseWhereInput
 }
 
+/**
+ * ExpenseCategoryCountOutputType without action
+ */
+export type ExpenseCategoryCountOutputTypeCountRecurringArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecurringExpenseWhereInput
+}
+
 
 export type ExpenseCategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -529,6 +617,7 @@ export type ExpenseCategorySelect<ExtArgs extends runtime.Types.Extensions.Inter
   isSystem?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   expenses?: boolean | Prisma.ExpenseCategory$expensesArgs<ExtArgs>
+  recurring?: boolean | Prisma.ExpenseCategory$recurringArgs<ExtArgs>
   _count?: boolean | Prisma.ExpenseCategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["expenseCategory"]>
 
@@ -559,6 +648,7 @@ export type ExpenseCategoryOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type ExpenseCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   expenses?: boolean | Prisma.ExpenseCategory$expensesArgs<ExtArgs>
+  recurring?: boolean | Prisma.ExpenseCategory$recurringArgs<ExtArgs>
   _count?: boolean | Prisma.ExpenseCategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ExpenseCategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -573,6 +663,7 @@ export type $ExpenseCategoryPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     tenant: Prisma.$TenantPayload<ExtArgs>
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
+    recurring: Prisma.$RecurringExpensePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -975,6 +1066,7 @@ export interface Prisma__ExpenseCategoryClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   expenses<T extends Prisma.ExpenseCategory$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExpenseCategory$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recurring<T extends Prisma.ExpenseCategory$recurringArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ExpenseCategory$recurringArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecurringExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1430,6 +1522,30 @@ export type ExpenseCategory$expensesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * ExpenseCategory.recurring
+ */
+export type ExpenseCategory$recurringArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecurringExpense
+   */
+  select?: Prisma.RecurringExpenseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecurringExpense
+   */
+  omit?: Prisma.RecurringExpenseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecurringExpenseInclude<ExtArgs> | null
+  where?: Prisma.RecurringExpenseWhereInput
+  orderBy?: Prisma.RecurringExpenseOrderByWithRelationInput | Prisma.RecurringExpenseOrderByWithRelationInput[]
+  cursor?: Prisma.RecurringExpenseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecurringExpenseScalarFieldEnum | Prisma.RecurringExpenseScalarFieldEnum[]
 }
 
 /**

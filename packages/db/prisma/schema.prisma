@@ -162,6 +162,8 @@ model Tenant {
   orderSeq     Int    @default(0)
   receiptPrefix String @default("R")
   receiptSeq   Int    @default(0)
+  /** Folio de traslados entre bodegas (`TR-0007`). Se incrementa con UPDATE atómico. */
+  transferSeq  Int    @default(0)
 
   catalogEnabled Boolean @default(false)
   catalogTagline String?
@@ -180,6 +182,7 @@ model Tenant {
   orders         SalesOrder[]
   expenses       Expense[]
   expenseCats    ExpenseCategory[]
+  recurringExpenses RecurringExpense[]
   metrics        DailyMetric[]
   searchEvents   SearchEvent[]
   demandDaily    DemandDaily[]
@@ -279,17 +282,60 @@ model Notification {
   @@map("notification")
 }
 
+/**
+ * Destino de un aviso.
+ *
+ * `token` es la dirección de entrega y es única en toda la base, no por negocio: dos negocios no
+ * pueden compartir el mismo teléfono suscrito, y si alguien cambia de bodega se reasigna la fila en
+ * vez de acumular avisos a una suscripción que ya no existe.
+ */
 model PushToken {
   id        String   @id @default(uuid(7))
   userId    String
   tenantId  String
+  /** Endpoint de Web Push o token de FCM. La dirección, no el secreto. */
   token     String   @unique
+  /** `web` o `fcm`. Determina por qué transporte sale el aviso. */
   platform  String
+  /** Claves de la suscripción Web Push (`aes128gcm`). Nulas en FCM. */
+  p256dh    String?
+  auth      String?
+  userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([tenantId, userId])
   @@map("push_token")
+}
+
+/**
+ * Operaciones de despacho ya aplicadas.
+ *
+ * El bodeguero toca "listo" sin señal, el teléfono guarda la operación y la reintenta al volver.
+ * Sin esta tabla el reintento aplicaría el cambio otra vez: un `LISTO → ENTREGADO` repetido
+ * descuenta la pieza dos veces del inventario y el estante queda con una pieza fantasma.
+ *
+ * La clave es `opId`, que genera el teléfono y nunca se reutiliza para otra línea.
+ */
+model DispatchOp {
+  id        String   @id @default(uuid(7))
+  tenantId  String
+  opId      String
+  orderId   String
+  itemId    String
+  /** Estado pedido por el teléfono, tal cual llegó. */
+  status    String
+  /** `APLICADO` o `RECHAZADO`. El reintento lee esto y responde lo mismo que la primera vez. */
+  outcome   String
+  /** Código leído, si hubo escaneo. Se guarda para auditar una entrega discutida. */
+  scannedCode String?
+  actorId   String
+  createdAt DateTime @default(now())
+
+  @@unique([tenantId, opId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, orderId])
+  @@map("dispatch_op")
 }
 
 /** Cola durable en Postgres. Sin Redis: en el plan gratis no hay y no hace falta. */
@@ -469,14 +515,21 @@ model StockTransfer {
 }
 
 model StockTransferItem {
-  id         String   @id @default(uuid(7))
-  tenantId   String
-  transferId String
-  variantId  String
-  quantity   Int
-  transfer   StockTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid(7))
+  tenantId    String
+  transferId  String
+  variantId   String
+  quantity    Int
+  /**
+   * Lo que de verdad llegó al destino. Un traslado puede recibirse incompleto (se perdió una caja
+   * en el camino) y lo pendiente sigue en tránsito: sin esta columna habría que cerrar el traslado
+   * entero y la diferencia aparecería como ajuste sin explicación.
+   */
+  receivedQty Int      @default(0)
+  transfer    StockTransfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, transferId])
+  @@index([tenantId, variantId])
   @@map("stock_transfer_item")
 }
 
@@ -571,11 +624,16 @@ model PartImage {
   tenantId String
   partId   String
   url      String
+  /** WebP de respaldo: AVIF no lo abre cualquier WebView Android de bodega. */
+  fallbackUrl String?
   alt      String?
+  width    Int?
+  height   Int?
   position Int     @default(0)
   part     Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
 
   @@index([partId])
+  @@index([tenantId, partId])
   @@map("part_image")
 }
 
@@ -604,11 +662,19 @@ enum ImportStatus {
   FALLIDA
 }
 
+/** Qué se hace con un SKU que ya existe. Se guarda con el job para poder auditar la decisión. */
+enum ImportMode {
+  CREAR
+  ACTUALIZAR
+  OMITIR_EXISTENTES
+}
+
 model ImportJob {
   id           String       @id @default(uuid(7))
   tenantId     String
   fileName     String
   status       ImportStatus @default(PENDIENTE)
+  mode         ImportMode   @default(CREAR)
   mapping      Json
   payload      Json?
   warehouseId  String?
@@ -616,6 +682,8 @@ model ImportJob {
   processedRows Int         @default(0)
   successRows  Int          @default(0)
   errorRows    Int          @default(0)
+  /** Filas válidas que se saltaron a propósito (`OMITIR_EXISTENTES`). */
+  skippedRows  Int          @default(0)
   createdParts Int          @default(0)
   createdVariants Int       @default(0)
   updatedVariants Int       @default(0)
@@ -701,8 +769,11 @@ model SalesOrder {
   customerTaxId  String?
   channel        OrderChannel @default(MOSTRADOR)
   status         OrderStatus  @default(ABIERTO)
-  sellerId       String
+  /** Nulo en un pedido de invitado del catálogo público: no hay empleado que lo haya capturado. */
+  sellerId       String?
   warehouseId    String
+  /** Slug del negocio en la vitrina cuando el pedido nació en `/c/<slug>`. */
+  sourceSlug     String?
   /** Total con impuesto incluido, en centavos. Suma exacta de las líneas. */
   subtotalCents  Int          @default(0)
   taxCents       Int          @default(0)
@@ -803,7 +874,11 @@ model Receipt {
   folio     String
   /** Token público de 128 bits: el cliente abre /r/<token> sin cuenta y sin filtrar nada más. */
   token     String   @unique
+  /** PDF de hoja carta. Se genera una vez y no se vuelve a tocar. */
   pdfKey    String?
+  /** PDF de ticket 80 mm para la impresora térmica del mostrador. */
+  ticketKey String?
+  /** Lo que se imprimió ese día. Congelado: ni precios ni nombre del negocio cambian después. */
   snapshot  Json
   totalCents Int
   createdAt DateTime @default(now())
@@ -824,6 +899,7 @@ model ExpenseCategory {
   isSystem Boolean   @default(false)
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   expenses Expense[]
+  recurring RecurringExpense[]
 
   @@unique([tenantId, name])
   @@map("expense_category")
@@ -844,6 +920,34 @@ model Expense {
 
   @@index([tenantId, paidAt])
   @@map("expense")
+}
+
+/**
+ * Gasto fijo mensual.
+ *
+ * Es una plantilla, no un gasto: el mantenimiento crea el gasto del mes a partir de ella y anota
+ * `lastRunMonth` para no crearlo dos veces. Guardar el gasto directamente obligaría a capturar el
+ * alquiler cada mes, y el mes que se olvide descuadra la utilidad sin que nadie lo note.
+ */
+model RecurringExpense {
+  id           String   @id @default(uuid(7))
+  tenantId     String
+  categoryId   String?
+  title        String
+  amountCents  Int
+  /** Día del mes en que se paga (1–28: el 31 no existe en febrero). */
+  dayOfMonth   Int      @default(1)
+  active       Boolean  @default(true)
+  /** `YYYY-MM` del último mes generado. Nulo = nunca se ha generado. */
+  lastRunMonth String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category ExpenseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, active])
+  @@map("recurring_expense")
 }
 
 /** Agregado diario: el tablero lee de aquí en vez de sumar pedidos de todo el historial. */
@@ -913,15 +1017,36 @@ model StockWatch {
   customerName  String
   customerPhone String
   notifiedAt DateTime?
+  /** Quién mandó el aviso. Sin esto, dos vendedores notifican al mismo cliente. */
+  notifiedBy String?
   createdAt  DateTime  @default(now())
   tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, notifiedAt])
   @@index([tenantId, variantId])
+  @@index([tenantId, partId])
   @@map("stock_watch")
 }
 
 // ───────────────────────────── Plataforma ─────────────────────────────
+
+/**
+ * Contador de la superficie pública.
+ *
+ * No guarda IPs: `key` es el hash de la IP o del token de Turnstile. Sin tenant en la mayoría de
+ * los casos (se escribe antes de resolver el negocio) y sin RLS a propósito.
+ */
+model PublicHit {
+  id        String   @id @default(uuid(7))
+  key       String
+  scope     String
+  tenantId  String?
+  createdAt DateTime @default(now())
+
+  @@index([key, scope, createdAt])
+  @@index([createdAt])
+  @@map("public_hit")
+}
 
 /** Plan concedido a mano (v1 sin pasarela de pago). */
 model PlanGrant {

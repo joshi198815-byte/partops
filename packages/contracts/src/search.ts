@@ -343,7 +343,12 @@ export function parsePartQuery(raw: string, vocab: VehicleVocabulary): ParsedQue
 
   // 5. Sinónimos: si alguna palabra es una forma conocida, el término se canoniza.
   //    "cubierta nissan sentra" → término "capo", para que el trigram case con la categoría real.
-  const termFromSynonym = leftover.some((t) => Boolean(PART_SYNONYMS[t]));
+  //    Solo cuenta como sinónimo cuando CAMBIA la palabra: "capo" está en el diccionario como sí
+  //    misma, y marcarlo así haría que la interfaz dijera "sinónimo del mostrador" en cada búsqueda.
+  const termFromSynonym = leftover.some((t) => {
+    const canonical = PART_SYNONYMS[t];
+    return Boolean(canonical) && canonical !== t;
+  });
 
   // 6. Sin sinónimo, se corrigen erratas contra las categorías conocidas (una sola edición:
   //    "amortiguadro" → "amortiguador" sí; "pastilla" → "defensa" no).
@@ -380,6 +385,132 @@ export function toTsQuery(term: string): string | null {
   const tokens = tokenize(term).filter((t) => t.length >= 2);
   if (!tokens.length) return null;
   return tokens.map((t) => `${t.replace(/[&|!():*<>]/g, '')}:*`).join(' & ');
+}
+
+/**
+ * Candidatos a código (OEM, SKU, número de parte) dentro de la consulta.
+ *
+ * El vendedor teclea "04465-0K290" o "04465 0k290": en los dos casos tiene que encontrar la pieza.
+ * Por eso se compara sin signos y en mayúsculas, y por eso se descartan los años —"2009" es un año,
+ * no un código— para no meter ruido en el `ANY(...)` del SQL.
+ */
+export function extractPartCodes(raw: string): string[] {
+  const out = new Set<string>();
+  const keep = (value: string) => {
+    // Cinco caracteres como mínimo: un código de fabricante tiene siempre al menos eso, y con
+    // menos se empieza a capturar basura ("2009", "12v") que ensucia el comparador.
+    if (value.length < 5) return;
+    if (!/\d/.test(value)) return;
+    const asYear = /^\d{4}$/.test(value) ? Number(value) : 0;
+    if (asYear >= 1900 && asYear <= 2100) return;
+    out.add(value);
+  };
+
+  const tokens = raw.split(/\s+/).filter(Boolean);
+  for (const token of tokens) keep(token.replace(/[^A-Za-z0-9]/g, '').toUpperCase());
+
+  /**
+   * El OEM se teclea partido: "04465 0k290". Solo se une cuando las dos partes llevan dígitos;
+   * unir "capo corolla 2009" produciría un pseudo-código de quince caracteres que nunca casa.
+   */
+  if (tokens.length === 2 && tokens.every((t) => /\d/.test(t))) {
+    keep(
+      tokens
+        .join('')
+        .replace(/[^A-Za-z0-9]/g, '')
+        .toUpperCase(),
+    );
+  }
+
+  // Seis bastan: una consulta con más códigos distintos no es una búsqueda, es un pegado.
+  return [...out].slice(0, 6);
+}
+
+// ───────────────────── Contrato de la búsqueda (API ↔ web) ─────────────────────
+
+export interface SearchAvailability {
+  warehouseId: string;
+  warehouseCode: string;
+  warehouseName: string;
+  /** `onHand - reserved`: lo que se puede prometer hoy. */
+  available: number;
+  binLocation: string | null;
+  reorderPoint: number | null;
+}
+
+export interface SearchVariant {
+  id: string;
+  sku: string;
+  title: string;
+  partNumber: string | null;
+  oemNumbers: string[];
+  priceCents: number;
+  /** `null` cuando la persona no tiene permiso de ver costos: no se manda y no se filtra en la UI. */
+  costCents: number | null;
+  totalAvailable: number;
+  availability: SearchAvailability[];
+}
+
+export interface SearchVehicle {
+  brand: string;
+  model: string;
+  yearStart: number;
+  yearEnd: number;
+  engine: string | null;
+}
+
+export interface SearchHit {
+  partId: string;
+  name: string;
+  brand: string | null;
+  category: string | null;
+  condition: 'NUEVO' | 'USADO' | 'REMANUFACTURADO';
+  unit: string;
+  warrantyDays: number | null;
+  imageUrl: string | null;
+  /** 1 cuando algún código de la consulta coincide exacto: es el orden que espera la bodega. */
+  codeMatch: boolean;
+  totalAvailable: number;
+  variants: SearchVariant[];
+  vehicles: SearchVehicle[];
+}
+
+export interface SearchFacet {
+  name: string;
+  /** Solo en modelos: la marca a la que pertenecen. */
+  brand?: string;
+  count: number;
+}
+
+export interface SearchResponse {
+  query: string;
+  parsed: {
+    term: string;
+    brand: string | null;
+    model: string | null;
+    year: number | null;
+    /** Correcciones ortográficas de vehículo: "corola" → "corolla". */
+    suggestions: string[];
+    /** Verdadero si el término salió de un sinónimo ("cubierta" → "capo"). */
+    synonym: boolean;
+  };
+  hits: SearchHit[];
+  facets: { brands: SearchFacet[]; models: SearchFacet[] };
+  total: number;
+  truncated: boolean;
+  tookMs: number;
+}
+
+/** Fila de "búsquedas sin existencia": qué pedir en la próxima compra. */
+export interface DemandRow {
+  term: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  searches: number;
+  withResults: number;
+  missedCount: number;
+  lastSeenAt: string | null;
 }
 
 /** Texto plano que se guarda en `part.searchText` para trigram y tsvector. */

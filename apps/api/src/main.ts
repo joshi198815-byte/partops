@@ -7,7 +7,6 @@ import { allowedOrigins, env, isProduction } from './config/env.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  const logger = new Logger('PartOps');
 
   app.setGlobalPrefix('api');
   app.enableCors({
@@ -27,12 +26,17 @@ async function bootstrap() {
     }),
   );
 
+  // Los logs se bufferizan hasta aquí; volcarlos es lo que hace visible el arranque en Render.
+  app.flushLogs();
   await app.listen(env.PORT, '0.0.0.0');
-  logger.log(`PartOps API escuchando en ${env.API_PUBLIC_URL} (rol: ${env.PROCESS_ROLE})`);
+
+  new Logger('PartOps').log(`PartOps API escuchando en ${env.API_PUBLIC_URL} (rol: ${env.PROCESS_ROLE})`);
 }
 
-bootstrap().catch((err) => {
-  // Sin este catch, un fallo de arranque (p. ej. env inválido) muere en silencio en Render.
-  new Logger('Bootstrap').error(err);
+bootstrap().catch((err: unknown) => {
+  // `console.error` y no el Logger: con `bufferLogs` activo, el logger de Nest puede no haber
+  // inicializado todavía cuando el fallo ocurre, y el error moriría sin imprimirse. Es
+  // exactamente el modo de falla que deja un contenedor reiniciándose sin pista alguna.
+  console.error('Fallo al arrancar PartOps API:', err);
   process.exit(1);
 });

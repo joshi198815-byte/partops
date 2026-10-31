@@ -27,10 +27,14 @@ export type AggregatePartImage = {
 }
 
 export type PartImageAvgAggregateOutputType = {
+  width: number | null
+  height: number | null
   position: number | null
 }
 
 export type PartImageSumAggregateOutputType = {
+  width: number | null
+  height: number | null
   position: number | null
 }
 
@@ -39,7 +43,10 @@ export type PartImageMinAggregateOutputType = {
   tenantId: string | null
   partId: string | null
   url: string | null
+  fallbackUrl: string | null
   alt: string | null
+  width: number | null
+  height: number | null
   position: number | null
 }
 
@@ -48,7 +55,10 @@ export type PartImageMaxAggregateOutputType = {
   tenantId: string | null
   partId: string | null
   url: string | null
+  fallbackUrl: string | null
   alt: string | null
+  width: number | null
+  height: number | null
   position: number | null
 }
 
@@ -57,17 +67,24 @@ export type PartImageCountAggregateOutputType = {
   tenantId: number
   partId: number
   url: number
+  fallbackUrl: number
   alt: number
+  width: number
+  height: number
   position: number
   _all: number
 }
 
 
 export type PartImageAvgAggregateInputType = {
+  width?: true
+  height?: true
   position?: true
 }
 
 export type PartImageSumAggregateInputType = {
+  width?: true
+  height?: true
   position?: true
 }
 
@@ -76,7 +93,10 @@ export type PartImageMinAggregateInputType = {
   tenantId?: true
   partId?: true
   url?: true
+  fallbackUrl?: true
   alt?: true
+  width?: true
+  height?: true
   position?: true
 }
 
@@ -85,7 +105,10 @@ export type PartImageMaxAggregateInputType = {
   tenantId?: true
   partId?: true
   url?: true
+  fallbackUrl?: true
   alt?: true
+  width?: true
+  height?: true
   position?: true
 }
 
@@ -94,7 +117,10 @@ export type PartImageCountAggregateInputType = {
   tenantId?: true
   partId?: true
   url?: true
+  fallbackUrl?: true
   alt?: true
+  width?: true
+  height?: true
   position?: true
   _all?: true
 }
@@ -190,7 +216,10 @@ export type PartImageGroupByOutputType = {
   tenantId: string
   partId: string
   url: string
+  fallbackUrl: string | null
   alt: string | null
+  width: number | null
+  height: number | null
   position: number
   _count: PartImageCountAggregateOutputType | null
   _avg: PartImageAvgAggregateOutputType | null
@@ -222,7 +251,10 @@ export type PartImageWhereInput = {
   tenantId?: Prisma.StringFilter<"PartImage"> | string
   partId?: Prisma.StringFilter<"PartImage"> | string
   url?: Prisma.StringFilter<"PartImage"> | string
+  fallbackUrl?: Prisma.StringNullableFilter<"PartImage"> | string | null
   alt?: Prisma.StringNullableFilter<"PartImage"> | string | null
+  width?: Prisma.IntNullableFilter<"PartImage"> | number | null
+  height?: Prisma.IntNullableFilter<"PartImage"> | number | null
   position?: Prisma.IntFilter<"PartImage"> | number
   part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
 }
@@ -232,7 +264,10 @@ export type PartImageOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   partId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  fallbackUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   alt?: Prisma.SortOrderInput | Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   part?: Prisma.PartOrderByWithRelationInput
 }
@@ -245,7 +280,10 @@ export type PartImageWhereUniqueInput = Prisma.AtLeast<{
   tenantId?: Prisma.StringFilter<"PartImage"> | string
   partId?: Prisma.StringFilter<"PartImage"> | string
   url?: Prisma.StringFilter<"PartImage"> | string
+  fallbackUrl?: Prisma.StringNullableFilter<"PartImage"> | string | null
   alt?: Prisma.StringNullableFilter<"PartImage"> | string | null
+  width?: Prisma.IntNullableFilter<"PartImage"> | number | null
+  height?: Prisma.IntNullableFilter<"PartImage"> | number | null
   position?: Prisma.IntFilter<"PartImage"> | number
   part?: Prisma.XOR<Prisma.PartScalarRelationFilter, Prisma.PartWhereInput>
 }, "id">
@@ -255,7 +293,10 @@ export type PartImageOrderByWithAggregationInput = {
   tenantId?: Prisma.SortOrder
   partId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  fallbackUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   alt?: Prisma.SortOrderInput | Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrder
   _count?: Prisma.PartImageCountOrderByAggregateInput
   _avg?: Prisma.PartImageAvgOrderByAggregateInput
@@ -272,7 +313,10 @@ export type PartImageScalarWhereWithAggregatesInput = {
   tenantId?: Prisma.StringWithAggregatesFilter<"PartImage"> | string
   partId?: Prisma.StringWithAggregatesFilter<"PartImage"> | string
   url?: Prisma.StringWithAggregatesFilter<"PartImage"> | string
+  fallbackUrl?: Prisma.StringNullableWithAggregatesFilter<"PartImage"> | string | null
   alt?: Prisma.StringNullableWithAggregatesFilter<"PartImage"> | string | null
+  width?: Prisma.IntNullableWithAggregatesFilter<"PartImage"> | number | null
+  height?: Prisma.IntNullableWithAggregatesFilter<"PartImage"> | number | null
   position?: Prisma.IntWithAggregatesFilter<"PartImage"> | number
 }
 
@@ -280,7 +324,10 @@ export type PartImageCreateInput = {
   id?: string
   tenantId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
   part: Prisma.PartCreateNestedOneWithoutImagesInput
 }
@@ -290,7 +337,10 @@ export type PartImageUncheckedCreateInput = {
   tenantId: string
   partId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
 }
 
@@ -298,7 +348,10 @@ export type PartImageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
   part?: Prisma.PartUpdateOneRequiredWithoutImagesNestedInput
 }
@@ -308,7 +361,10 @@ export type PartImageUncheckedUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   partId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -317,7 +373,10 @@ export type PartImageCreateManyInput = {
   tenantId: string
   partId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
 }
 
@@ -325,7 +384,10 @@ export type PartImageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -334,7 +396,10 @@ export type PartImageUncheckedUpdateManyInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   partId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -353,11 +418,16 @@ export type PartImageCountOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   partId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  fallbackUrl?: Prisma.SortOrder
   alt?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
 
 export type PartImageAvgOrderByAggregateInput = {
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
 
@@ -366,7 +436,10 @@ export type PartImageMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   partId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  fallbackUrl?: Prisma.SortOrder
   alt?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
 
@@ -375,11 +448,16 @@ export type PartImageMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   partId?: Prisma.SortOrder
   url?: Prisma.SortOrder
+  fallbackUrl?: Prisma.SortOrder
   alt?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
 
 export type PartImageSumOrderByAggregateInput = {
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   position?: Prisma.SortOrder
 }
 
@@ -429,7 +507,10 @@ export type PartImageCreateWithoutPartInput = {
   id?: string
   tenantId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
 }
 
@@ -437,7 +518,10 @@ export type PartImageUncheckedCreateWithoutPartInput = {
   id?: string
   tenantId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
 }
 
@@ -475,7 +559,10 @@ export type PartImageScalarWhereInput = {
   tenantId?: Prisma.StringFilter<"PartImage"> | string
   partId?: Prisma.StringFilter<"PartImage"> | string
   url?: Prisma.StringFilter<"PartImage"> | string
+  fallbackUrl?: Prisma.StringNullableFilter<"PartImage"> | string | null
   alt?: Prisma.StringNullableFilter<"PartImage"> | string | null
+  width?: Prisma.IntNullableFilter<"PartImage"> | number | null
+  height?: Prisma.IntNullableFilter<"PartImage"> | number | null
   position?: Prisma.IntFilter<"PartImage"> | number
 }
 
@@ -483,7 +570,10 @@ export type PartImageCreateManyPartInput = {
   id?: string
   tenantId: string
   url: string
+  fallbackUrl?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   position?: number
 }
 
@@ -491,7 +581,10 @@ export type PartImageUpdateWithoutPartInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -499,7 +592,10 @@ export type PartImageUncheckedUpdateWithoutPartInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -507,7 +603,10 @@ export type PartImageUncheckedUpdateManyWithoutPartInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
+  fallbackUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   position?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -518,7 +617,10 @@ export type PartImageSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tenantId?: boolean
   partId?: boolean
   url?: boolean
+  fallbackUrl?: boolean
   alt?: boolean
+  width?: boolean
+  height?: boolean
   position?: boolean
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partImage"]>
@@ -528,7 +630,10 @@ export type PartImageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   partId?: boolean
   url?: boolean
+  fallbackUrl?: boolean
   alt?: boolean
+  width?: boolean
+  height?: boolean
   position?: boolean
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partImage"]>
@@ -538,7 +643,10 @@ export type PartImageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   partId?: boolean
   url?: boolean
+  fallbackUrl?: boolean
   alt?: boolean
+  width?: boolean
+  height?: boolean
   position?: boolean
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partImage"]>
@@ -548,11 +656,14 @@ export type PartImageSelectScalar = {
   tenantId?: boolean
   partId?: boolean
   url?: boolean
+  fallbackUrl?: boolean
   alt?: boolean
+  width?: boolean
+  height?: boolean
   position?: boolean
 }
 
-export type PartImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "partId" | "url" | "alt" | "position", ExtArgs["result"]["partImage"]>
+export type PartImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "partId" | "url" | "fallbackUrl" | "alt" | "width" | "height" | "position", ExtArgs["result"]["partImage"]>
 export type PartImageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   part?: boolean | Prisma.PartDefaultArgs<ExtArgs>
 }
@@ -573,7 +684,13 @@ export type $PartImagePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tenantId: string
     partId: string
     url: string
+    /**
+     * * WebP de respaldo: AVIF no lo abre cualquier WebView Android de bodega.
+     */
+    fallbackUrl: string | null
     alt: string | null
+    width: number | null
+    height: number | null
     position: number
   }, ExtArgs["result"]["partImage"]>
   composites: {}
@@ -1003,7 +1120,10 @@ export interface PartImageFieldRefs {
   readonly tenantId: Prisma.FieldRef<"PartImage", 'String'>
   readonly partId: Prisma.FieldRef<"PartImage", 'String'>
   readonly url: Prisma.FieldRef<"PartImage", 'String'>
+  readonly fallbackUrl: Prisma.FieldRef<"PartImage", 'String'>
   readonly alt: Prisma.FieldRef<"PartImage", 'String'>
+  readonly width: Prisma.FieldRef<"PartImage", 'Int'>
+  readonly height: Prisma.FieldRef<"PartImage", 'Int'>
   readonly position: Prisma.FieldRef<"PartImage", 'Int'>
 }
     

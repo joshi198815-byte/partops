@@ -6,8 +6,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@partops/ui": ["../../packages/ui/src/index.ts"],
-      "@partops/ui/*": ["../../packages/ui/src/*"],
-      "@partops/contracts": ["../../packages/contracts/src/index.ts"]
+      "@partops/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

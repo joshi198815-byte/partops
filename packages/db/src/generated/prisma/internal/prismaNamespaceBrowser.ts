@@ -64,6 +64,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Notification: 'Notification',
   PushToken: 'PushToken',
+  DispatchOp: 'DispatchOp',
   BackgroundJob: 'BackgroundJob',
   VehicleBrand: 'VehicleBrand',
   VehicleModel: 'VehicleModel',
@@ -89,10 +90,12 @@ export const ModelName = {
   Receipt: 'Receipt',
   ExpenseCategory: 'ExpenseCategory',
   Expense: 'Expense',
+  RecurringExpense: 'RecurringExpense',
   DailyMetric: 'DailyMetric',
   SearchEvent: 'SearchEvent',
   DemandDaily: 'DemandDaily',
   StockWatch: 'StockWatch',
+  PublicHit: 'PublicHit',
   PlanGrant: 'PlanGrant'
 } as const
 
@@ -232,6 +235,7 @@ export const TenantScalarFieldEnum = {
   orderSeq: 'orderSeq',
   receiptPrefix: 'receiptPrefix',
   receiptSeq: 'receiptSeq',
+  transferSeq: 'transferSeq',
   catalogEnabled: 'catalogEnabled',
   catalogTagline: 'catalogTagline',
   suspended: 'suspended',
@@ -322,11 +326,30 @@ export const PushTokenScalarFieldEnum = {
   tenantId: 'tenantId',
   token: 'token',
   platform: 'platform',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type PushTokenScalarFieldEnum = (typeof PushTokenScalarFieldEnum)[keyof typeof PushTokenScalarFieldEnum]
+
+
+export const DispatchOpScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  opId: 'opId',
+  orderId: 'orderId',
+  itemId: 'itemId',
+  status: 'status',
+  outcome: 'outcome',
+  scannedCode: 'scannedCode',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type DispatchOpScalarFieldEnum = (typeof DispatchOpScalarFieldEnum)[keyof typeof DispatchOpScalarFieldEnum]
 
 
 export const BackgroundJobScalarFieldEnum = {
@@ -460,7 +483,8 @@ export const StockTransferItemScalarFieldEnum = {
   tenantId: 'tenantId',
   transferId: 'transferId',
   variantId: 'variantId',
-  quantity: 'quantity'
+  quantity: 'quantity',
+  receivedQty: 'receivedQty'
 } as const
 
 export type StockTransferItemScalarFieldEnum = (typeof StockTransferItemScalarFieldEnum)[keyof typeof StockTransferItemScalarFieldEnum]
@@ -525,7 +549,10 @@ export const PartImageScalarFieldEnum = {
   tenantId: 'tenantId',
   partId: 'partId',
   url: 'url',
+  fallbackUrl: 'fallbackUrl',
   alt: 'alt',
+  width: 'width',
+  height: 'height',
   position: 'position'
 } as const
 
@@ -548,6 +575,7 @@ export const ImportJobScalarFieldEnum = {
   tenantId: 'tenantId',
   fileName: 'fileName',
   status: 'status',
+  mode: 'mode',
   mapping: 'mapping',
   payload: 'payload',
   warehouseId: 'warehouseId',
@@ -555,6 +583,7 @@ export const ImportJobScalarFieldEnum = {
   processedRows: 'processedRows',
   successRows: 'successRows',
   errorRows: 'errorRows',
+  skippedRows: 'skippedRows',
   createdParts: 'createdParts',
   createdVariants: 'createdVariants',
   updatedVariants: 'updatedVariants',
@@ -608,6 +637,7 @@ export const SalesOrderScalarFieldEnum = {
   status: 'status',
   sellerId: 'sellerId',
   warehouseId: 'warehouseId',
+  sourceSlug: 'sourceSlug',
   subtotalCents: 'subtotalCents',
   taxCents: 'taxCents',
   discountCents: 'discountCents',
@@ -680,6 +710,7 @@ export const ReceiptScalarFieldEnum = {
   folio: 'folio',
   token: 'token',
   pdfKey: 'pdfKey',
+  ticketKey: 'ticketKey',
   snapshot: 'snapshot',
   totalCents: 'totalCents',
   createdAt: 'createdAt'
@@ -711,6 +742,22 @@ export const ExpenseScalarFieldEnum = {
 } as const
 
 export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+
+export const RecurringExpenseScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  categoryId: 'categoryId',
+  title: 'title',
+  amountCents: 'amountCents',
+  dayOfMonth: 'dayOfMonth',
+  active: 'active',
+  lastRunMonth: 'lastRunMonth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecurringExpenseScalarFieldEnum = (typeof RecurringExpenseScalarFieldEnum)[keyof typeof RecurringExpenseScalarFieldEnum]
 
 
 export const DailyMetricScalarFieldEnum = {
@@ -767,10 +814,22 @@ export const StockWatchScalarFieldEnum = {
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   notifiedAt: 'notifiedAt',
+  notifiedBy: 'notifiedBy',
   createdAt: 'createdAt'
 } as const
 
 export type StockWatchScalarFieldEnum = (typeof StockWatchScalarFieldEnum)[keyof typeof StockWatchScalarFieldEnum]
+
+
+export const PublicHitScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  scope: 'scope',
+  tenantId: 'tenantId',
+  createdAt: 'createdAt'
+} as const
+
+export type PublicHitScalarFieldEnum = (typeof PublicHitScalarFieldEnum)[keyof typeof PublicHitScalarFieldEnum]
 
 
 export const PlanGrantScalarFieldEnum = {

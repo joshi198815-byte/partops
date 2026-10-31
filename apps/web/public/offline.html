@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es-GT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#16324F" />
+    <title>Sin señal · PartOps</title>
+    <style>
+      /* Página autónoma: se sirve desde el Service Worker sin red, así que no puede depender del
+         CSS de la app (ni de las fuentes, que también viven en la red). */
+      :root {
+        color-scheme: light dark;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: #f7f5f1;
+        color: #1c2733;
+      }
+      main {
+        max-width: 420px;
+        width: 100%;
+        border: 1px solid #e2ddd4;
+        border-radius: 8px;
+        background: #fff;
+        padding: 28px 24px;
+      }
+      .bar {
+        height: 3px;
+        width: 48px;
+        background: #b4703a;
+        border-radius: 2px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-size: 20px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0 0 18px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: #55606c;
+      }
+      ul {
+        margin: 0 0 20px;
+        padding-left: 18px;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: #55606c;
+      }
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        width: 100%;
+        border-radius: 4px;
+        background: #16324f;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #101820; color: #eef1f4; }
+        main { background: #1a242e; border-color: #2c3844; }
+        p, ul { color: #a5b0ba; }
+        a { background: #eef1f4; color: #101820; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="bar"></div>
+      <h1>Estás sin señal</h1>
+      <p>
+        La bodega no alcanza la red en este momento. No pasa nada: lo que ya marcaste está guardado
+        en este teléfono y se envía solo cuando vuelva la conexión.
+      </p>
+      <ul>
+        <li>Los cambios que hiciste se guardan aquí.</li>
+        <li>Al volver la señal se envían una sola vez.</li>
+        <li>Puedes seguir marcando piezas sin esperar.</li>
+      </ul>
+      <a href="/app/despacho">Volver a la lista</a>
+    </main>
+  </body>
+</html>

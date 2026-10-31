@@ -32,7 +32,11 @@ const schema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET: z.string().default('partops'),
   R2_PUBLIC_URL: z.string().optional(),
+  /** Solo desarrollo: dónde caen las imágenes cuando no hay R2. */
+  STORAGE_DIR: z.string().default('var/uploads'),
 
+  /** Clave del sitio de Turnstile. La pareja del secreto: sin las dos, el widget no se pinta. */
+  TURNSTILE_SITE_KEY: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(),
   CRON_SECRET: z.string().optional(),
   SENTRY_DSN: z.string().optional(),

@@ -12,6 +12,9 @@ playwright-report/
 .env.*.local
 *.log
 
+# Artefactos de pruebas manuales (PDFs, hojas de cálculo, capturas)
+var/
+
 .DS_Store
 Thumbs.db
 

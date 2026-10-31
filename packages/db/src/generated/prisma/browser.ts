@@ -79,9 +79,26 @@ export type AuditLog = Prisma.AuditLogModel
 export type Notification = Prisma.NotificationModel
 /**
  * Model PushToken
- * 
+ * *
+ *  * Destino de un aviso.
+ *  *
+ *  * `token` es la dirección de entrega y es única en toda la base, no por negocio: dos negocios no
+ *  * pueden compartir el mismo teléfono suscrito, y si alguien cambia de bodega se reasigna la fila en
+ *  * vez de acumular avisos a una suscripción que ya no existe.
  */
 export type PushToken = Prisma.PushTokenModel
+/**
+ * Model DispatchOp
+ * *
+ *  * Operaciones de despacho ya aplicadas.
+ *  *
+ *  * El bodeguero toca "listo" sin señal, el teléfono guarda la operación y la reintenta al volver.
+ *  * Sin esta tabla el reintento aplicaría el cambio otra vez: un `LISTO → ENTREGADO` repetido
+ *  * descuenta la pieza dos veces del inventario y el estante queda con una pieza fantasma.
+ *  *
+ *  * La clave es `opId`, que genera el teléfono y nunca se reutiliza para otra línea.
+ */
+export type DispatchOp = Prisma.DispatchOpModel
 /**
  * Model BackgroundJob
  * * Cola durable en Postgres. Sin Redis: en el plan gratis no hay y no hace falta.
@@ -208,6 +225,16 @@ export type ExpenseCategory = Prisma.ExpenseCategoryModel
  */
 export type Expense = Prisma.ExpenseModel
 /**
+ * Model RecurringExpense
+ * *
+ *  * Gasto fijo mensual.
+ *  *
+ *  * Es una plantilla, no un gasto: el mantenimiento crea el gasto del mes a partir de ella y anota
+ *  * `lastRunMonth` para no crearlo dos veces. Guardar el gasto directamente obligaría a capturar el
+ *  * alquiler cada mes, y el mes que se olvide descuadra la utilidad sin que nadie lo note.
+ */
+export type RecurringExpense = Prisma.RecurringExpenseModel
+/**
  * Model DailyMetric
  * * Agregado diario: el tablero lee de aquí en vez de sumar pedidos de todo el historial.
  */
@@ -227,6 +254,15 @@ export type DemandDaily = Prisma.DemandDailyModel
  * * "Avísame cuando llegue": la lista de WhatsApp que se genera sola al entrar existencias.
  */
 export type StockWatch = Prisma.StockWatchModel
+/**
+ * Model PublicHit
+ * *
+ *  * Contador de la superficie pública.
+ *  *
+ *  * No guarda IPs: `key` es el hash de la IP o del token de Turnstile. Sin tenant en la mayoría de
+ *  * los casos (se escribe antes de resolver el negocio) y sin RLS a propósito.
+ */
+export type PublicHit = Prisma.PublicHitModel
 /**
  * Model PlanGrant
  * * Plan concedido a mano (v1 sin pasarela de pago).

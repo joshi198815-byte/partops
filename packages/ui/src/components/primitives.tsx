@@ -44,15 +44,19 @@ export function CodeChip({
 export function StockPill({
   quantity,
   reorderPoint,
+  low,
   unit = 'u',
   className,
 }: {
   quantity: number;
   reorderPoint?: number | null;
+  /** El listado ya sabe si la pieza está bajo el mínimo de *alguna* variante; esto lo respeta. */
+  low?: boolean;
   unit?: string;
   className?: string;
 }) {
-  const state = quantity <= 0 ? 'out' : reorderPoint != null && quantity <= reorderPoint ? 'low' : 'ok';
+  const state =
+    quantity <= 0 ? 'out' : low || (reorderPoint != null && quantity <= reorderPoint) ? 'low' : 'ok';
   const tone =
     state === 'out'
       ? 'text-[var(--color-stock-out)] border-[color-mix(in_oklch,var(--color-stock-out)_35%,transparent)]'

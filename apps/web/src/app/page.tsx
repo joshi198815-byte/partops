@@ -1,4 +1,5 @@
 import { Button, CodeChip, PartOpsLogo, StatTile, StockPill, VehicleBreadcrumb } from '@partops/ui';
+import Link from 'next/link';
 
 /**
  * Landing de PartOps.
@@ -39,10 +40,14 @@ function SiteHeader() {
           </a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm">
-            Entrar
-          </Button>
-          <Button size="sm">Crear cuenta</Button>
+          <Link href="/entrar">
+            <Button variant="ghost" size="sm">
+              Entrar
+            </Button>
+          </Link>
+          <Link href="/registro">
+            <Button size="sm">Crear cuenta</Button>
+          </Link>
         </div>
       </div>
     </header>
@@ -74,10 +79,14 @@ function Hero() {
           </p>
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Button size="lg">Empezar con mi bodega</Button>
-            <Button size="lg" variant="secondary">
-              Ver el catálogo de ejemplo
-            </Button>
+            <Link href="/registro">
+              <Button size="lg">Empezar con mi bodega</Button>
+            </Link>
+            <Link href="/catalogo">
+              <Button size="lg" variant="secondary">
+                Ver el catálogo de ejemplo
+              </Button>
+            </Link>
           </div>
 
           <p className="mt-4 text-[12px] text-[var(--foreground-muted)]">
@@ -403,10 +412,14 @@ function ClosingNote() {
               haga falta antes de guardar nada. El catálogo arranca con lo que ya tenía.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg">Crear mi cuenta</Button>
-              <Button size="lg" variant="secondary">
-                Hablar con alguien
-              </Button>
+              <Link href="/registro">
+                <Button size="lg">Crear mi cuenta</Button>
+              </Link>
+              <a href="mailto:partopsgt@gmail.com">
+                <Button size="lg" variant="secondary">
+                  Hablar con alguien
+                </Button>
+              </a>
             </div>
           </div>
         </div>

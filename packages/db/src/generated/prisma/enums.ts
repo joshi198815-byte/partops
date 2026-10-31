@@ -63,6 +63,15 @@ export const ImportStatus = {
 export type ImportStatus = (typeof ImportStatus)[keyof typeof ImportStatus]
 
 
+export const ImportMode = {
+  CREAR: 'CREAR',
+  ACTUALIZAR: 'ACTUALIZAR',
+  OMITIR_EXISTENTES: 'OMITIR_EXISTENTES'
+} as const
+
+export type ImportMode = (typeof ImportMode)[keyof typeof ImportMode]
+
+
 export const OrderStatus = {
   ABIERTO: 'ABIERTO',
   EN_PREPARACION: 'EN_PREPARACION',

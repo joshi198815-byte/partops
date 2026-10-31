@@ -28,10 +28,12 @@ export type AggregateStockTransferItem = {
 
 export type StockTransferItemAvgAggregateOutputType = {
   quantity: number | null
+  receivedQty: number | null
 }
 
 export type StockTransferItemSumAggregateOutputType = {
   quantity: number | null
+  receivedQty: number | null
 }
 
 export type StockTransferItemMinAggregateOutputType = {
@@ -40,6 +42,7 @@ export type StockTransferItemMinAggregateOutputType = {
   transferId: string | null
   variantId: string | null
   quantity: number | null
+  receivedQty: number | null
 }
 
 export type StockTransferItemMaxAggregateOutputType = {
@@ -48,6 +51,7 @@ export type StockTransferItemMaxAggregateOutputType = {
   transferId: string | null
   variantId: string | null
   quantity: number | null
+  receivedQty: number | null
 }
 
 export type StockTransferItemCountAggregateOutputType = {
@@ -56,16 +60,19 @@ export type StockTransferItemCountAggregateOutputType = {
   transferId: number
   variantId: number
   quantity: number
+  receivedQty: number
   _all: number
 }
 
 
 export type StockTransferItemAvgAggregateInputType = {
   quantity?: true
+  receivedQty?: true
 }
 
 export type StockTransferItemSumAggregateInputType = {
   quantity?: true
+  receivedQty?: true
 }
 
 export type StockTransferItemMinAggregateInputType = {
@@ -74,6 +81,7 @@ export type StockTransferItemMinAggregateInputType = {
   transferId?: true
   variantId?: true
   quantity?: true
+  receivedQty?: true
 }
 
 export type StockTransferItemMaxAggregateInputType = {
@@ -82,6 +90,7 @@ export type StockTransferItemMaxAggregateInputType = {
   transferId?: true
   variantId?: true
   quantity?: true
+  receivedQty?: true
 }
 
 export type StockTransferItemCountAggregateInputType = {
@@ -90,6 +99,7 @@ export type StockTransferItemCountAggregateInputType = {
   transferId?: true
   variantId?: true
   quantity?: true
+  receivedQty?: true
   _all?: true
 }
 
@@ -185,6 +195,7 @@ export type StockTransferItemGroupByOutputType = {
   transferId: string
   variantId: string
   quantity: number
+  receivedQty: number
   _count: StockTransferItemCountAggregateOutputType | null
   _avg: StockTransferItemAvgAggregateOutputType | null
   _sum: StockTransferItemSumAggregateOutputType | null
@@ -216,6 +227,7 @@ export type StockTransferItemWhereInput = {
   transferId?: Prisma.StringFilter<"StockTransferItem"> | string
   variantId?: Prisma.StringFilter<"StockTransferItem"> | string
   quantity?: Prisma.IntFilter<"StockTransferItem"> | number
+  receivedQty?: Prisma.IntFilter<"StockTransferItem"> | number
   transfer?: Prisma.XOR<Prisma.StockTransferScalarRelationFilter, Prisma.StockTransferWhereInput>
 }
 
@@ -225,6 +237,7 @@ export type StockTransferItemOrderByWithRelationInput = {
   transferId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
   transfer?: Prisma.StockTransferOrderByWithRelationInput
 }
 
@@ -237,6 +250,7 @@ export type StockTransferItemWhereUniqueInput = Prisma.AtLeast<{
   transferId?: Prisma.StringFilter<"StockTransferItem"> | string
   variantId?: Prisma.StringFilter<"StockTransferItem"> | string
   quantity?: Prisma.IntFilter<"StockTransferItem"> | number
+  receivedQty?: Prisma.IntFilter<"StockTransferItem"> | number
   transfer?: Prisma.XOR<Prisma.StockTransferScalarRelationFilter, Prisma.StockTransferWhereInput>
 }, "id">
 
@@ -246,6 +260,7 @@ export type StockTransferItemOrderByWithAggregationInput = {
   transferId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
   _count?: Prisma.StockTransferItemCountOrderByAggregateInput
   _avg?: Prisma.StockTransferItemAvgOrderByAggregateInput
   _max?: Prisma.StockTransferItemMaxOrderByAggregateInput
@@ -262,6 +277,7 @@ export type StockTransferItemScalarWhereWithAggregatesInput = {
   transferId?: Prisma.StringWithAggregatesFilter<"StockTransferItem"> | string
   variantId?: Prisma.StringWithAggregatesFilter<"StockTransferItem"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"StockTransferItem"> | number
+  receivedQty?: Prisma.IntWithAggregatesFilter<"StockTransferItem"> | number
 }
 
 export type StockTransferItemCreateInput = {
@@ -269,6 +285,7 @@ export type StockTransferItemCreateInput = {
   tenantId: string
   variantId: string
   quantity: number
+  receivedQty?: number
   transfer: Prisma.StockTransferCreateNestedOneWithoutItemsInput
 }
 
@@ -278,6 +295,7 @@ export type StockTransferItemUncheckedCreateInput = {
   transferId: string
   variantId: string
   quantity: number
+  receivedQty?: number
 }
 
 export type StockTransferItemUpdateInput = {
@@ -285,6 +303,7 @@ export type StockTransferItemUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
   transfer?: Prisma.StockTransferUpdateOneRequiredWithoutItemsNestedInput
 }
 
@@ -294,6 +313,7 @@ export type StockTransferItemUncheckedUpdateInput = {
   transferId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockTransferItemCreateManyInput = {
@@ -302,6 +322,7 @@ export type StockTransferItemCreateManyInput = {
   transferId: string
   variantId: string
   quantity: number
+  receivedQty?: number
 }
 
 export type StockTransferItemUpdateManyMutationInput = {
@@ -309,6 +330,7 @@ export type StockTransferItemUpdateManyMutationInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockTransferItemUncheckedUpdateManyInput = {
@@ -317,6 +339,7 @@ export type StockTransferItemUncheckedUpdateManyInput = {
   transferId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockTransferItemListRelationFilter = {
@@ -335,10 +358,12 @@ export type StockTransferItemCountOrderByAggregateInput = {
   transferId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
 }
 
 export type StockTransferItemAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
 }
 
 export type StockTransferItemMaxOrderByAggregateInput = {
@@ -347,6 +372,7 @@ export type StockTransferItemMaxOrderByAggregateInput = {
   transferId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
 }
 
 export type StockTransferItemMinOrderByAggregateInput = {
@@ -355,10 +381,12 @@ export type StockTransferItemMinOrderByAggregateInput = {
   transferId?: Prisma.SortOrder
   variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
 }
 
 export type StockTransferItemSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+  receivedQty?: Prisma.SortOrder
 }
 
 export type StockTransferItemCreateNestedManyWithoutTransferInput = {
@@ -408,6 +436,7 @@ export type StockTransferItemCreateWithoutTransferInput = {
   tenantId: string
   variantId: string
   quantity: number
+  receivedQty?: number
 }
 
 export type StockTransferItemUncheckedCreateWithoutTransferInput = {
@@ -415,6 +444,7 @@ export type StockTransferItemUncheckedCreateWithoutTransferInput = {
   tenantId: string
   variantId: string
   quantity: number
+  receivedQty?: number
 }
 
 export type StockTransferItemCreateOrConnectWithoutTransferInput = {
@@ -452,6 +482,7 @@ export type StockTransferItemScalarWhereInput = {
   transferId?: Prisma.StringFilter<"StockTransferItem"> | string
   variantId?: Prisma.StringFilter<"StockTransferItem"> | string
   quantity?: Prisma.IntFilter<"StockTransferItem"> | number
+  receivedQty?: Prisma.IntFilter<"StockTransferItem"> | number
 }
 
 export type StockTransferItemCreateManyTransferInput = {
@@ -459,6 +490,7 @@ export type StockTransferItemCreateManyTransferInput = {
   tenantId: string
   variantId: string
   quantity: number
+  receivedQty?: number
 }
 
 export type StockTransferItemUpdateWithoutTransferInput = {
@@ -466,6 +498,7 @@ export type StockTransferItemUpdateWithoutTransferInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockTransferItemUncheckedUpdateWithoutTransferInput = {
@@ -473,6 +506,7 @@ export type StockTransferItemUncheckedUpdateWithoutTransferInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StockTransferItemUncheckedUpdateManyWithoutTransferInput = {
@@ -480,6 +514,7 @@ export type StockTransferItemUncheckedUpdateManyWithoutTransferInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   variantId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  receivedQty?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -490,6 +525,7 @@ export type StockTransferItemSelect<ExtArgs extends runtime.Types.Extensions.Int
   transferId?: boolean
   variantId?: boolean
   quantity?: boolean
+  receivedQty?: boolean
   transfer?: boolean | Prisma.StockTransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransferItem"]>
 
@@ -499,6 +535,7 @@ export type StockTransferItemSelectCreateManyAndReturn<ExtArgs extends runtime.T
   transferId?: boolean
   variantId?: boolean
   quantity?: boolean
+  receivedQty?: boolean
   transfer?: boolean | Prisma.StockTransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransferItem"]>
 
@@ -508,6 +545,7 @@ export type StockTransferItemSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   transferId?: boolean
   variantId?: boolean
   quantity?: boolean
+  receivedQty?: boolean
   transfer?: boolean | Prisma.StockTransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransferItem"]>
 
@@ -517,9 +555,10 @@ export type StockTransferItemSelectScalar = {
   transferId?: boolean
   variantId?: boolean
   quantity?: boolean
+  receivedQty?: boolean
 }
 
-export type StockTransferItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "transferId" | "variantId" | "quantity", ExtArgs["result"]["stockTransferItem"]>
+export type StockTransferItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "transferId" | "variantId" | "quantity" | "receivedQty", ExtArgs["result"]["stockTransferItem"]>
 export type StockTransferItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transfer?: boolean | Prisma.StockTransferDefaultArgs<ExtArgs>
 }
@@ -541,6 +580,13 @@ export type $StockTransferItemPayload<ExtArgs extends runtime.Types.Extensions.I
     transferId: string
     variantId: string
     quantity: number
+    /**
+     * *
+     *    * Lo que de verdad llegó al destino. Un traslado puede recibirse incompleto (se perdió una caja
+     *    * en el camino) y lo pendiente sigue en tránsito: sin esta columna habría que cerrar el traslado
+     *    * entero y la diferencia aparecería como ajuste sin explicación.
+     */
+    receivedQty: number
   }, ExtArgs["result"]["stockTransferItem"]>
   composites: {}
 }
@@ -970,6 +1016,7 @@ export interface StockTransferItemFieldRefs {
   readonly transferId: Prisma.FieldRef<"StockTransferItem", 'String'>
   readonly variantId: Prisma.FieldRef<"StockTransferItem", 'String'>
   readonly quantity: Prisma.FieldRef<"StockTransferItem", 'Int'>
+  readonly receivedQty: Prisma.FieldRef<"StockTransferItem", 'Int'>
 }
     
 

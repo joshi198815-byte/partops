@@ -410,6 +410,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Notification: 'Notification',
   PushToken: 'PushToken',
+  DispatchOp: 'DispatchOp',
   BackgroundJob: 'BackgroundJob',
   VehicleBrand: 'VehicleBrand',
   VehicleModel: 'VehicleModel',
@@ -435,10 +436,12 @@ export const ModelName = {
   Receipt: 'Receipt',
   ExpenseCategory: 'ExpenseCategory',
   Expense: 'Expense',
+  RecurringExpense: 'RecurringExpense',
   DailyMetric: 'DailyMetric',
   SearchEvent: 'SearchEvent',
   DemandDaily: 'DemandDaily',
   StockWatch: 'StockWatch',
+  PublicHit: 'PublicHit',
   PlanGrant: 'PlanGrant'
 } as const
 
@@ -455,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "twoFactor" | "passkey" | "tenant" | "member" | "role" | "invitation" | "auditLog" | "notification" | "pushToken" | "backgroundJob" | "vehicleBrand" | "vehicleModel" | "vehicle" | "partTerm" | "warehouse" | "inventoryLevel" | "stockMovement" | "stockTransfer" | "stockTransferItem" | "partCategory" | "part" | "partVariant" | "partImage" | "partCompatibility" | "importJob" | "importRowError" | "customer" | "salesOrder" | "salesOrderItem" | "orderEvent" | "payment" | "receipt" | "expenseCategory" | "expense" | "dailyMetric" | "searchEvent" | "demandDaily" | "stockWatch" | "planGrant"
+    modelProps: "user" | "session" | "account" | "verification" | "twoFactor" | "passkey" | "tenant" | "member" | "role" | "invitation" | "auditLog" | "notification" | "pushToken" | "dispatchOp" | "backgroundJob" | "vehicleBrand" | "vehicleModel" | "vehicle" | "partTerm" | "warehouse" | "inventoryLevel" | "stockMovement" | "stockTransfer" | "stockTransferItem" | "partCategory" | "part" | "partVariant" | "partImage" | "partCompatibility" | "importJob" | "importRowError" | "customer" | "salesOrder" | "salesOrderItem" | "orderEvent" | "payment" | "receipt" | "expenseCategory" | "expense" | "recurringExpense" | "dailyMetric" | "searchEvent" | "demandDaily" | "stockWatch" | "publicHit" | "planGrant"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1418,6 +1421,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PushTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PushTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    DispatchOp: {
+      payload: Prisma.$DispatchOpPayload<ExtArgs>
+      fields: Prisma.DispatchOpFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DispatchOpFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DispatchOpFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        findFirst: {
+          args: Prisma.DispatchOpFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DispatchOpFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        findMany: {
+          args: Prisma.DispatchOpFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>[]
+        }
+        create: {
+          args: Prisma.DispatchOpCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        createMany: {
+          args: Prisma.DispatchOpCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DispatchOpCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>[]
+        }
+        delete: {
+          args: Prisma.DispatchOpDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        update: {
+          args: Prisma.DispatchOpUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        deleteMany: {
+          args: Prisma.DispatchOpDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DispatchOpUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DispatchOpUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>[]
+        }
+        upsert: {
+          args: Prisma.DispatchOpUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DispatchOpPayload>
+        }
+        aggregate: {
+          args: Prisma.DispatchOpAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDispatchOp>
+        }
+        groupBy: {
+          args: Prisma.DispatchOpGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DispatchOpGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DispatchOpCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DispatchOpCountAggregateOutputType> | number
         }
       }
     }
@@ -3271,6 +3348,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RecurringExpense: {
+      payload: Prisma.$RecurringExpensePayload<ExtArgs>
+      fields: Prisma.RecurringExpenseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecurringExpenseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecurringExpenseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        findFirst: {
+          args: Prisma.RecurringExpenseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecurringExpenseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        findMany: {
+          args: Prisma.RecurringExpenseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>[]
+        }
+        create: {
+          args: Prisma.RecurringExpenseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        createMany: {
+          args: Prisma.RecurringExpenseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecurringExpenseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>[]
+        }
+        delete: {
+          args: Prisma.RecurringExpenseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        update: {
+          args: Prisma.RecurringExpenseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        deleteMany: {
+          args: Prisma.RecurringExpenseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecurringExpenseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecurringExpenseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>[]
+        }
+        upsert: {
+          args: Prisma.RecurringExpenseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecurringExpensePayload>
+        }
+        aggregate: {
+          args: Prisma.RecurringExpenseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecurringExpense>
+        }
+        groupBy: {
+          args: Prisma.RecurringExpenseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecurringExpenseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecurringExpenseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecurringExpenseCountAggregateOutputType> | number
+        }
+      }
+    }
     DailyMetric: {
       payload: Prisma.$DailyMetricPayload<ExtArgs>
       fields: Prisma.DailyMetricFieldRefs
@@ -3567,6 +3718,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PublicHit: {
+      payload: Prisma.$PublicHitPayload<ExtArgs>
+      fields: Prisma.PublicHitFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PublicHitFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PublicHitFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        findFirst: {
+          args: Prisma.PublicHitFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PublicHitFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        findMany: {
+          args: Prisma.PublicHitFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>[]
+        }
+        create: {
+          args: Prisma.PublicHitCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        createMany: {
+          args: Prisma.PublicHitCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PublicHitCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>[]
+        }
+        delete: {
+          args: Prisma.PublicHitDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        update: {
+          args: Prisma.PublicHitUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        deleteMany: {
+          args: Prisma.PublicHitDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PublicHitUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PublicHitUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>[]
+        }
+        upsert: {
+          args: Prisma.PublicHitUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PublicHitPayload>
+        }
+        aggregate: {
+          args: Prisma.PublicHitAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePublicHit>
+        }
+        groupBy: {
+          args: Prisma.PublicHitGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PublicHitGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PublicHitCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PublicHitCountAggregateOutputType> | number
+        }
+      }
+    }
     PlanGrant: {
       payload: Prisma.$PlanGrantPayload<ExtArgs>
       fields: Prisma.PlanGrantFieldRefs
@@ -3800,6 +4025,7 @@ export const TenantScalarFieldEnum = {
   orderSeq: 'orderSeq',
   receiptPrefix: 'receiptPrefix',
   receiptSeq: 'receiptSeq',
+  transferSeq: 'transferSeq',
   catalogEnabled: 'catalogEnabled',
   catalogTagline: 'catalogTagline',
   suspended: 'suspended',
@@ -3890,11 +4116,30 @@ export const PushTokenScalarFieldEnum = {
   tenantId: 'tenantId',
   token: 'token',
   platform: 'platform',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type PushTokenScalarFieldEnum = (typeof PushTokenScalarFieldEnum)[keyof typeof PushTokenScalarFieldEnum]
+
+
+export const DispatchOpScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  opId: 'opId',
+  orderId: 'orderId',
+  itemId: 'itemId',
+  status: 'status',
+  outcome: 'outcome',
+  scannedCode: 'scannedCode',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type DispatchOpScalarFieldEnum = (typeof DispatchOpScalarFieldEnum)[keyof typeof DispatchOpScalarFieldEnum]
 
 
 export const BackgroundJobScalarFieldEnum = {
@@ -4028,7 +4273,8 @@ export const StockTransferItemScalarFieldEnum = {
   tenantId: 'tenantId',
   transferId: 'transferId',
   variantId: 'variantId',
-  quantity: 'quantity'
+  quantity: 'quantity',
+  receivedQty: 'receivedQty'
 } as const
 
 export type StockTransferItemScalarFieldEnum = (typeof StockTransferItemScalarFieldEnum)[keyof typeof StockTransferItemScalarFieldEnum]
@@ -4093,7 +4339,10 @@ export const PartImageScalarFieldEnum = {
   tenantId: 'tenantId',
   partId: 'partId',
   url: 'url',
+  fallbackUrl: 'fallbackUrl',
   alt: 'alt',
+  width: 'width',
+  height: 'height',
   position: 'position'
 } as const
 
@@ -4116,6 +4365,7 @@ export const ImportJobScalarFieldEnum = {
   tenantId: 'tenantId',
   fileName: 'fileName',
   status: 'status',
+  mode: 'mode',
   mapping: 'mapping',
   payload: 'payload',
   warehouseId: 'warehouseId',
@@ -4123,6 +4373,7 @@ export const ImportJobScalarFieldEnum = {
   processedRows: 'processedRows',
   successRows: 'successRows',
   errorRows: 'errorRows',
+  skippedRows: 'skippedRows',
   createdParts: 'createdParts',
   createdVariants: 'createdVariants',
   updatedVariants: 'updatedVariants',
@@ -4176,6 +4427,7 @@ export const SalesOrderScalarFieldEnum = {
   status: 'status',
   sellerId: 'sellerId',
   warehouseId: 'warehouseId',
+  sourceSlug: 'sourceSlug',
   subtotalCents: 'subtotalCents',
   taxCents: 'taxCents',
   discountCents: 'discountCents',
@@ -4248,6 +4500,7 @@ export const ReceiptScalarFieldEnum = {
   folio: 'folio',
   token: 'token',
   pdfKey: 'pdfKey',
+  ticketKey: 'ticketKey',
   snapshot: 'snapshot',
   totalCents: 'totalCents',
   createdAt: 'createdAt'
@@ -4279,6 +4532,22 @@ export const ExpenseScalarFieldEnum = {
 } as const
 
 export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+
+export const RecurringExpenseScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  categoryId: 'categoryId',
+  title: 'title',
+  amountCents: 'amountCents',
+  dayOfMonth: 'dayOfMonth',
+  active: 'active',
+  lastRunMonth: 'lastRunMonth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecurringExpenseScalarFieldEnum = (typeof RecurringExpenseScalarFieldEnum)[keyof typeof RecurringExpenseScalarFieldEnum]
 
 
 export const DailyMetricScalarFieldEnum = {
@@ -4335,10 +4604,22 @@ export const StockWatchScalarFieldEnum = {
   customerName: 'customerName',
   customerPhone: 'customerPhone',
   notifiedAt: 'notifiedAt',
+  notifiedBy: 'notifiedBy',
   createdAt: 'createdAt'
 } as const
 
 export type StockWatchScalarFieldEnum = (typeof StockWatchScalarFieldEnum)[keyof typeof StockWatchScalarFieldEnum]
+
+
+export const PublicHitScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  scope: 'scope',
+  tenantId: 'tenantId',
+  createdAt: 'createdAt'
+} as const
+
+export type PublicHitScalarFieldEnum = (typeof PublicHitScalarFieldEnum)[keyof typeof PublicHitScalarFieldEnum]
 
 
 export const PlanGrantScalarFieldEnum = {
@@ -4538,6 +4819,20 @@ export type EnumImportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'ImportStatus[]'
  */
 export type ListEnumImportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImportStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ImportMode'
+ */
+export type EnumImportModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImportMode'>
+    
+
+
+/**
+ * Reference to a field of type 'ImportMode[]'
+ */
+export type ListEnumImportModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImportMode[]'>
     
 
 
@@ -4774,6 +5069,7 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   notification?: Prisma.NotificationOmit
   pushToken?: Prisma.PushTokenOmit
+  dispatchOp?: Prisma.DispatchOpOmit
   backgroundJob?: Prisma.BackgroundJobOmit
   vehicleBrand?: Prisma.VehicleBrandOmit
   vehicleModel?: Prisma.VehicleModelOmit
@@ -4799,10 +5095,12 @@ export type GlobalOmitConfig = {
   receipt?: Prisma.ReceiptOmit
   expenseCategory?: Prisma.ExpenseCategoryOmit
   expense?: Prisma.ExpenseOmit
+  recurringExpense?: Prisma.RecurringExpenseOmit
   dailyMetric?: Prisma.DailyMetricOmit
   searchEvent?: Prisma.SearchEventOmit
   demandDaily?: Prisma.DemandDailyOmit
   stockWatch?: Prisma.StockWatchOmit
+  publicHit?: Prisma.PublicHitOmit
   planGrant?: Prisma.PlanGrantOmit
 }
 

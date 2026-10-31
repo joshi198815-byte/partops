@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   editDistance,
+  extractPartCodes,
   normalizeQuery,
   normalizeYear,
   parsePartQuery,
@@ -74,7 +75,9 @@ describe('parsePartQuery', () => {
     expect(r.model).toBe('Corolla');
     expect(r.year).toBe(2009);
     expect(r.term).toBe('capo');
-    expect(r.termFromSynonym).toBe(true);
+    // "capo" es la forma canónica: no hubo sinónimo que normalizar, aunque sí sea un término
+    // reconocido del vocabulario de piezas.
+    expect(r.termFromSynonym).toBe(false);
   });
 
   it('funciona sin marca: la infiere del modelo', () => {
@@ -94,6 +97,12 @@ describe('parsePartQuery', () => {
   it('canoniza sinónimos del habla local', () => {
     expect(parsePartQuery('cubierta nissan sentra 2015', VOCAB).term).toBe('capo');
     expect(parsePartQuery('balatas kia sportage', VOCAB).term).toBe('pastillas');
+  });
+
+  it('no marca como sinónimo una palabra que ya es la canónica', () => {
+    // "capo" es la forma normal: decir que se "normalizó un sinónimo" sería inventar un cambio.
+    expect(parsePartQuery('capo toyota corolla 2009', VOCAB).termFromSynonym).toBe(false);
+    expect(parsePartQuery('cubierta toyota corolla 2009', VOCAB).termFromSynonym).toBe(true);
   });
 
   it('un modelo no se casa con la marca equivocada', () => {
@@ -148,5 +157,37 @@ describe('toTsQuery', () => {
 
   it('sin tokens útiles devuelve null', () => {
     expect(toTsQuery('  ')).toBeNull();
+  });
+});
+
+describe('extractPartCodes', () => {
+  it('conserva un OEM con guion y lo deja comparable', () => {
+    expect(extractPartCodes('04465-0K290')).toContain('044650K290');
+  });
+
+  it('encuentra el OEM aunque venga con espacio en vez de guion', () => {
+    expect(extractPartCodes('04465 0k290')).toContain('044650K290');
+  });
+
+  it('encuentra el código dentro de una frase', () => {
+    expect(extractPartCodes('pastillas 04465-0K290 toyota')).toContain('044650K290');
+  });
+
+  it('no confunde un año con un código', () => {
+    expect(extractPartCodes('capo corolla 2009')).toEqual([]);
+  });
+
+  it('descarta palabras sin dígitos', () => {
+    expect(extractPartCodes('capo toyota corolla')).toEqual([]);
+  });
+
+  it('descarta fragmentos demasiado cortos para ser un código', () => {
+    expect(extractPartCodes('ab12')).toEqual([]);
+  });
+
+  it('quita repetidos y limita la cantidad', () => {
+    const codes = extractPartCodes('04465-0K290 04465-0K290 12345 67890 11111 22222 33333 44444');
+    expect(codes).toHaveLength(6);
+    expect(new Set(codes).size).toBe(codes.length);
   });
 });

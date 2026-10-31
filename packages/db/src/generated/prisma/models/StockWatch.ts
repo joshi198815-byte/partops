@@ -33,6 +33,7 @@ export type StockWatchMinAggregateOutputType = {
   customerName: string | null
   customerPhone: string | null
   notifiedAt: Date | null
+  notifiedBy: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +46,7 @@ export type StockWatchMaxAggregateOutputType = {
   customerName: string | null
   customerPhone: string | null
   notifiedAt: Date | null
+  notifiedBy: string | null
   createdAt: Date | null
 }
 
@@ -57,6 +59,7 @@ export type StockWatchCountAggregateOutputType = {
   customerName: number
   customerPhone: number
   notifiedAt: number
+  notifiedBy: number
   createdAt: number
   _all: number
 }
@@ -71,6 +74,7 @@ export type StockWatchMinAggregateInputType = {
   customerName?: true
   customerPhone?: true
   notifiedAt?: true
+  notifiedBy?: true
   createdAt?: true
 }
 
@@ -83,6 +87,7 @@ export type StockWatchMaxAggregateInputType = {
   customerName?: true
   customerPhone?: true
   notifiedAt?: true
+  notifiedBy?: true
   createdAt?: true
 }
 
@@ -95,6 +100,7 @@ export type StockWatchCountAggregateInputType = {
   customerName?: true
   customerPhone?: true
   notifiedAt?: true
+  notifiedBy?: true
   createdAt?: true
   _all?: true
 }
@@ -180,6 +186,7 @@ export type StockWatchGroupByOutputType = {
   customerName: string
   customerPhone: string
   notifiedAt: Date | null
+  notifiedBy: string | null
   createdAt: Date
   _count: StockWatchCountAggregateOutputType | null
   _min: StockWatchMinAggregateOutputType | null
@@ -213,6 +220,7 @@ export type StockWatchWhereInput = {
   customerName?: Prisma.StringFilter<"StockWatch"> | string
   customerPhone?: Prisma.StringFilter<"StockWatch"> | string
   notifiedAt?: Prisma.DateTimeNullableFilter<"StockWatch"> | Date | string | null
+  notifiedBy?: Prisma.StringNullableFilter<"StockWatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockWatch"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
 }
@@ -226,6 +234,7 @@ export type StockWatchOrderByWithRelationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   notifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  notifiedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
 }
@@ -242,6 +251,7 @@ export type StockWatchWhereUniqueInput = Prisma.AtLeast<{
   customerName?: Prisma.StringFilter<"StockWatch"> | string
   customerPhone?: Prisma.StringFilter<"StockWatch"> | string
   notifiedAt?: Prisma.DateTimeNullableFilter<"StockWatch"> | Date | string | null
+  notifiedBy?: Prisma.StringNullableFilter<"StockWatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockWatch"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
 }, "id">
@@ -255,6 +265,7 @@ export type StockWatchOrderByWithAggregationInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   notifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  notifiedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.StockWatchCountOrderByAggregateInput
   _max?: Prisma.StockWatchMaxOrderByAggregateInput
@@ -273,6 +284,7 @@ export type StockWatchScalarWhereWithAggregatesInput = {
   customerName?: Prisma.StringWithAggregatesFilter<"StockWatch"> | string
   customerPhone?: Prisma.StringWithAggregatesFilter<"StockWatch"> | string
   notifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"StockWatch"> | Date | string | null
+  notifiedBy?: Prisma.StringNullableWithAggregatesFilter<"StockWatch"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StockWatch"> | Date | string
 }
 
@@ -284,6 +296,7 @@ export type StockWatchCreateInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutStockWatchesInput
 }
@@ -297,6 +310,7 @@ export type StockWatchUncheckedCreateInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -308,6 +322,7 @@ export type StockWatchUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutStockWatchesNestedInput
 }
@@ -321,6 +336,7 @@ export type StockWatchUncheckedUpdateInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -333,6 +349,7 @@ export type StockWatchCreateManyInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -344,6 +361,7 @@ export type StockWatchUpdateManyMutationInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -356,6 +374,7 @@ export type StockWatchUncheckedUpdateManyInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -378,6 +397,7 @@ export type StockWatchCountOrderByAggregateInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   notifiedAt?: Prisma.SortOrder
+  notifiedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -390,6 +410,7 @@ export type StockWatchMaxOrderByAggregateInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   notifiedAt?: Prisma.SortOrder
+  notifiedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -402,6 +423,7 @@ export type StockWatchMinOrderByAggregateInput = {
   customerName?: Prisma.SortOrder
   customerPhone?: Prisma.SortOrder
   notifiedAt?: Prisma.SortOrder
+  notifiedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -455,6 +477,7 @@ export type StockWatchCreateWithoutTenantInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -466,6 +489,7 @@ export type StockWatchUncheckedCreateWithoutTenantInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -507,6 +531,7 @@ export type StockWatchScalarWhereInput = {
   customerName?: Prisma.StringFilter<"StockWatch"> | string
   customerPhone?: Prisma.StringFilter<"StockWatch"> | string
   notifiedAt?: Prisma.DateTimeNullableFilter<"StockWatch"> | Date | string | null
+  notifiedBy?: Prisma.StringNullableFilter<"StockWatch"> | string | null
   createdAt?: Prisma.DateTimeFilter<"StockWatch"> | Date | string
 }
 
@@ -518,6 +543,7 @@ export type StockWatchCreateManyTenantInput = {
   customerName: string
   customerPhone: string
   notifiedAt?: Date | string | null
+  notifiedBy?: string | null
   createdAt?: Date | string
 }
 
@@ -529,6 +555,7 @@ export type StockWatchUpdateWithoutTenantInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -540,6 +567,7 @@ export type StockWatchUncheckedUpdateWithoutTenantInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -551,6 +579,7 @@ export type StockWatchUncheckedUpdateManyWithoutTenantInput = {
   customerName?: Prisma.StringFieldUpdateOperationsInput | string
   customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
   notifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  notifiedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -565,6 +594,7 @@ export type StockWatchSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   customerName?: boolean
   customerPhone?: boolean
   notifiedAt?: boolean
+  notifiedBy?: boolean
   createdAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockWatch"]>
@@ -578,6 +608,7 @@ export type StockWatchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   customerName?: boolean
   customerPhone?: boolean
   notifiedAt?: boolean
+  notifiedBy?: boolean
   createdAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockWatch"]>
@@ -591,6 +622,7 @@ export type StockWatchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   customerName?: boolean
   customerPhone?: boolean
   notifiedAt?: boolean
+  notifiedBy?: boolean
   createdAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["stockWatch"]>
@@ -604,10 +636,11 @@ export type StockWatchSelectScalar = {
   customerName?: boolean
   customerPhone?: boolean
   notifiedAt?: boolean
+  notifiedBy?: boolean
   createdAt?: boolean
 }
 
-export type StockWatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "partId" | "variantId" | "rawQuery" | "customerName" | "customerPhone" | "notifiedAt" | "createdAt", ExtArgs["result"]["stockWatch"]>
+export type StockWatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "partId" | "variantId" | "rawQuery" | "customerName" | "customerPhone" | "notifiedAt" | "notifiedBy" | "createdAt", ExtArgs["result"]["stockWatch"]>
 export type StockWatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }
@@ -632,6 +665,10 @@ export type $StockWatchPayload<ExtArgs extends runtime.Types.Extensions.Internal
     customerName: string
     customerPhone: string
     notifiedAt: Date | null
+    /**
+     * * Quién mandó el aviso. Sin esto, dos vendedores notifican al mismo cliente.
+     */
+    notifiedBy: string | null
     createdAt: Date
   }, ExtArgs["result"]["stockWatch"]>
   composites: {}
@@ -1065,6 +1102,7 @@ export interface StockWatchFieldRefs {
   readonly customerName: Prisma.FieldRef<"StockWatch", 'String'>
   readonly customerPhone: Prisma.FieldRef<"StockWatch", 'String'>
   readonly notifiedAt: Prisma.FieldRef<"StockWatch", 'DateTime'>
+  readonly notifiedBy: Prisma.FieldRef<"StockWatch", 'String'>
   readonly createdAt: Prisma.FieldRef<"StockWatch", 'DateTime'>
 }
     

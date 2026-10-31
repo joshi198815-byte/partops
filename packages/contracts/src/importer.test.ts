@@ -44,6 +44,25 @@ describe('autoMapColumns', () => {
       new Set(Object.values(mapping).filter(Boolean)).size,
     );
   });
+
+  it('"Marca" junto a Modelo y Año es la del vehículo, no la de la pieza', () => {
+    const { mapping, unmapped } = autoMapColumns(['SKU', 'Nombre', 'Precio', 'Marca', 'Modelo', 'Año']);
+    expect(mapping.vehicleBrand).toBe('Marca');
+    expect(mapping.brand).toBeUndefined();
+    expect(unmapped).toEqual([]);
+  });
+
+  it('"Marca" sola es el fabricante de la pieza', () => {
+    const { mapping } = autoMapColumns(['SKU', 'Nombre', 'Precio', 'Marca']);
+    expect(mapping.brand).toBe('Marca');
+    expect(mapping.vehicleBrand).toBeUndefined();
+  });
+
+  it('"Marca" no pisa una columna de marca de pieza ya declarada', () => {
+    const { mapping } = autoMapColumns(['SKU', 'Nombre', 'Precio', 'Fabricante', 'Marca', 'Modelo']);
+    expect(mapping.brand).toBe('Fabricante');
+    expect(mapping.vehicleBrand).toBe('Marca');
+  });
 });
 
 describe('validateImportRow', () => {

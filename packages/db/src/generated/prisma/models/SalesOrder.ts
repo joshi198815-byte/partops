@@ -54,6 +54,7 @@ export type SalesOrderMinAggregateOutputType = {
   status: $Enums.OrderStatus | null
   sellerId: string | null
   warehouseId: string | null
+  sourceSlug: string | null
   subtotalCents: number | null
   taxCents: number | null
   discountCents: number | null
@@ -77,6 +78,7 @@ export type SalesOrderMaxAggregateOutputType = {
   status: $Enums.OrderStatus | null
   sellerId: string | null
   warehouseId: string | null
+  sourceSlug: string | null
   subtotalCents: number | null
   taxCents: number | null
   discountCents: number | null
@@ -100,6 +102,7 @@ export type SalesOrderCountAggregateOutputType = {
   status: number
   sellerId: number
   warehouseId: number
+  sourceSlug: number
   subtotalCents: number
   taxCents: number
   discountCents: number
@@ -141,6 +144,7 @@ export type SalesOrderMinAggregateInputType = {
   status?: true
   sellerId?: true
   warehouseId?: true
+  sourceSlug?: true
   subtotalCents?: true
   taxCents?: true
   discountCents?: true
@@ -164,6 +168,7 @@ export type SalesOrderMaxAggregateInputType = {
   status?: true
   sellerId?: true
   warehouseId?: true
+  sourceSlug?: true
   subtotalCents?: true
   taxCents?: true
   discountCents?: true
@@ -187,6 +192,7 @@ export type SalesOrderCountAggregateInputType = {
   status?: true
   sellerId?: true
   warehouseId?: true
+  sourceSlug?: true
   subtotalCents?: true
   taxCents?: true
   discountCents?: true
@@ -295,8 +301,9 @@ export type SalesOrderGroupByOutputType = {
   customerTaxId: string | null
   channel: $Enums.OrderChannel
   status: $Enums.OrderStatus
-  sellerId: string
+  sellerId: string | null
   warehouseId: string
+  sourceSlug: string | null
   subtotalCents: number
   taxCents: number
   discountCents: number
@@ -341,8 +348,9 @@ export type SalesOrderWhereInput = {
   customerTaxId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   channel?: Prisma.EnumOrderChannelFilter<"SalesOrder"> | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFilter<"SalesOrder"> | $Enums.OrderStatus
-  sellerId?: Prisma.StringFilter<"SalesOrder"> | string
+  sellerId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   warehouseId?: Prisma.StringFilter<"SalesOrder"> | string
+  sourceSlug?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   subtotalCents?: Prisma.IntFilter<"SalesOrder"> | number
   taxCents?: Prisma.IntFilter<"SalesOrder"> | number
   discountCents?: Prisma.IntFilter<"SalesOrder"> | number
@@ -370,8 +378,9 @@ export type SalesOrderOrderByWithRelationInput = {
   customerTaxId?: Prisma.SortOrderInput | Prisma.SortOrder
   channel?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  sellerId?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrderInput | Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
+  sourceSlug?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotalCents?: Prisma.SortOrder
   taxCents?: Prisma.SortOrder
   discountCents?: Prisma.SortOrder
@@ -404,8 +413,9 @@ export type SalesOrderWhereUniqueInput = Prisma.AtLeast<{
   customerTaxId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   channel?: Prisma.EnumOrderChannelFilter<"SalesOrder"> | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFilter<"SalesOrder"> | $Enums.OrderStatus
-  sellerId?: Prisma.StringFilter<"SalesOrder"> | string
+  sellerId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   warehouseId?: Prisma.StringFilter<"SalesOrder"> | string
+  sourceSlug?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   subtotalCents?: Prisma.IntFilter<"SalesOrder"> | number
   taxCents?: Prisma.IntFilter<"SalesOrder"> | number
   discountCents?: Prisma.IntFilter<"SalesOrder"> | number
@@ -433,8 +443,9 @@ export type SalesOrderOrderByWithAggregationInput = {
   customerTaxId?: Prisma.SortOrderInput | Prisma.SortOrder
   channel?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  sellerId?: Prisma.SortOrder
+  sellerId?: Prisma.SortOrderInput | Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
+  sourceSlug?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotalCents?: Prisma.SortOrder
   taxCents?: Prisma.SortOrder
   discountCents?: Prisma.SortOrder
@@ -464,8 +475,9 @@ export type SalesOrderScalarWhereWithAggregatesInput = {
   customerTaxId?: Prisma.StringNullableWithAggregatesFilter<"SalesOrder"> | string | null
   channel?: Prisma.EnumOrderChannelWithAggregatesFilter<"SalesOrder"> | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"SalesOrder"> | $Enums.OrderStatus
-  sellerId?: Prisma.StringWithAggregatesFilter<"SalesOrder"> | string
+  sellerId?: Prisma.StringNullableWithAggregatesFilter<"SalesOrder"> | string | null
   warehouseId?: Prisma.StringWithAggregatesFilter<"SalesOrder"> | string
+  sourceSlug?: Prisma.StringNullableWithAggregatesFilter<"SalesOrder"> | string | null
   subtotalCents?: Prisma.IntWithAggregatesFilter<"SalesOrder"> | number
   taxCents?: Prisma.IntWithAggregatesFilter<"SalesOrder"> | number
   discountCents?: Prisma.IntWithAggregatesFilter<"SalesOrder"> | number
@@ -485,8 +497,9 @@ export type SalesOrderCreateInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -514,8 +527,9 @@ export type SalesOrderUncheckedCreateInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -539,8 +553,9 @@ export type SalesOrderUpdateInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -568,8 +583,9 @@ export type SalesOrderUncheckedUpdateInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -595,8 +611,9 @@ export type SalesOrderCreateManyInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -616,8 +633,9 @@ export type SalesOrderUpdateManyMutationInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -639,8 +657,9 @@ export type SalesOrderUncheckedUpdateManyInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -684,6 +703,7 @@ export type SalesOrderCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   sellerId?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
+  sourceSlug?: Prisma.SortOrder
   subtotalCents?: Prisma.SortOrder
   taxCents?: Prisma.SortOrder
   discountCents?: Prisma.SortOrder
@@ -715,6 +735,7 @@ export type SalesOrderMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   sellerId?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
+  sourceSlug?: Prisma.SortOrder
   subtotalCents?: Prisma.SortOrder
   taxCents?: Prisma.SortOrder
   discountCents?: Prisma.SortOrder
@@ -738,6 +759,7 @@ export type SalesOrderMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   sellerId?: Prisma.SortOrder
   warehouseId?: Prisma.SortOrder
+  sourceSlug?: Prisma.SortOrder
   subtotalCents?: Prisma.SortOrder
   taxCents?: Prisma.SortOrder
   discountCents?: Prisma.SortOrder
@@ -918,8 +940,9 @@ export type SalesOrderCreateWithoutTenantInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -945,8 +968,9 @@ export type SalesOrderUncheckedCreateWithoutTenantInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1001,8 +1025,9 @@ export type SalesOrderScalarWhereInput = {
   customerTaxId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   channel?: Prisma.EnumOrderChannelFilter<"SalesOrder"> | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFilter<"SalesOrder"> | $Enums.OrderStatus
-  sellerId?: Prisma.StringFilter<"SalesOrder"> | string
+  sellerId?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   warehouseId?: Prisma.StringFilter<"SalesOrder"> | string
+  sourceSlug?: Prisma.StringNullableFilter<"SalesOrder"> | string | null
   subtotalCents?: Prisma.IntFilter<"SalesOrder"> | number
   taxCents?: Prisma.IntFilter<"SalesOrder"> | number
   discountCents?: Prisma.IntFilter<"SalesOrder"> | number
@@ -1022,8 +1047,9 @@ export type SalesOrderCreateWithoutCustomerInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1049,8 +1075,9 @@ export type SalesOrderUncheckedCreateWithoutCustomerInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1100,8 +1127,9 @@ export type SalesOrderCreateWithoutItemsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1128,8 +1156,9 @@ export type SalesOrderUncheckedCreateWithoutItemsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1168,8 +1197,9 @@ export type SalesOrderUpdateWithoutItemsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1196,8 +1226,9 @@ export type SalesOrderUncheckedUpdateWithoutItemsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1220,8 +1251,9 @@ export type SalesOrderCreateWithoutEventsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1248,8 +1280,9 @@ export type SalesOrderUncheckedCreateWithoutEventsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1288,8 +1321,9 @@ export type SalesOrderUpdateWithoutEventsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1316,8 +1350,9 @@ export type SalesOrderUncheckedUpdateWithoutEventsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1340,8 +1375,9 @@ export type SalesOrderCreateWithoutPaymentsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1368,8 +1404,9 @@ export type SalesOrderUncheckedCreateWithoutPaymentsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1408,8 +1445,9 @@ export type SalesOrderUpdateWithoutPaymentsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1436,8 +1474,9 @@ export type SalesOrderUncheckedUpdateWithoutPaymentsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1460,8 +1499,9 @@ export type SalesOrderCreateWithoutReceiptsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1488,8 +1528,9 @@ export type SalesOrderUncheckedCreateWithoutReceiptsInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1528,8 +1569,9 @@ export type SalesOrderUpdateWithoutReceiptsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1556,8 +1598,9 @@ export type SalesOrderUncheckedUpdateWithoutReceiptsInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1581,8 +1624,9 @@ export type SalesOrderCreateManyTenantInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1602,8 +1646,9 @@ export type SalesOrderUpdateWithoutTenantInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1629,8 +1674,9 @@ export type SalesOrderUncheckedUpdateWithoutTenantInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1655,8 +1701,9 @@ export type SalesOrderUncheckedUpdateManyWithoutTenantInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1677,8 +1724,9 @@ export type SalesOrderCreateManyCustomerInput = {
   customerTaxId?: string | null
   channel?: $Enums.OrderChannel
   status?: $Enums.OrderStatus
-  sellerId: string
+  sellerId?: string | null
   warehouseId: string
+  sourceSlug?: string | null
   subtotalCents?: number
   taxCents?: number
   discountCents?: number
@@ -1698,8 +1746,9 @@ export type SalesOrderUpdateWithoutCustomerInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1725,8 +1774,9 @@ export type SalesOrderUncheckedUpdateWithoutCustomerInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1751,8 +1801,9 @@ export type SalesOrderUncheckedUpdateManyWithoutCustomerInput = {
   customerTaxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   channel?: Prisma.EnumOrderChannelFieldUpdateOperationsInput | $Enums.OrderChannel
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
-  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   warehouseId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subtotalCents?: Prisma.IntFieldUpdateOperationsInput | number
   taxCents?: Prisma.IntFieldUpdateOperationsInput | number
   discountCents?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1834,6 +1885,7 @@ export type SalesOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   status?: boolean
   sellerId?: boolean
   warehouseId?: boolean
+  sourceSlug?: boolean
   subtotalCents?: boolean
   taxCents?: boolean
   discountCents?: boolean
@@ -1864,6 +1916,7 @@ export type SalesOrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   sellerId?: boolean
   warehouseId?: boolean
+  sourceSlug?: boolean
   subtotalCents?: boolean
   taxCents?: boolean
   discountCents?: boolean
@@ -1889,6 +1942,7 @@ export type SalesOrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   status?: boolean
   sellerId?: boolean
   warehouseId?: boolean
+  sourceSlug?: boolean
   subtotalCents?: boolean
   taxCents?: boolean
   discountCents?: boolean
@@ -1914,6 +1968,7 @@ export type SalesOrderSelectScalar = {
   status?: boolean
   sellerId?: boolean
   warehouseId?: boolean
+  sourceSlug?: boolean
   subtotalCents?: boolean
   taxCents?: boolean
   discountCents?: boolean
@@ -1925,7 +1980,7 @@ export type SalesOrderSelectScalar = {
   closedAt?: boolean
 }
 
-export type SalesOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "number" | "customerId" | "customerName" | "customerPhone" | "customerTaxId" | "channel" | "status" | "sellerId" | "warehouseId" | "subtotalCents" | "taxCents" | "discountCents" | "totalCents" | "notes" | "idempotencyKey" | "createdAt" | "updatedAt" | "closedAt", ExtArgs["result"]["salesOrder"]>
+export type SalesOrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "number" | "customerId" | "customerName" | "customerPhone" | "customerTaxId" | "channel" | "status" | "sellerId" | "warehouseId" | "sourceSlug" | "subtotalCents" | "taxCents" | "discountCents" | "totalCents" | "notes" | "idempotencyKey" | "createdAt" | "updatedAt" | "closedAt", ExtArgs["result"]["salesOrder"]>
 export type SalesOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.SalesOrder$customerArgs<ExtArgs>
@@ -1964,8 +2019,15 @@ export type $SalesOrderPayload<ExtArgs extends runtime.Types.Extensions.Internal
     customerTaxId: string | null
     channel: $Enums.OrderChannel
     status: $Enums.OrderStatus
-    sellerId: string
+    /**
+     * * Nulo en un pedido de invitado del catálogo público: no hay empleado que lo haya capturado.
+     */
+    sellerId: string | null
     warehouseId: string
+    /**
+     * * Slug del negocio en la vitrina cuando el pedido nació en `/c/<slug>`.
+     */
+    sourceSlug: string | null
     /**
      * * Total con impuesto incluido, en centavos. Suma exacta de las líneas.
      */
@@ -2421,6 +2483,7 @@ export interface SalesOrderFieldRefs {
   readonly status: Prisma.FieldRef<"SalesOrder", 'OrderStatus'>
   readonly sellerId: Prisma.FieldRef<"SalesOrder", 'String'>
   readonly warehouseId: Prisma.FieldRef<"SalesOrder", 'String'>
+  readonly sourceSlug: Prisma.FieldRef<"SalesOrder", 'String'>
   readonly subtotalCents: Prisma.FieldRef<"SalesOrder", 'Int'>
   readonly taxCents: Prisma.FieldRef<"SalesOrder", 'Int'>
   readonly discountCents: Prisma.FieldRef<"SalesOrder", 'Int'>

@@ -40,6 +40,37 @@ export interface StockResult {
 @Injectable()
 export class InventoryService {
   async apply(tx: TxClient, c: StockChange): Promise<StockResult> {
+    const result = await this.move(tx, c);
+    if (!result) {
+      throw new BadRequestException({
+        code: 'OUT_OF_STOCK',
+        message: 'No hay existencia suficiente para completar esta operación',
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Igual que `apply` pero devuelve `null` en vez de lanzar cuando no alcanza.
+   *
+   * Lo usa el alta de pedidos: una venta de cinco piezas de la que solo hay tres no puede reventar
+   * la transacción entera —el cliente se queda sin nada y el vendedor sin explicación—. La línea
+   * que no alcanza nace `SIN_STOCK` y las demás se reservan normalmente.
+   *
+   * No abre un hueco de concurrencia: es exactamente la misma sentencia condicional, solo cambia
+   * qué hace el llamador cuando `RETURNING` vuelve vacío.
+   */
+  tryReserve(
+    tx: TxClient,
+    args: Omit<StockChange, 'onHandDelta' | 'reservedDelta' | 'type'> & { quantity: number },
+  ): Promise<StockResult | null> {
+    if (args.quantity <= 0) {
+      return Promise.resolve(null);
+    }
+    return this.move(tx, { ...args, reservedDelta: args.quantity, type: 'RESERVA' });
+  }
+
+  async move(tx: TxClient, c: StockChange): Promise<StockResult | null> {
     const onHand = c.onHandDelta ?? 0;
     const reserved = c.reservedDelta ?? 0;
     if (onHand === 0 && reserved === 0) {
@@ -77,12 +108,7 @@ export class InventoryService {
     // `$queryRaw` devuelve las columnas tal cual las nombra Postgres: hay que mapear a mano,
     // porque el driver las entrega con el nombre físico ("onHand") y no como objeto del modelo.
     const raw = rows[0];
-    if (!raw) {
-      throw new BadRequestException({
-        code: 'OUT_OF_STOCK',
-        message: 'No hay existencia suficiente para completar esta operación',
-      });
-    }
+    if (!raw) return null;
     const level = { onHand: Number(raw.onHand), reserved: Number(raw.reserved) };
 
     if (onHand !== 0) {
