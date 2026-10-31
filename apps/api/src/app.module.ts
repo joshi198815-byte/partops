@@ -11,11 +11,15 @@ import { RealtimeGateway } from './infra/realtime.gateway.js';
 import { RealtimeService } from './infra/realtime.service.js';
 import { StorageService } from './infra/storage.service.js';
 import { MailModule } from './mail/mail.module.js';
+import { AuditController } from './modules/account/audit.controller.js';
+import { AuditQueryService } from './modules/account/audit.query.service.js';
 import { CatalogController } from './modules/catalog/catalog.controller.js';
 import { CatalogService } from './modules/catalog/catalog.service.js';
 import { ImagesService } from './modules/catalog/images.service.js';
 import { MediaController } from './modules/catalog/media.controller.js';
 import { PartsController } from './modules/catalog/parts.controller.js';
+import { DashboardController } from './modules/dashboard/dashboard.controller.js';
+import { DashboardService } from './modules/dashboard/dashboard.service.js';
 import { DemandController, StockWatchController } from './modules/demand/demand.controller.js';
 import { DemandService } from './modules/demand/demand.service.js';
 import { StockWatchService } from './modules/demand/stock-watch.service.js';
@@ -41,6 +45,8 @@ import { PublicCatalogService } from './modules/public-catalog/public-catalog.se
 import { PublicGuardService } from './modules/public-catalog/public-guard.service.js';
 import { PublicReceiptsController, ReceiptsController } from './modules/receipts/receipts.controller.js';
 import { ReceiptsService } from './modules/receipts/receipts.service.js';
+import { CommandController } from './modules/search/command.controller.js';
+import { CommandService } from './modules/search/command.service.js';
 import { SearchController } from './modules/search/search.controller.js';
 import { SearchService } from './modules/search/search.service.js';
 import { SettingsController } from './modules/settings/settings.controller.js';
@@ -54,13 +60,16 @@ import { TeamService } from './modules/team/team.service.js';
     AuthController,
     MeController,
     InvitationController,
+    AuditController,
     OnboardingController,
     TeamController,
     SettingsController,
     SearchController,
+    CommandController,
     CatalogController,
     PartsController,
     MediaController,
+    DashboardController,
     InventoryController,
     ImporterController,
     OrdersController,
@@ -76,15 +85,18 @@ import { TeamService } from './modules/team/team.service.js';
   providers: [
     ...API_PROVIDERS,
     AuthService,
+    AuditQueryService,
     OnboardingService,
     TeamService,
     SearchService,
+    CommandService,
     StorageService,
     ImagesService,
     InventoryService,
     InventoryQueryService,
     TransferService,
     CatalogService,
+    DashboardService,
     ImporterService,
     RealtimeService,
     RealtimeGateway,

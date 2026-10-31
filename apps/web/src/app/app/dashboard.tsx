@@ -1,4 +1,4 @@
-import type { MeResponse } from '@partops/contracts';
+import { type DashboardToday, formatMoney, type MeResponse } from '@partops/contracts';
 import { CodeChip, EmptyState, PartOpsMark, StatTile } from '@partops/ui';
 import Link from 'next/link';
 import { requireMe, serverFetch } from '@/lib/session';
@@ -15,12 +15,15 @@ interface Overview {
 /**
  * Tablero.
  *
- * Las cifras salen de `/api/catalog/overview`, no de un cálculo en el cliente ni de un texto fijo.
- * Antes esta pantalla decía "todavía no hay piezas cargadas" siempre, incluso con catálogo: una
- * afirmación falsa es peor que una pantalla vacía, porque nadie va a buscarla para desmentirla.
+ * Las cifras salen de la API, no de un cálculo en el cliente ni de un texto fijo. Antes esta
+ * pantalla decía "todavía no hay piezas cargadas" siempre, incluso con catálogo: una afirmación
+ * falsa es peor que una pantalla vacía, porque nadie va a buscarla para desmentirla.
  *
- * Lo que no hay todavía (ventas del día, utilidad) no se pinta con ceros: un cero es un dato y
- * aquí sería una mentira.
+ * Arriba va lo del día (`/api/dashboard/today`), que es lo que el dueño abre a ver: cuánto se
+ * vendió, qué falta despachar, qué se agotó, qué buscaron sin encontrarlo. Abajo sigue el estado
+ * del catálogo, que cambia poco y sirve para saber si la carga inicial ya está completa.
+ *
+ * Lo que no hay todavía no se pinta con ceros: un cero es un dato y aquí sería una mentira.
  */
 export default async function Dashboard({ me }: { me?: MeResponse }) {
   const session = me ?? (await requireMe());
@@ -29,9 +32,16 @@ export default async function Dashboard({ me }: { me?: MeResponse }) {
 
   // Un fallo del resumen no debe tumbar el tablero: se muestra el catálogo como "sin datos" y el
   // resto de la pantalla sigue sirviendo para trabajar.
-  const overview = await serverFetch('/api/catalog/overview')
-    .then((res) => (res.ok ? (res.json() as Promise<Overview>) : null))
-    .catch(() => null);
+  const [overview, today] = await Promise.all([
+    serverFetch('/api/catalog/overview')
+      .then((res) => (res.ok ? (res.json() as Promise<Overview>) : null))
+      .catch(() => null),
+    serverFetch('/api/dashboard/today')
+      .then((res) => (res.ok ? (res.json() as Promise<DashboardToday>) : null))
+      .catch(() => null),
+  ]);
+
+  const currency = 'GTQ';
 
   const actions = [
     {
@@ -77,6 +87,90 @@ export default async function Dashboard({ me }: { me?: MeResponse }) {
           <span className="font-mono text-[12px]">partops.gt/{session.tenant?.slug}</span>
         </p>
       </header>
+
+      {/* Cifras del día. Primero lo que se mueve cada hora; el catálogo va después porque cambia
+          poco y no es lo que alguien abre a revisar a las siete de la mañana. */}
+      {today ? (
+        <section aria-labelledby="hoy" className="mb-8">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2
+              id="hoy"
+              className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--foreground-muted)]"
+            >
+              Hoy
+            </h2>
+            <span className="font-mono text-[11px] text-[var(--foreground-muted)]">{today.day}</span>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-4">
+            <Link
+              href={'/app/finanzas' as never}
+              className="block bg-[var(--surface)] hover:bg-[var(--surface-sunken)]"
+            >
+              <StatTile
+                label="Vendido hoy"
+                value={today.salesCents === null ? '—' : formatMoney(today.salesCents, currency)}
+                hint={
+                  today.salesCents === null
+                    ? 'Necesitas permiso de finanzas para ver el importe'
+                    : today.ordersTodayCount === 1
+                      ? '1 pedido entregado'
+                      : `${today.ordersTodayCount ?? 0} pedidos entregados`
+                }
+                className="h-full rounded-none border-0"
+              />
+            </Link>
+            <Link
+              href={'/app/despacho' as never}
+              className="block bg-[var(--surface)] hover:bg-[var(--surface-sunken)]"
+            >
+              <StatTile
+                label="Por despachar"
+                value={String(today.pendingUnits)}
+                hint={
+                  today.readyUnits > 0
+                    ? `${today.readyUnits} ${today.readyUnits === 1 ? 'unidad lista' : 'unidades listas'} esperando entrega`
+                    : today.pendingUnits > 0
+                      ? 'Hay que sacarlas del estante'
+                      : 'Nada pendiente'
+                }
+                className="h-full rounded-none border-0"
+              />
+            </Link>
+            <Link
+              href={'/app/inventario' as never}
+              className="block bg-[var(--surface)] hover:bg-[var(--surface-sunken)]"
+            >
+              <StatTile
+                label="Sin existencia"
+                value={String(today.outOfStock)}
+                hint={
+                  today.lowStock > 0
+                    ? `${today.lowStock} ${today.lowStock === 1 ? 'variante bajo el mínimo' : 'variantes bajo el mínimo'}`
+                    : 'Todo lo del catálogo tiene existencia'
+                }
+                className="h-full rounded-none border-0"
+              />
+            </Link>
+            <Link
+              href={'/app/buscar' as never}
+              className="block bg-[var(--surface)] hover:bg-[var(--surface-sunken)]"
+            >
+              <StatTile
+                label="Búsquedas sin respuesta"
+                value={String(today.missedSearches)}
+                hint="Últimos 30 días"
+                className="h-full rounded-none border-0"
+              />
+            </Link>
+          </div>
+          {today.openOrders > 0 ? (
+            <p className="mt-3 text-[12.5px] leading-snug text-[var(--foreground-muted)]">
+              {today.openOrders === 1 ? '1 pedido sigue' : `${today.openOrders} pedidos siguen`} abiertos en
+              la bodega.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <section aria-labelledby="empezar" className="mb-8">
         <h2
@@ -126,22 +220,6 @@ export default async function Dashboard({ me }: { me?: MeResponse }) {
                 label="Bajo el mínimo"
                 value={String(overview.lowStock)}
                 hint={overview.lowStock > 0 ? 'Reponer antes de la próxima venta' : 'Nada por reponer'}
-                className="rounded-none border-0"
-              />
-              <StatTile
-                label="Sin existencia"
-                value={String(overview.outOfStock)}
-                hint={
-                  overview.outOfStock > 0
-                    ? 'Alguien va a preguntar por esto'
-                    : 'Todo lo del catálogo tiene existencia'
-                }
-                className="rounded-none border-0"
-              />
-              <StatTile
-                label="Búsquedas sin resultado"
-                value={String(overview.missedSearches)}
-                hint="Últimos 30 días"
                 className="rounded-none border-0"
               />
             </div>

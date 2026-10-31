@@ -1,4 +1,7 @@
+export * from './audit.js';
 export * from './catalog.js';
+export * from './command.js';
+export * from './dashboard.js';
 export * from './demand.js';
 export * from './dispatch.js';
 export * from './finance.js';

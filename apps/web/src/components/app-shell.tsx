@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { signOut } from '@/lib/auth';
+import { CommandPalette } from './command-palette';
 
 /**
  * Marco de la aplicación.
@@ -34,9 +35,9 @@ const NAV: NavItem[] = [
   { href: '/app/catalogo', label: 'Catálogo', permission: 'catalog.view', group: 'negocio' },
   { href: '/app/finanzas', label: 'Finanzas', permission: 'finance.view', group: 'negocio' },
   { href: '/app/equipo', label: 'Equipo', permission: 'team.manage', group: 'negocio' },
+  { href: '/app/auditoria', label: 'Auditoría', permission: 'audit.view', group: 'negocio' },
   { href: '/app/configuracion', label: 'Configuración', permission: 'settings.manage', group: 'negocio' },
 ];
-
 export function AppShell({ me, children }: { me: MeResponse; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -85,6 +86,7 @@ export function AppShell({ me, children }: { me: MeResponse; children: React.Rea
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface)]/95 px-4 backdrop-blur-sm">
           <TenantSwitcher me={me} />
           <div className="flex items-center gap-1">
+            <CommandPalette />
             <span className="hidden max-w-[180px] truncate text-[12.5px] text-[var(--foreground-muted)] sm:inline">
               {me.user.name}
             </span>
