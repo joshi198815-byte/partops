@@ -13,11 +13,12 @@
   "name": "partops-web-preview",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-01",
-  // Sin `global_fetch_strictly_public`, y con `global_fetch_private_origin` puesta a propósito: el
-  // rewrite `/api/*` apunta a `api.partops.autos`, que vive en la MISMA zona. Con la bandera
-  // pública la subpetición vuelve a entrar por el front door de Cloudflare, pierde el `Host` y
-  // responde 403 (error 1003). Con esta, se enruta por dentro de la zona hasta el origen.
-  "compatibility_flags": ["nodejs_compat", "global_fetch_private_origin"],
+  // Sin `global_fetch_strictly_public`: el adaptador lo pide a veces, pero aquí la app reescribe
+  // `/api/*` a `api.partops.autos`, que está en la MISMA zona. Con la bandera pública la
+  // subpetición vuelve al front door de Cloudflare, pierde el `Host` y la zona responde 403 con
+  // error 1003 «A valid Host header must be supplied». Con el comportamiento por defecto la
+  // petición llega a la API. Ver `wrangler.jsonc`.
+  "compatibility_flags": ["nodejs_compat"],
 
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web-preview" }],

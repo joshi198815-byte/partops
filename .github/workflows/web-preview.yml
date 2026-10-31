@@ -71,6 +71,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GITHUB_SHA: ${{ github.sha }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.PRODUCTION_SENTRY_DSN }}
+          # `next.config.mjs` lee `API_URL` **al construir** y hornea el destino del rewrite en la
+          # tabla de rutas. Sin esto cae al fallback `http://localhost:4000`, y `/api/*` responde
+          # 403 en el ensayo mientras el mismo código funciona en producción: el fallo es del
+          # ensayo, no del Worker.
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
         # `wrangler deploy` y no `opennextjs-cloudflare deploy`: el segundo precarga en R2 las
         # páginas generadas en el build, y para eso levanta un Worker local y le pasa la red de
         # Cloudflare por un proxy. En el runner eso expira a los 60 s y reintenta 15 veces. El
