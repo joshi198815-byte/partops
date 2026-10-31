@@ -4,8 +4,13 @@
   "main": ".open-next/worker.js",
   // Node y fecha recientes: sin `nodejs_compat` el adaptador no puede cargar Next, y las APIs que
   // usa el servidor (streams, `AsyncLocalStorage`, `crypto`) dependen de la fecha de compatibilidad.
+  //
+  // `global_fetch_strictly_public` NO va aquí. La app reescribe `/api/*` a `api.partops.autos`,
+  // que es la misma zona: con esa bandera la subpetición vuelve a entrar por el front door de
+  // Cloudflare, pierde el `Host` y responde 403 con error 1003. Sin ella, la petición sale como
+  // tráfico normal hacia la zona y la API contesta.
   "compatibility_date": "2026-10-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "compatibility_flags": ["nodejs_compat"],
 
   // El Worker sirve los assets estáticos de Workers Static Assets; el directorio lo llena OpenNext.
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },

@@ -13,7 +13,10 @@
   "name": "partops-web-preview",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Sin `global_fetch_strictly_public`: el rewrite `/api/*` apunta a `api.partops.autos`, misma
+  // zona. Con esa bandera la subpetición vuelve por el front door de Cloudflare, pierde el `Host`
+  // y responde 403 (error 1003). Ver `wrangler.jsonc`.
+  "compatibility_flags": ["nodejs_compat"],
 
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web-preview" }],
