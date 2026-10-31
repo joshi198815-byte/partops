@@ -28,6 +28,7 @@ import { audit, diff } from '../../common/audit.js';
 import type { Ctx } from '../../common/context.js';
 import { DatabaseService } from '../../infra/database.module.js';
 import { InventoryService } from '../inventory/inventory.service.js';
+import { PlanService } from '../plan/plan.service.js';
 import { SearchService } from '../search/search.service.js';
 import { ImagesService } from './images.service.js';
 
@@ -74,6 +75,7 @@ export class CatalogService {
     @Inject(ImagesService) private readonly images: ImagesService,
     @Inject(InventoryService) private readonly inventory: InventoryService,
     @Inject(SearchService) private readonly search: SearchService,
+    @Inject(PlanService) private readonly plan: PlanService,
   ) {}
 
   // ───────────────────────────── Listado ─────────────────────────────
@@ -452,6 +454,9 @@ export class CatalogService {
     const tenantId = ctx.tenant.tenantId;
 
     const partId = await this.db.tx(tenantId, async (tx) => {
+      // El tope se comprueba dentro de la misma transacción que crea: dos altas simultáneas en el
+      // borde del límite no pueden colarse las dos.
+      await this.plan.assertCanAddParts(ctx, tx, 1);
       const categoryId = await this.resolveCategory(tx, tenantId, input.categoryId, input.categoryName);
       const slug = await this.freeSlug(tx, tenantId, partSlug(input.name));
 

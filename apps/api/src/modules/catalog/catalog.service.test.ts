@@ -14,6 +14,7 @@ import type { Ctx } from '../../common/context.js';
 import type { DatabaseService } from '../../infra/database.module.js';
 import type { StoredFile } from '../../infra/storage.service.js';
 import { InventoryService } from '../inventory/inventory.service.js';
+import { PlanService } from '../plan/plan.service.js';
 import { SearchService } from '../search/search.service.js';
 import { CatalogService } from './catalog.service.js';
 import { ImagesService } from './images.service.js';
@@ -124,7 +125,13 @@ describe.skipIf(skip)('CatalogService: piezas, variantes, compatibilidad e imág
     } as unknown as DatabaseService;
     storage = new FakeStorage();
     const images = new ImagesService(storage as never);
-    catalog = new CatalogService(db, images, new InventoryService(), new SearchService(db));
+    catalog = new CatalogService(
+      db,
+      images,
+      new InventoryService(),
+      new SearchService(db),
+      new PlanService(db),
+    );
 
     await systemTx(base, async (tx) => {
       await tx.tenant.create({ data: { id: tenantId, slug: `cat-${tenantId.slice(0, 8)}`, name: 'Bodega' } });

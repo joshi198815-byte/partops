@@ -87,7 +87,9 @@ export default function EquipoPage() {
                     ? 'ya trabaja contigo'
                     : s.reason === 'INVITACION_PENDIENTE'
                       ? 'ya tiene una invitación pendiente'
-                      : 'ese rol no existe'}
+                      : s.reason === 'LIMITE_DEL_PLAN'
+                        ? 'tu plan ya no admite más usuarios'
+                        : 'ese rol no existe'}
                 </li>
               ))}
             </ul>

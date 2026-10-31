@@ -474,4 +474,38 @@ describe.skipIf(skip)('catálogo público: aislamiento, existencia y cola de bod
     // Limpieza: el vocabulario vehicular es global y sobrevive al borrado del negocio.
     await systemTx(base, (tx) => tx.vehicle.delete({ where: { id: vehicle.id } }));
   });
+
+  /**
+   * El vocabulario de la portada.
+   *
+   * Es la única consulta pública que no sale de un negocio, así que la prueba mira dos cosas: que
+   * traiga la tabla curada global, y que **no** arrastre la categoría de pieza de ningún negocio
+   * (`part_category` sí lleva `tenantId`).
+   */
+  it('el vocabulario público trae marcas y modelos globales y nada de negocio', async () => {
+    const suffix = tenantId.slice(0, 8);
+    const brandName = `Vitrina-${suffix}`;
+    const modelName = `Vitrina-Modelo-${suffix}`;
+
+    const brandId = await systemTx(base, async (tx) => {
+      // Una categoría del negocio con un nombre imposible de confundir: si aparece en la respuesta,
+      // se está filtrando catálogo por la puerta de atrás.
+      await tx.partCategory.create({
+        data: { tenantId, name: `Categoría privada ${suffix}`, slug: `cat-${suffix}` },
+      });
+      const brand = await tx.vehicleBrand.create({ data: { name: brandName } });
+      await tx.vehicleModel.create({ data: { brandId: brand.id, name: modelName } });
+      return brand.id;
+    });
+
+    const vocab = await service.referenceVocabulary();
+    try {
+      expect(vocab.brands).toContain(brandName);
+      expect(vocab.models).toEqual(expect.arrayContaining([{ name: modelName, brand: brandName }]));
+      expect(vocab.categories ?? []).toHaveLength(0);
+      expect(JSON.stringify(vocab)).not.toContain('Categoría privada');
+    } finally {
+      await systemTx(base, (tx) => tx.vehicleBrand.delete({ where: { id: brandId } }));
+    }
+  });
 });

@@ -37,12 +37,14 @@ FROM deps AS build
 # estos `ARG` se llenan solos desde `render.yaml`. En local hay que pasarlos con `--build-arg`.
 # Ningún valor sensible va aquí: un ARG queda grabado en el historial de la imagen.
 ARG API_URL=http://localhost:4000
+ARG NEXT_PUBLIC_API_URL=
 ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
 ARG NEXT_PUBLIC_SENTRY_DSN=
 # Render lo inyecta en build; se hornea en la cabecera `x-partops-commit` para que `deploy.yml`
 # verifique que la web nueva está sirviendo, no solo que el deploy fue disparado.
 ARG RENDER_GIT_COMMIT=dev
 ENV API_URL=$API_URL \
+    NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL \
     NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN \
     RENDER_GIT_COMMIT=$RENDER_GIT_COMMIT

@@ -35,7 +35,33 @@ export function useSubmit() {
     }
   }, []);
 
-  return { pending, error, issues, run, setError };
+  /**
+   * Igual que `run`, pero devuelve la respuesta.
+   *
+   * `run` devuelve un booleano para que el llamador corte con `if (!ok) return`. Eso no sirve
+   * cuando la pantalla necesita parte de la respuesta —el `delivered` de una invitación— y no se
+   * puede cambiar el contrato de `run` sin tocar cada formulario. Por eso es una función aparte:
+   * mismo manejo de errores, `null` en vez de `false`.
+   */
+  const runValue = useCallback(async <T>(fn: () => Promise<T>): Promise<T | null> => {
+    setPending(true);
+    setError(null);
+    setIssues({});
+    try {
+      return await fn();
+    } catch (err) {
+      setError(errorMessage(err));
+      setIssues(fieldErrors(err));
+      if (err instanceof ApiError && err.status === 401 && typeof window !== 'undefined') {
+        window.location.href = '/entrar';
+      }
+      return null;
+    } finally {
+      setPending(false);
+    }
+  }, []);
+
+  return { pending, error, issues, run, runValue, setError };
 }
 
 /** Errores de un `safeParse` de Zod, con la misma forma que los del servidor. */

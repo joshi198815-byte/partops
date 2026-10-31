@@ -21,6 +21,7 @@ import { audit } from '../../common/audit.js';
 import type { AuthUser, TenantContext } from '../../common/context.js';
 import { DatabaseService } from '../../infra/database.module.js';
 import { MailService } from '../../mail/mail.service.js';
+import { PlanService } from '../plan/plan.service.js';
 
 export interface CreatedTenant {
   id: string;
@@ -47,6 +48,7 @@ export class OnboardingService {
     @Inject(DatabaseService) private readonly db: DatabaseService,
     @Inject(AuthService) private readonly auth: AuthService,
     @Inject(MailService) private readonly mail: MailService,
+    @Inject(PlanService) private readonly plan: PlanService,
   ) {}
 
   /**
@@ -337,6 +339,17 @@ export class OnboardingService {
       const result: Array<{ email: string; token: string; expiresAt: Date }> = [];
       const skipped: Array<{ email: string; reason: string }> = [];
 
+      // Quién ya ocupó lugar en el plan: el propietario ya es miembro y cada invitación pendiente
+      // cuenta. Se lleva la cuenta en memoria para no consultar la base en cada fila.
+      const spec = await this.plan.effective({ tenant }, tx);
+      const limit = spec.limits.members;
+      let seats =
+        limit === null
+          ? Number.POSITIVE_INFINITY
+          : await tx.member.count({
+              where: { tenantId: tenant.tenantId, isActive: true },
+            });
+
       for (const invite of invites) {
         if (alreadySet.has(invite.email)) {
           skipped.push({ email: invite.email, reason: 'YA_ES_MIEMBRO' });
@@ -344,6 +357,13 @@ export class OnboardingService {
         }
         if (pendingSet.has(invite.email)) {
           skipped.push({ email: invite.email, reason: 'INVITACION_PENDIENTE' });
+          continue;
+        }
+        // El plan se comprueba aquí y no en `insert`: se quieren invitar cuatro de una vez y el
+        // plan solo da para dos. Rechazar la tanda entera obligaría a adivinar cuántas caben; así
+        // entran las que caben y las demás dicen por qué no.
+        if (limit !== null && seats + 1 > limit) {
+          skipped.push({ email: invite.email, reason: 'LIMITE_DEL_PLAN' });
           continue;
         }
         const roleId = byKey.get(invite.roleKey);
@@ -364,6 +384,7 @@ export class OnboardingService {
             expiresAt,
           },
         });
+        seats += 1;
         await audit(tx, {
           tenantId: tenant.tenantId,
           userId: user.id,

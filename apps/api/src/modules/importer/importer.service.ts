@@ -24,6 +24,7 @@ import { audit } from '../../common/audit.js';
 import type { Ctx } from '../../common/context.js';
 import { DatabaseService } from '../../infra/database.module.js';
 import { InventoryService } from '../inventory/inventory.service.js';
+import { PlanService } from '../plan/plan.service.js';
 import { SearchService } from '../search/search.service.js';
 import { parseImportFile } from './sheet.reader.js';
 
@@ -73,6 +74,7 @@ export class ImporterService {
     @Inject(DatabaseService) private readonly db: DatabaseService,
     @Inject(InventoryService) private readonly inventory: InventoryService,
     @Inject(SearchService) private readonly search: SearchService,
+    @Inject(PlanService) private readonly plan: PlanService,
   ) {}
 
   // ───────────────────────────── 1. Subir ─────────────────────────────
@@ -83,6 +85,11 @@ export class ImporterService {
   ): Promise<ImportUploadResponse> {
     const tenantId = ctx.tenant.tenantId;
     const sheet = await parseImportFile(file);
+
+    // El tope de filas se comprueba antes de validar una por una: no tiene sentido gastar el
+    // parseo de 4.000 filas que el plan no va a dejar guardar. El mensaje dice el número exacto.
+    await this.plan.assertImportRows(ctx, sheet.rows.length);
+
     const preview = buildPreview(sheet.rows, sheet.mapping, sheet.unmapped);
     const stored: StoredSheet = {
       headers: sheet.headers,
@@ -260,6 +267,12 @@ export class ImporterService {
         async (tx) => {
           const errors: { rowNumber: number; field: string | null; message: string; raw: unknown }[] = [];
 
+          // Presupuesto de piezas nuevas para este lote. Se calcula una vez (una consulta por lote
+          // de 150 filas, no por fila) y se descuenta al crear. Al agotarse, las filas que
+          // necesitarían una pieza nueva se rechazan con el mensaje del plan en vez de dejar el
+          // archivo a medio importar sin explicación.
+          const budget = { remaining: await this.plan.partBudget(ctx, tx) };
+
           for (const { rowNumber, raw } of rows) {
             const known = rejected.get(rowNumber);
             if (known) {
@@ -290,6 +303,7 @@ export class ImporterService {
               warehouses,
               partByKey,
               slugsTaken,
+              budget,
             });
 
             switch (outcome.kind) {
@@ -297,6 +311,7 @@ export class ImporterService {
                 counters.createdVariants += 1;
                 if (outcome.newPart) {
                   counters.createdParts += 1;
+                  budget.remaining -= 1;
                   slugsTaken.add(partSlug(validation.data.name));
                 }
                 counters.successRows += 1;
@@ -370,6 +385,8 @@ export class ImporterService {
       warehouses: WarehouseLookup;
       partByKey: Map<string, string>;
       slugsTaken: Set<string>;
+      /** Piezas nuevas que el plan todavía permite en este lote. Se descuenta al crear. */
+      budget: { remaining: number };
     },
   ): Promise<RowOutcome> {
     const tenantId = ctx.tenant.tenantId;
@@ -423,8 +440,10 @@ export class ImporterService {
     }
 
     const part = await this.resolvePart(tx, tenantId, row, args);
+    if ('denied' in part) return { kind: 'error', message: part.denied, field: 'sku' };
 
     /**
+     * La existencia inicial entra por el ledger.
      * La existencia inicial entra por el ledger. Escribir `onHand` directo dejaría un saldo sin
      * origen: el primer inventario físico no cuadraría con nada y no habría forma de auditar de
      * dónde salieron esas 400 unidades.
@@ -540,8 +559,8 @@ export class ImporterService {
     tx: TxClient,
     tenantId: string,
     row: ImportRow,
-    args: { partByKey: Map<string, string>; slugsTaken: Set<string> },
-  ): Promise<{ id: string; created: boolean }> {
+    args: { partByKey: Map<string, string>; slugsTaken: Set<string>; budget: { remaining: number } },
+  ): Promise<{ id: string; created: boolean } | { denied: string }> {
     const key = this.partKey(row);
     const cached = args.partByKey.get(key);
     if (cached) return { id: cached, created: false };
@@ -558,6 +577,16 @@ export class ImporterService {
     if (found[0]) {
       args.partByKey.set(key, found[0].id);
       return { id: found[0].id, created: false };
+    }
+
+    // Solo las piezas NUEVAS consumen tope. Una fila que agrega una variante a una pieza que ya
+    // existe pasa aunque el plan esté lleno: es la diferencia entre "no puedo cargar más catálogo"
+    // y "no puedo vender el segundo color de lo que ya tengo".
+    if (args.budget.remaining <= 0) {
+      return {
+        denied:
+          'Tu plan alcanzó su tope de piezas. Las piezas nuevas de este archivo no se crearon; las variantes de piezas existentes sí. Sube de plan o archiva piezas para hacer lugar.',
+      };
     }
 
     const categoryId = row.category ? await this.resolveCategory(tx, tenantId, row.category) : null;

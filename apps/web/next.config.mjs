@@ -30,7 +30,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
+      // Subdominio de terceros: solo para fotos subidas antes del dominio propio. Se puede quitar
+      // cuando el RUNBOOK § 3b diga que ya no queda ninguna fila apuntando ahí.
       { protocol: 'https', hostname: '*.r2.dev' },
+      // Dominio de las fotos. Sin esta línea, `next/image` lanza "hostname not configured" y las
+      // imágenes nuevas no se pintan: la migración del CDN se vería como un catálogo sin fotos.
+      { protocol: 'https', hostname: 'cdn.partops.autos' },
     ],
   },
   /**

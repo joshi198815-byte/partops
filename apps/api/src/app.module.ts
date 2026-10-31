@@ -44,11 +44,13 @@ import { OnboardingController } from './modules/onboarding/onboarding.controller
 import { OnboardingService } from './modules/onboarding/onboarding.service.js';
 import { OrdersController } from './modules/orders/orders.controller.js';
 import { OrdersService } from './modules/orders/orders.service.js';
+import { PlanService } from './modules/plan/plan.service.js';
 import { PlatformController } from './modules/platform/platform.controller.js';
 import { PlatformService } from './modules/platform/platform.service.js';
 import { PublicCatalogController } from './modules/public-catalog/public-catalog.controller.js';
 import { PublicCatalogService } from './modules/public-catalog/public-catalog.service.js';
 import { PublicGuardService } from './modules/public-catalog/public-guard.service.js';
+import { VocabularyController } from './modules/public-catalog/vocabulary.controller.js';
 import { PublicReceiptsController, ReceiptsController } from './modules/receipts/receipts.controller.js';
 import { ReceiptsService } from './modules/receipts/receipts.service.js';
 import { CommandController } from './modules/search/command.controller.js';
@@ -92,6 +94,7 @@ import { TeamService } from './modules/team/team.service.js';
     ReceiptsController,
     PublicReceiptsController,
     PublicCatalogController,
+    VocabularyController,
     DemandController,
     StockWatchController,
     FinanceController,
@@ -130,6 +133,7 @@ import { TeamService } from './modules/team/team.service.js';
     FinanceExportService,
     MaintenanceService,
     PlatformService,
+    PlanService,
     // Global: toda ruta es privada salvo que se marque `@Public()`. Al revés —privado por
     // omisión— un endpoint nuevo olvidado queda expuesto; así, un endpoint nuevo olvidado queda
     // cerrado y se nota en la primera prueba, no en la primera fuga.

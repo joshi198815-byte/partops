@@ -1,11 +1,27 @@
 'use client';
 
-import { formatGtPhone } from '@partops/contracts';
+import { formatGtPhone, formatMoney, usageLabel } from '@partops/contracts';
 import { Alert, Button, Checkbox, CodeChip, Field, Input } from '@partops/ui';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
 import { useSubmit } from '@/lib/use-submit';
+
+/** Lo que devuelve `GET /api/settings/plan`. Los topes vienen de `PLANS`, no de la base. */
+interface PlanInfo {
+  tier: string;
+  name: string;
+  priceCentsPerMonth: number;
+  tagline: string;
+  limits: {
+    parts: number | null;
+    members: number | null;
+    importRowsPerFile: number | null;
+    publicCatalog: boolean;
+    exportData: boolean;
+  };
+  usage: { parts: number; members: number };
+}
 
 interface Settings {
   name: string;
@@ -65,6 +81,7 @@ export function SettingsScreen({
         </p>
       </header>
 
+      <PlanPanel />
       <Identity settings={settings} onSaved={setSettings} />
       <Taxes settings={settings} onSaved={setSettings} />
       <PublicCatalog settings={settings} onSaved={setSettings} />
@@ -310,6 +327,108 @@ function PublicCatalog({ settings, onSaved }: { settings: Settings; onSaved: (s:
             )}
           </div>
         </form>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * El plan del negocio y cuánto lleva consumido.
+ *
+ * Va arriba de todo porque es lo que explica cualquier «no puedo crear más» de la aplicación. Los
+ * topes vienen de la API (que a su vez los lee de `PLANS`) y se pintan con `usageLabel`, así que la
+ * cifra de aquí y la del candado son la misma por construcción.
+ *
+ * Sin barras de progreso cuando no hay tope: una barra llena al 3 % de «infinito» no informa nada.
+ */
+function PlanPanel() {
+  const [plan, setPlan] = useState<PlanInfo | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    api<PlanInfo>('/api/settings/plan')
+      .then(setPlan)
+      .catch(() => setFailed(true));
+  }, []);
+
+  if (failed) return null;
+  if (!plan) return null;
+
+  const rows = [
+    {
+      key: 'parts',
+      label: usageLabel(plan.usage.parts, plan.limits.parts, 'piezas'),
+      used: plan.usage.parts,
+      limit: plan.limits.parts,
+    },
+    {
+      key: 'members',
+      label: usageLabel(plan.usage.members, plan.limits.members, 'usuarios'),
+      used: plan.usage.members,
+      limit: plan.limits.members,
+    },
+  ];
+
+  return (
+    <section aria-labelledby="plan">
+      <SectionTitle id="plan" title="Plan" />
+      <div className="relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] p-4 pl-5">
+        {/* Filete de cobre: el motivo de marca. Nunca fondo, nunca glow. */}
+        <span aria-hidden className="absolute inset-y-0 left-0 w-0.5 bg-[var(--accent)]" />
+
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div>
+            <p className="font-[family-name:var(--font-display)] text-[17px] font-bold tracking-[-0.01em] text-[var(--foreground)]">
+              {plan.name}
+            </p>
+            <p className="mt-0.5 text-[12px] text-[var(--foreground-muted)]">{plan.tagline}</p>
+          </div>
+          <p className="partops-num font-mono text-[13px] text-[var(--foreground)]">
+            {plan.priceCentsPerMonth === 0 ? 'Gratis' : `${formatMoney(plan.priceCentsPerMonth, 'GTQ')}/mes`}
+            {plan.priceCentsPerMonth === 0 ? null : (
+              <span className="ml-1 font-sans text-[11px] text-[var(--foreground-muted)]">IVA incluido</span>
+            )}
+          </p>
+        </div>
+
+        <dl className="mt-4 space-y-2.5">
+          {rows.map((row) => {
+            const pct = row.limit === null ? null : Math.min(100, Math.round((row.used / row.limit) * 100));
+            return (
+              <div key={row.key}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt className="text-[12px] text-[var(--foreground-muted)]">
+                    {row.key === 'parts' ? 'Piezas' : 'Usuarios'}
+                  </dt>
+                  <dd className="partops-num text-[12px] font-medium text-[var(--foreground)]">
+                    {row.label}
+                  </dd>
+                </div>
+                {pct === null ? null : (
+                  <div
+                    role="presentation"
+                    className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--surface-sunken)]"
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${pct}%`,
+                        background: pct >= 80 ? 'var(--accent)' : 'var(--border-strong)',
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </dl>
+
+        <p className="mt-3 text-[12px] text-[var(--foreground-muted)]">
+          <Link href="/planes" className="font-medium text-[var(--color-copper-700)] hover:underline">
+            Cambiar de plan
+          </Link>
+          {plan.limits.publicCatalog ? null : ' · El catálogo público entra desde el plan Mostrador.'}
+        </p>
       </div>
     </section>
   );

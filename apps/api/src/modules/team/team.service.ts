@@ -14,6 +14,7 @@ import { audit, diff } from '../../common/audit.js';
 import type { AuthUser, TenantContext } from '../../common/context.js';
 import { DatabaseService } from '../../infra/database.module.js';
 import { MailService } from '../../mail/mail.service.js';
+import { PlanService } from '../plan/plan.service.js';
 
 export interface TeamMemberView {
   id: string;
@@ -55,6 +56,7 @@ export class TeamService {
     @Inject(DatabaseService) private readonly db: DatabaseService,
     @Inject(AuthService) private readonly auth: AuthService,
     @Inject(MailService) private readonly mail: MailService,
+    @Inject(PlanService) private readonly plan: PlanService,
   ) {}
 
   async list(tenant: TenantContext) {
@@ -179,6 +181,10 @@ export class TeamService {
         }
       }
 
+      // Después de descartar duplicados: si la persona ya está o ya tiene enlace, ese es el
+      // motivo que hay que decir, no un límite del plan que confunde.
+      await this.plan.assertCanAddMember({ tenant }, tx);
+
       const invitation = await tx.invitation.create({
         data: {
           tenantId: tenant.tenantId,
@@ -203,16 +209,34 @@ export class TeamService {
       return { roleId: role.id, invitation };
     });
 
+    const inviteUrl = `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/invitacion/${roleId.invitation.token}`;
+
+    /**
+     * `delivered` no es adorno: con `MAIL_PROVIDER=log` el correo no sale y la pantalla no puede
+     * decir "enviada". El enlace se devuelve igual para que quien invita lo comparta a mano —el
+     * botón "Copiar enlace" ya existe— y la persona no se quede esperando un correo que no va a
+     * llegar.
+     */
+    let delivered = true;
     await this.mail
       .send(input.email, {
         template: 'invitation',
-        url: `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/invitacion/${roleId.invitation.token}`,
+        url: inviteUrl,
         tenantName: tenant.tenantName,
         inviterName: user.name,
       })
-      .catch((err) => this.log.warn(`Invitación creada pero no enviada a ${input.email}: ${err}`));
+      .catch((err) => {
+        delivered = false;
+        this.log.warn(`Invitación creada pero no enviada a ${input.email}: ${err}`);
+      });
 
-    return { id: roleId.invitation.id, email: input.email, expiresAt: roleId.invitation.expiresAt };
+    return {
+      id: roleId.invitation.id,
+      email: input.email,
+      expiresAt: roleId.invitation.expiresAt,
+      delivered,
+      url: inviteUrl,
+    };
   }
 
   /** Reenvía el mismo token y correo. Cambiar el token rompería el enlace que ya se compartió. */
@@ -244,13 +268,14 @@ export class TeamService {
       return found;
     });
 
+    const url = `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/invitacion/${invitation.token}`;
     await this.mail.send(invitation.email, {
       template: 'invitation',
-      url: `${process.env.WEB_APP_URL ?? 'http://localhost:3000'}/invitacion/${invitation.token}`,
+      url,
       tenantName: tenant.tenantName,
       inviterName: user.name,
     });
-    return { ok: true };
+    return { ok: true, delivered: true, url };
   }
 
   async cancelInvitation(tenant: TenantContext, user: AuthUser, invitationId: string) {

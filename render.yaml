@@ -51,6 +51,10 @@ services:
         value: https://app.partops.autos
       - key: CORS_ORIGINS
         value: https://app.partops.autos,capacitor://localhost
+      # Cookie en el dominio padre: la web y la API son subdominios distintos, y sin el punto
+      # inicial la sesión no viaja de una pantalla a la siguiente.
+      - key: COOKIE_DOMAIN
+        value: .partops.autos
       # ── Secretos ──
       - key: BETTER_AUTH_SECRET
         sync: false
@@ -164,6 +168,10 @@ services:
       - key: PORT
         value: "3000"
       - key: API_URL
+        value: https://api.partops.autos
+      # El navegador llama a la API directo. El rewrite queda como respaldo: si esta variable se
+      # vacía, todo vuelve a pasar por Next sin tocar código. Requiere `COOKIE_DOMAIN` en la API.
+      - key: NEXT_PUBLIC_API_URL
         value: https://api.partops.autos
       - key: NEXT_PUBLIC_APP_URL
         value: https://app.partops.autos

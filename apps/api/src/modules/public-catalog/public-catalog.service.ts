@@ -769,6 +769,41 @@ export class PublicCatalogService {
     return data;
   }
 
+  /**
+   * Vocabulario para la portada pública y para cualquier demo del parser.
+   *
+   * Solo marcas y modelos: son la tabla curada global (`vehicle_brand` / `vehicle_model`, sin
+   * `tenantId`). Las **categorías de pieza sí son de cada negocio** (`part_category.tenantId`), así
+   * que no salen de aquí: exponer la de un negocio sería filtrar su catálogo por la puerta de atrás.
+   * El tipo lo permite porque `categories` es opcional.
+   *
+   * Corre con `db.system` porque no hay tenant que fijar: es la única consulta de este archivo que
+   * no pasa por RLS, y por eso no toca ninguna tabla de negocio.
+   */
+  private refVocabCache: { loadedAt: number; data: VehicleVocabulary } | null = null;
+  async referenceVocabulary(): Promise<VehicleVocabulary> {
+    const cached = this.refVocabCache;
+    if (cached && Date.now() - cached.loadedAt < 60 * 60_000) return cached.data;
+
+    const data = await this.db.system(async (tx) => {
+      const [brands, models] = await Promise.all([
+        tx.vehicleBrand.findMany({ select: { name: true }, orderBy: { name: 'asc' } }),
+        tx.vehicleModel.findMany({
+          select: { name: true, brand: { select: { name: true } } },
+          orderBy: { name: 'asc' },
+        }),
+      ]);
+      const vocab: VehicleVocabulary = {
+        brands: brands.map((b) => b.name),
+        models: models.map((m) => ({ name: m.name, brand: m.brand.name })),
+      };
+      return vocab;
+    });
+
+    this.refVocabCache = { loadedAt: Date.now(), data };
+    return data;
+  }
+
   /** Variantes que de verdad se pueden pedir hoy: activas, en bodega en línea y con existencia. */
   private async purchasableVariants(tx: TxClient, ids: string[]): Promise<Set<string>> {
     if (!ids.length) return new Set();

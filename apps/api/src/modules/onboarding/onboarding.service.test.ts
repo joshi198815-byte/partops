@@ -7,6 +7,7 @@ import { AuthService } from '../../auth/auth.service.js';
 import type { AuthUser } from '../../common/context.js';
 import { DatabaseService } from '../../infra/database.module.js';
 import { MailService } from '../../mail/mail.service.js';
+import { PlanService } from '../plan/plan.service.js';
 import { TeamService } from '../team/team.service.js';
 import { OnboardingService } from './onboarding.service.js';
 
@@ -36,8 +37,8 @@ describe.skipIf(skip)('Onboarding y equipo', () => {
     db = new DatabaseService();
     const mail = new MailService();
     auth = new AuthService(db, mail);
-    onboarding = new OnboardingService(db, auth, mail);
-    team = new TeamService(db, auth, mail);
+    onboarding = new OnboardingService(db, auth, mail, new PlanService(db));
+    team = new TeamService(db, auth, mail, new PlanService(db));
     base = db.client;
     owner = new Client({ connectionString: process.env.DIRECT_DATABASE_URL ?? DATABASE_URL });
     await owner.connect();

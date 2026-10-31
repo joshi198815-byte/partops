@@ -5,6 +5,7 @@ import { Client } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { DatabaseService } from '../../infra/database.module.js';
 import { InventoryService } from '../inventory/inventory.service.js';
+import { PlanService } from '../plan/plan.service.js';
 import { SearchService } from '../search/search.service.js';
 import { ImporterService } from './importer.service.js';
 
@@ -91,6 +92,7 @@ describe.skipIf(skip)('ImporterService: importación desde Excel', () => {
       dbLike(base, tenantId),
       inventory,
       new SearchService(dbLike(base, tenantId)),
+      new PlanService(dbLike(base, tenantId)),
     );
   });
 

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Archivo, JetBrains_Mono, Public_Sans } from 'next/font/google';
+import { headers } from 'next/headers';
 import './globals.css';
 
 /**
@@ -68,7 +69,21 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  /**
+   * Se lee `headers()` para que el layout sea dinámico, y con eso Next aplique a sus `<script>` el
+   * nonce del CSP que manda el proxy.
+   *
+   * Qué se rompía sin esto: el proxy genera un nonce por petición, pero una página **prerenderizada**
+   * se generó en otro momento y sus scripts salen sin nonce. Con `strict-dynamic`, el navegador
+   * bloquea todo el JS: la página se ve bien y no responde. Es un fallo silencioso —el HTML es
+   * correcto— y por eso la verificación tiene que ser interactuar, no mirar el código fuente.
+   *
+   * El costo es que la portada se renderiza por petición. Se acepta: conserva su caché de datos
+   * (`fetch` con `revalidate`) y el resto de la app ya era dinámica por la sesión.
+   */
+  await headers();
+
   return (
     <html lang="es-GT" suppressHydrationWarning>
       <body className={`${archivo.variable} ${publicSans.variable} ${jetbrains.variable}`}>{children}</body>

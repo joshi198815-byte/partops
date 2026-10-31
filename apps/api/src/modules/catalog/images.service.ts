@@ -112,12 +112,25 @@ export class ImagesService {
     }
   }
 
-  /** Extrae la `key` de una URL pública. Es lo único que sirve para borrar en R2 o en disco. */
+  /**
+   * Extrae la `key` de una URL pública. Es lo único que sirve para borrar en R2 o en disco.
+   *
+   * Acepta el origen configurado **y** los que ya no lo son. Una foto subida antes de mover las
+   * imágenes a `cdn.partops.autos` sigue guardada con `pub-*.r2.dev` en la base; si aquí solo se
+   * reconociera el dominio nuevo, borrar esa pieza devolvería `null` y el objeto quedaría en el
+   * bucket para siempre. Se reconocen los dos hosts de R2 a propósito.
+   */
   keyFromUrl(url: string): string | null {
     const media = url.match(/\/api\/media\/(.+)$/);
     if (media?.[1]) return decodeURIComponent(media[1]);
+
     const publicBase = process.env.R2_PUBLIC_URL?.replace(/\/+$/, '');
     if (publicBase && url.startsWith(`${publicBase}/`)) return url.slice(publicBase.length + 1);
+
+    // `pub-*.r2.dev` es el dominio de terceros que se usó antes: sigue en filas viejas.
+    const legacy = url.match(/^https?:\/\/[^/]*\.r2\.dev\/(.+)$/i);
+    if (legacy?.[1]) return decodeURIComponent(legacy[1]);
+
     return null;
   }
 }

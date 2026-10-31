@@ -20,6 +20,9 @@ const schema = z.object({
   BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET necesita al menos 32 caracteres'),
   BETTER_AUTH_URL: z.string().url().default('http://localhost:3000'),
 
+  /** Dominio de la cookie de sesión. En producción, `.partops.autos` para que viaje entre web y API. */
+  COOKIE_DOMAIN: z.string().optional(),
+
   /** `gmail` mientras no haya dominio verificado; `resend` cuando exista. `log` en tests. */
   MAIL_PROVIDER: z.enum(['log', 'gmail', 'resend']).default('log'),
   MAIL_FROM: z.string().default('PartOps <partopsgt@gmail.com>'),

@@ -6,6 +6,7 @@ import type {
   DispatchQueueResponse,
   DispatchSyncResponse,
 } from '@partops/contracts';
+import { apiUrl, CROSS_ORIGIN_API } from './api';
 
 /**
  * Cola de despacho en el teléfono.
@@ -145,9 +146,9 @@ export async function flush(): Promise<{
   for (const row of rows) latest.set(`${row.orderId}:${row.itemId}`, row);
   const batch = [...latest.values()];
 
-  const response = await fetch('/api/dispatch/sync', {
+  const response = await fetch(apiUrl('/api/dispatch/sync'), {
     method: 'POST',
-    credentials: 'same-origin',
+    credentials: CROSS_ORIGIN_API ? 'include' : 'same-origin',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       ops: batch.map(({ opId, orderId, itemId, status, scannedCode }) => ({

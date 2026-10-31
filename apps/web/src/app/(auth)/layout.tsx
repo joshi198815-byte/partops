@@ -21,11 +21,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative max-w-sm">
           <p className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-[var(--color-steel-50)]">
-            La pieza correcta, en el estante correcto.
+            Escribe «cubierta corola 2009». Aparece la pieza, el estante y si hay.
           </p>
           <p className="mt-3 text-[13px] leading-relaxed text-[var(--color-steel-300)]">
-            Existencias por bodega, reservas que vencen solas y recibos con NIT. Hecho para bodegas de
-            repuestos en Guatemala.
+            El mismo parser que ves en la portada. Existencias por bodega, reservas que vencen en 20 minutos y
+            recibos con NIT. Hecho para bodegas de repuestos en Guatemala.
           </p>
           <div className="mt-6 flex flex-wrap gap-1.5 text-[11px] text-[var(--color-steel-300)]">
             <span className="rounded-[var(--radius-xs)] border border-white/15 px-2 py-1">Quetzales</span>

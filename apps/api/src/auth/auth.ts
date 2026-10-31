@@ -148,6 +148,16 @@ export function createAuth(db: BaseClient, mail: MailService) {
       cookiePrefix: 'partops',
       useSecureCookies: isProduction,
       /**
+       * Cookie de dominio padre.
+       *
+       * Sin esto, la web en `app.partops.autos` y la API en `api.partops.autos` tendrían cookies
+       * distintas y el login «funcionaría» hasta la siguiente pantalla, que expulsa al usuario.
+       * El punto inicial es obligatorio: `partops.autos` sin punto no cubre los subdominios.
+       * En desarrollo queda apagado y todo sigue por el rewrite de Next.
+       */
+      crossSubDomainCookies:
+        isProduction && env.COOKIE_DOMAIN ? { enabled: true, domain: env.COOKIE_DOMAIN } : { enabled: false },
+      /**
        * `'uuid'` haría que Better Auth esperara que la base generara el id con `gen_random_uuid()`,
        * pero el esquema declara `@id` sin default: el insert salía sin `id` y todo alta fallaba
        * con "Argument `id` is missing". Se genera en la app, que funciona igual en cualquier

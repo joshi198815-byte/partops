@@ -6,6 +6,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { apiUrl } from '@/lib/api';
 import { type StorefrontQuery, storefrontQueryString } from '@/lib/public-catalog';
 import { PartCard } from './part-card';
 import { StockWatchForm } from './stock-watch-form';
@@ -43,11 +44,12 @@ export function CatalogScreen({ data, query }: { data: PublicCatalogResponse; qu
     const term = query.q.trim();
     if (term.length < 3 || tracked.current === term) return;
     tracked.current = term;
-    void fetch(`/api/public/catalog/${encodeURIComponent(shop.slug)}/track`, {
+    void fetch(apiUrl(`/api/public/catalog/${encodeURIComponent(shop.slug)}/track`), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ q: term }),
       keepalive: true,
+      credentials: 'omit',
     }).catch(() => undefined);
   }, [query.q, shop.slug]);
 

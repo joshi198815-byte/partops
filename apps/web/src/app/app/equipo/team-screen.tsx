@@ -307,11 +307,27 @@ function Members({
 }
 
 function Invitations({ data, onChanged }: { data: TeamData; onChanged: () => Promise<void> }) {
-  const { pending, error, issues, run, setError } = useSubmit();
+  const { pending, error, issues, runValue, setError } = useSubmit();
   const [email, setEmail] = useState('');
   const [roleKey, setRoleKey] = useState('vendedor');
   const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
-  const [sent, setSent] = useState<string | null>(null);
+  /**
+   * Resultado del último envío. `delivered: false` significa que la invitación **existe** pero el
+   * correo no salió (servidor con `MAIL_PROVIDER=log`). Decir "enviada" ahí dejaría a la persona
+   * esperando un correo que no va a llegar, así que se ofrece el enlace para compartirlo a mano.
+   */
+  const [sent, setSent] = useState<{
+    email: string;
+    delivered: boolean;
+    url: string;
+  } | null>(null);
+  /**
+   * Resultado de reenviar. Antes el `catch` se tragaba el error y el botón parecía no hacer nada:
+   * quien reenviaba no sabía si el correo salió. Ahora se dice, con la misma distinción que al
+   * invitar (enviado vs. enlace para compartir a mano).
+   */
+  const [resend, setResend] = useState<{ email: string; delivered: boolean; url: string } | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
 
   async function invite(event: React.FormEvent) {
     event.preventDefault();
@@ -320,13 +336,35 @@ function Invitations({ data, onChanged }: { data: TeamData; onChanged: () => Pro
       setError(parsed.error.issues[0]?.message ?? 'Revisa los datos');
       return;
     }
-    const ok = await run(async () => {
-      await api('/api/team/invitations', { method: 'POST', body: parsed.data });
-    });
-    if (!ok) return;
-    setSent(email);
+    const result = await runValue(async () =>
+      api<{ delivered: boolean; url: string }>('/api/team/invitations', {
+        method: 'POST',
+        body: parsed.data,
+      }),
+    );
+    if (!result) return;
+    setSent({ email, delivered: result.delivered, url: result.url });
     setEmail('');
     await onChanged();
+  }
+
+  /** Copiar sin `navigator.clipboard` (http sin TLS lo bloquea): el texto queda seleccionable. */
+  function copy(url: string) {
+    void navigator.clipboard?.writeText(url);
+  }
+
+  async function resendInvitation(inv: Invitation) {
+    setResendError(null);
+    try {
+      const result = await api<{ delivered: boolean; url: string }>(
+        `/api/team/invitations/${inv.id}/resend`,
+        { method: 'POST', body: {} },
+      );
+      setResend({ email: inv.email, delivered: result.delivered, url: result.url });
+      await onChanged();
+    } catch (err) {
+      setResendError(`${inv.email}: ${errorMessage(err)}`);
+    }
   }
 
   return (
@@ -349,9 +387,36 @@ function Invitations({ data, onChanged }: { data: TeamData; onChanged: () => Pro
           </Alert>
         ) : null}
         {sent ? (
-          <Alert tone="success" className="mb-3">
-            Invitación enviada a {sent}. Vence en siete días y se puede reenviar desde la lista.
-          </Alert>
+          <div
+            className="mb-3 rounded-[var(--radius-sm)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 text-[12.5px] leading-relaxed text-[var(--foreground)]"
+            style={{
+              borderLeftColor: sent.delivered ? 'var(--color-stock-ok)' : 'var(--color-stock-low)',
+            }}
+            role="status"
+          >
+            {sent.delivered ? (
+              <p>
+                Invitación enviada a <span className="font-semibold">{sent.email}</span>. Vence en siete días
+                y se puede reenviar desde la lista.
+              </p>
+            ) : (
+              <>
+                <p className="font-semibold">La invitación quedó creada, pero el correo no salió.</p>
+                <p className="mt-1 text-[var(--foreground-muted)]">
+                  Este servidor no tiene correo configurado. Comparte el enlace con {sent.email} por WhatsApp
+                  o en mano: funciona igual y vence en siete días.
+                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <code className="min-w-0 flex-1 truncate rounded-[var(--radius-xs)] border border-[var(--border)] bg-[var(--surface-sunken)] px-2 py-1 font-mono text-[11px]">
+                    {sent.url}
+                  </code>
+                  <Button size="sm" variant="secondary" onClick={() => copy(sent.url)}>
+                    Copiar enlace
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         ) : null}
 
         <div className="grid gap-3 sm:grid-cols-[1.5fr_0.9fr_auto] sm:items-end">
@@ -413,6 +478,38 @@ function Invitations({ data, onChanged }: { data: TeamData; onChanged: () => Pro
         ) : null}
       </form>
 
+      {resendError ? (
+        <Alert tone="error" className="mt-3">
+          {resendError}
+        </Alert>
+      ) : null}
+      {resend ? (
+        <div
+          className="mt-3 rounded-[var(--radius-sm)] border border-[var(--border)] border-l-2 bg-[var(--surface)] px-3 py-2.5 text-[12.5px] leading-relaxed"
+          style={{ borderLeftColor: resend.delivered ? 'var(--color-stock-ok)' : 'var(--color-stock-low)' }}
+          role="status"
+        >
+          {resend.delivered ? (
+            <p>
+              Reenviada a <span className="font-semibold">{resend.email}</span>. El enlace es el mismo de
+              antes: si ya lo había compartido, sigue sirviendo.
+            </p>
+          ) : (
+            <>
+              <p className="font-semibold">El enlace sigue vigente, pero el correo no salió.</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded-[var(--radius-xs)] border border-[var(--border)] bg-[var(--surface-sunken)] px-2 py-1 font-mono text-[11px]">
+                  {resend.url}
+                </code>
+                <Button size="sm" variant="secondary" onClick={() => copy(resend.url)}>
+                  Copiar enlace
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
+
       {data.invitations.length ? (
         <ul className="mt-3 divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius-md)] border border-[var(--border)]">
           {data.invitations.map((inv) => (
@@ -438,16 +535,7 @@ function Invitations({ data, onChanged }: { data: TeamData; onChanged: () => Pro
                 >
                   Copiar enlace
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={async () => {
-                    await api(`/api/team/invitations/${inv.id}/resend`, { method: 'POST', body: {} }).catch(
-                      () => undefined,
-                    );
-                    await onChanged();
-                  }}
-                >
+                <Button size="sm" variant="ghost" onClick={() => void resendInvitation(inv)}>
                   Reenviar
                 </Button>
                 <Button

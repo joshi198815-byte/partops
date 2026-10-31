@@ -30,17 +30,36 @@ const HAS_EXTENSION = /\.[a-z0-9]{2,5}$/i;
 
 const DEV = process.env.NODE_ENV !== 'production';
 
+/** Origen de la API cuando el navegador la llama directo (`api.partops.autos`). Vacío en local. */
+const API_ORIGIN = (() => {
+  const value = process.env.NEXT_PUBLIC_API_URL;
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    // Una variable mal escrita no debe tumbar el CSP: se ignora y la web sigue por el rewrite.
+    return null;
+  }
+})();
+
 function buildPolicy(nonce: string): string {
-  // En `next dev` el refresco en caliente usa `eval` y un websocket al propio servidor. Se relaja
+  // En `next dev` el refresh en caliente usa `eval` y un websocket al propio servidor. Se relaja
   // solo ahí: relajarlo en producción por comodidad es exactamente cómo se acaba sin CSP.
   const scriptSrc = ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'", ...(DEV ? ["'unsafe-eval'"] : [])];
-  const connectSrc = ["'self'", 'https:', 'wss:', ...(DEV ? ['ws:', 'http://localhost:*'] : [])];
+  const connectSrc = [
+    "'self'",
+    'https:',
+    'wss:',
+    // Explícito además de `https:`: deja la intención escrita para quien lea la política.
+    ...(API_ORIGIN ? [API_ORIGIN] : []),
+    ...(DEV ? ['ws:', 'http://localhost:*'] : []),
+  ];
 
   return [
     "default-src 'self'",
     `script-src ${scriptSrc.join(' ')}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com",
+    "img-src 'self' data: blob: https://cdn.partops.autos https://*.r2.dev https://*.r2.cloudflarestorage.com",
     "font-src 'self' data:",
     `connect-src ${connectSrc.join(' ')}`,
     "worker-src 'self' blob:",

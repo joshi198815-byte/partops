@@ -5,6 +5,7 @@ import { audit, diff } from '../../common/audit.js';
 import { type Ctx, CurrentCtx, RequirePermissions } from '../../common/context.js';
 import { ZodBody } from '../../common/zod.js';
 import { DatabaseService } from '../../infra/database.module.js';
+import { PlanService } from '../plan/plan.service.js';
 
 /**
  * Configuración del negocio.
@@ -52,7 +53,30 @@ export class SettingsController {
   constructor(
     @Inject(DatabaseService) private readonly db: DatabaseService,
     @Inject(AuthService) private readonly auth: AuthService,
+    @Inject(PlanService) private readonly plan: PlanService,
   ) {}
+
+  /**
+   * El plan del negocio y su consumo.
+   *
+   * Va con `settings.manage`: quien puede ver la configuración puede ver por qué le falta espacio.
+   * El precio y el tope salen de `PLANS`, no de la base, para que la pantalla y el candado nunca
+   * digan cosas distintas.
+   */
+  @Get('plan')
+  @RequirePermissions('settings.manage')
+  async currentPlan(@CurrentCtx() ctx: Ctx) {
+    const [spec, usage] = await Promise.all([this.plan.effective(ctx), this.plan.usage(ctx)]);
+    return {
+      tier: spec.tier,
+      name: spec.name,
+      priceCentsPerMonth: spec.priceCentsPerMonth,
+      tagline: spec.tagline,
+      limits: spec.limits,
+      includes: spec.includes,
+      usage,
+    };
+  }
 
   @Get()
   @RequirePermissions('settings.manage')
@@ -65,6 +89,13 @@ export class SettingsController {
   @Patch()
   @RequirePermissions('settings.manage')
   async update(@CurrentCtx() ctx: Ctx, @ZodBody(patchSchema) body: z.output<typeof patchSchema>) {
+    // Publicar la vitrina es lo que se vende en PRO. Se comprueba antes de escribir: un negocio en
+    // FREE que intenta encenderla recibe el motivo, no un catálogo encendido que la API pública
+    // luego ignora (o peor, uno que se publica sin que nadie lo haya pagado).
+    if (body.catalogEnabled === true) {
+      await this.plan.assertFeature(ctx, 'publicCatalog');
+    }
+
     const result = await this.db.tx(ctx.tenant.tenantId, async (tx) => {
       const before = await tx.tenant.findUniqueOrThrow({
         where: { id: ctx.tenant.tenantId },

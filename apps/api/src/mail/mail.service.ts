@@ -1,4 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
+import nodemailer from 'nodemailer';
+import { isProduction } from '../config/env.js';
 
 export type MailTemplate =
   | { template: 'verify-email'; url: string }
@@ -20,8 +22,37 @@ export type MailTemplate =
  * variable, no reescribir el código que manda correos.
  */
 @Injectable()
-export class MailService {
+export class MailService implements OnModuleInit {
   private readonly log = new Logger(MailService.name);
+
+  /**
+   * Aviso de arranque, no de envío.
+   *
+   * Si el proveedor está en `log`, la aplicación funciona y los correos **no salen**: invitaciones y
+   * recuperación de contraseña se pierden sin que nadie vea un error. Eso ya pasó una vez y se
+   * descubrió cuando un cliente pidió su enlace. Por eso se dice al arrancar, en el log del
+   * servicio, que es donde se mira cuando algo no llega.
+   */
+  onModuleInit() {
+    const provider = process.env.MAIL_PROVIDER ?? 'log';
+    if (provider === 'log') {
+      const message =
+        'MAIL_PROVIDER=log: los correos NO se envían (solo se escriben aquí). ' +
+        'Invitaciones y recuperación de contraseña no llegan al destinatario.';
+      if (isProduction) this.log.error(message);
+      else this.log.warn(message);
+      return;
+    }
+    if (provider === 'resend' && !process.env.RESEND_API_KEY) {
+      this.log.error('MAIL_PROVIDER=resend sin RESEND_API_KEY: todo envío va a fallar.');
+      return;
+    }
+    if (provider === 'gmail' && !(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD)) {
+      this.log.error('MAIL_PROVIDER=gmail sin GMAIL_USER/GMAIL_APP_PASSWORD: todo envío va a fallar.');
+      return;
+    }
+    this.log.log(`Correo saliendo por ${provider}`);
+  }
 
   async send(to: string, message: MailTemplate): Promise<void> {
     const provider = process.env.MAIL_PROVIDER ?? 'log';
@@ -95,17 +126,44 @@ export class MailService {
     }
   }
 
-  private async sendGmail(to: string, subject: string, _text: string) {
+  /**
+   * Gmail por SMTP.
+   *
+   * Es el proveedor que se usa mientras `partops.autos` no esté verificado: el correo sale como
+   * `partopsgt@gmail.com` y el cliente lo ve raro, pero **llega**. Fingir éxito aquí es peor que
+   * fallar: la pantalla de invitación diría "enviada" y el vendedor nunca recibiría nada.
+   *
+   * Se abre un transporte por envío y se cierra: el volumen es de decenas de correos al mes, y un
+   * pool persistente en una instancia que se duerme en Render deja sockets muertos.
+   */
+  private async sendGmail(to: string, subject: string, text: string) {
     const user = process.env.GMAIL_USER;
     const pass = process.env.GMAIL_APP_PASSWORD;
     if (!user || !pass) {
       this.log.error('MAIL_PROVIDER=gmail sin GMAIL_USER/GMAIL_APP_PASSWORD: el correo no se envía');
       throw new Error('Correo no configurado');
     }
-    // Se usa la API SMTP por HTTP de Gmail a través de nodemailer cuando esté disponible; aquí se
-    // deja explícito el fallo en lugar de fingir éxito. La integración completa entra al configurar
-    // la contraseña de aplicación.
-    this.log.warn(`Gmail SMTP pendiente de credenciales válidas; mensaje "${subject}" para ${to}`);
-    throw new Error('Correo no configurado');
+
+    const transport = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: { user, pass },
+    });
+
+    try {
+      await transport.sendMail({
+        from: process.env.MAIL_FROM ?? `PartOps <${user}>`,
+        to,
+        subject,
+        text,
+      });
+    } catch (err) {
+      // El error típico es 535 (contraseña de aplicación revocada) o 550 (remitente no permitido).
+      this.log.error(`Gmail rechazó el envío: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error('No se pudo enviar el correo');
+    } finally {
+      transport.close();
+    }
   }
 }

@@ -21,7 +21,7 @@ import {
 import { Alert, Button, CodeChip, EmptyState, Field, Select } from '@partops/ui';
 import Link from 'next/link';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ApiError, api, errorMessage } from '@/lib/api';
+import { ApiError, api, apiUrl, CROSS_ORIGIN_API, errorMessage } from '@/lib/api';
 
 interface Warehouse {
   id: string;
@@ -73,10 +73,10 @@ export function ImportScreen({ canImport }: { canImport: boolean }) {
     try {
       const form = new FormData();
       form.append('file', file);
-      const res = await fetch('/api/catalog/imports', {
+      const res = await fetch(apiUrl('/api/catalog/imports'), {
         method: 'POST',
         body: form,
-        credentials: 'same-origin',
+        credentials: CROSS_ORIGIN_API ? 'include' : 'same-origin',
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { message?: string } | null;

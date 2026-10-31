@@ -100,6 +100,55 @@
   );
 }
 
+/* Regla de estante: la línea donde se apoyan las piezas, con la muesca de la etiqueta de pasillo.
+   Es un filete de 1 px con marcas cortas encima; se usa como separador, nunca detrás de texto. */
+.partops-shelf {
+  --rule-estante: color-mix(in oklch, var(--border-strong) 70%, transparent);
+  height: 4px;
+  background-image:
+    repeating-linear-gradient(90deg, var(--rule-estante) 0 1px, transparent 1px 12px),
+    linear-gradient(var(--rule-estante), var(--rule-estante));
+  background-repeat: repeat-x, no-repeat;
+  background-size:
+    12px 4px,
+    100% 1px;
+  background-position:
+    left bottom,
+    left bottom;
+}
+
+/* Ticket de mostrador: borde superior dentado, como el papel que sale de la impresora de 80 mm.
+   Los dientes se dibujan con dos conic-gradient opuestos; sin imágenes ni blur. No impone ancho:
+   el que lo use decide cuánto mide, porque en una rejilla de tres columnas el ticket es ancho. */
+.partops-ticket {
+  position: relative;
+}
+
+.partops-ticket::before {
+  content: "";
+  position: absolute;
+  inset: -6px 0 auto 0;
+  height: 6px;
+  background-image:
+    conic-gradient(from -45deg at 50% 100%, var(--border) 90deg, transparent 0),
+    conic-gradient(from 135deg at 50% 0%, var(--border) 90deg, transparent 0);
+  background-size: 12px 6px;
+  background-position:
+    left bottom,
+    left top;
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Solo la decoración se detiene; el spinner de carga sigue girando porque comunica estado. */
+  .partops-shelf,
+  .partops-ticket::before,
+  .partops-hatch {
+    animation: none !important;
+  }
+}
+
 /* Toda cifra se alinea: precios, cantidades y folios se comparan de un vistazo. */
 .partops-num {
   font-variant-numeric: tabular-nums;

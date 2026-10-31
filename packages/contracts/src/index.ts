@@ -12,6 +12,7 @@ export * from './money.js';
 export * from './onboarding.js';
 export * from './orders.js';
 export * from './permissions.js';
+export * from './plans.js';
 export * from './platform.js';
 export * from './public-catalog.js';
 export * from './receipts.js';

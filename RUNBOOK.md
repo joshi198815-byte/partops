@@ -108,8 +108,62 @@ curl -sI https://cdn.partops.autos/parts/<id>.webp | head -3
 Si el objeto existe y el dominio no responde: revisar el DNS del dominio en Cloudflare (registro CNAME
 al bucket) y el estado del certificado en R2 → Settings → Custom Domains.
 
+**Conectarlo (una vez).** El script es idempotente y no fuerza un estado a medias:
+
+```bash
+export CF_API_TOKEN=…   # Zone:Read + R2:Edit; nunca en el repo
+export CF_ACCOUNT_ID=…
+export CF_ZONE_ID=…
+node scripts/r2-custom-domain.mjs          # conecta y espera a que el certificado quede activo
+node scripts/r2-custom-domain.mjs --check  # solo verifica, no escribe nada
+```
+
+Después de que quede `active`: `R2_PUBLIC_URL=https://cdn.partops.autos` en la API y redesplegar. Las
+URLs ya guardadas seguirán saliendo por `pub-*.r2.dev`: **deja ese subdominio activo una semana** y
+después apágalo en R2 → Settings → Public access.
+
 **Cómo se confirma.** `curl -I` del dominio devuelve 200 con `content-type: image/webp` y una imagen
 carga en `/app/catalogo`.
+
+---
+
+## 3b · Cambiar el dominio de las fotos sin romper las viejas
+
+**El problema, en una frase.** La URL de cada foto se guarda **en la base** dentro de
+`part_image.url`. Las fotos subidas hoy apuntan a `https://pub-<hash>.r2.dev/...`; si mañana se apaga
+ese subdominio, esas fotos dejan de cargar aunque `R2_PUBLIC_URL` ya diga `cdn.partops.autos`. Y el
+borrado también se rompe: `keyFromUrl` solo puede extraer la `key` de una URL que reconoce.
+
+**Por eso el orden es este y no otro:**
+1. Conectar `cdn.partops.autos` (`node scripts/r2-custom-domain.mjs`) y esperar a `active`.
+2. Poner `R2_PUBLIC_URL=https://cdn.partops.autos` en la API. **Las fotos nuevas ya salen por ahí.**
+3. Dejar `pub-*.r2.dev` encendido. No es pereza: es lo que mantiene visibles las fotos ya guardadas.
+4. Migrar las filas viejas cuando convenga (abajo).
+5. Solo entonces apagar `pub-*.r2.dev` en R2 → Settings → Public access.
+
+**Migrar las URLs guardadas** (idempotente, se puede correr dos veces). Cambia el host y deja la
+`key` intacta, que es lo que hace que el borrado siga funcionando:
+
+```sql
+-- Antes: cuántas quedan apuntando al subdominio de terceros (principal + respaldo WebP).
+SELECT count(*) FROM "part_image"
+ WHERE "url" LIKE 'https://pub-%.r2.dev/%' OR "fallbackUrl" LIKE 'https://pub-%.r2.dev/%';
+
+UPDATE "part_image"
+   SET "url" = regexp_replace("url", '^https://pub-[a-z0-9]+\.r2\.dev/', 'https://cdn.partops.autos/'),
+       "fallbackUrl" = CASE
+         WHEN "fallbackUrl" LIKE 'https://pub-%.r2.dev/%'
+         THEN regexp_replace("fallbackUrl", '^https://pub-[a-z0-9]+\.r2\.dev/', 'https://cdn.partops.autos/')
+         ELSE "fallbackUrl"
+       END
+ WHERE "url" LIKE 'https://pub-%.r2.dev/%' OR "fallbackUrl" LIKE 'https://pub-%.r2.dev/%';
+```
+
+El `^` no es adorno: sin él, una `key` que contenga `https://pub-…r2.dev/` también se reescribiría.
+Correr la primera consulta después del `UPDATE` tiene que dar `0`.
+
+**Cómo se confirma.** Abrir una pieza con foto vieja y su miniatura carga; borrar una imagen desde
+`/app/catalogo` la quita del bucket (no deja huérfana).
 
 ---
 
@@ -200,6 +254,119 @@ migración—, escribir la prueba que lo habría detectado y solo entonces reabr
 tablas con `tenantId`, y una prueba con dos cuentas reales —una de cada negocio— confirma que ninguna
 ve los datos de la otra. Esa prueba está en `packages/db/src/rls.test.ts` y también se corre contra
 producción a mano con dos cuentas de prueba antes de dar por cerrado.
+
+---
+
+## 6 · El login deja de funcionar (cookie entre subdominios)
+
+**Cómo se detecta.** El formulario de `/entrar` responde 200, la pantalla siguiente expulsa al usuario,
+y al recargar vuelve a pedir contraseña. O entra, navega a `/app` y la primera petición da 401.
+
+**Las tres causas, en orden de frecuencia.**
+1. **La cookie no lleva dominio.** Debe decir `Domain=.partops.autos` en DevTools → Application →
+   Cookies. Si dice `app.partops.autos` o `api.partops.autos`, falta `COOKIE_DOMAIN` en la API o está
+   escrito sin el punto inicial.
+2. **El CSP bloquea la API.** La consola dice `Refused to connect`. `connect-src` en `proxy.ts`
+   incluye el origen de `NEXT_PUBLIC_API_URL`; si la variable apunta a otro host, se bloquea.
+3. **`NEXT_PUBLIC_API_URL` y `COOKIE_DOMAIN` se contradicen.** El navegador llama a la API directo
+   pero la cookie es del host de la web, o al revés.
+
+**Qué se hace.**
+
+```bash
+# 1. ¿Qué cookie está emitiendo la API?
+curl -sI https://api.partops.autos/api/auth/get-session | grep -i set-cookie
+
+# 2. Volver al rewrite mientras se corrige (no requiere tocar código):
+#    vaciar NEXT_PUBLIC_API_URL en el servicio web y redesplegar.
+```
+
+El rewrite de `/api/*` se deja puesto a propósito: es el respaldo de un solo cambio de variable. Con
+la variable vacía la app funciona como antes, pasando por el servidor de la web.
+
+**Cómo se confirma.** Entrar, navegar a `/app`, recargar, cambiar de negocio y salir — todo sin que
+nadie sea expulsado. En DevTools, la cookie dice `Domain=.partops.autos` y las peticiones van a
+`api.partops.autos`.
+
+---
+
+## 7 · Un correo no llegó (invitación o recuperación)
+
+**Cómo se detecta.** El sistema dice "invitación enviada" y la persona jura que no le llegó nada. O
+alguien pulsa "Olvidé mi contraseña" y el enlace nunca aparece.
+
+**Lo primero: mirar el proveedor, no el código.** El log del servicio `partops-api` dice al arrancar
+por dónde sale el correo:
+
+```
+Correo saliendo por gmail          ← configurado
+MAIL_PROVIDER=log: los correos NO se envían…   ← en ROJO: nadie recibe nada
+MAIL_PROVIDER=resend sin RESEND_API_KEY…       ← en ROJO: todo envío falla
+```
+
+Si dice `log`, no hay nada que depurar: **no se envía**. La pantalla de Equipo ya no miente en ese
+caso —dice "la invitación quedó creada, pero el correo no salió" y ofrece el enlace— pero el enlace
+de recuperación de contraseña no tiene ese respaldo: con `log` la recuperación no funciona y hay que
+cambiarla a mano desde la base o esperar a tener correo.
+
+| Síntoma en el log                        | Causa                                       | Qué hacer                                                                    |
+| ---------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
+| `535 Username and Password not accepted` | Contraseña de aplicación revocada o vencida | Generar otra en la cuenta de Gmail (requiere 2FA) y actualizar el secreto.   |
+| `Resend rechazó el envío: 401`           | Token revocado                              | Token nuevo en Resend → `RESEND_API_KEY` → redesplegar.                      |
+| `Resend rechazó el envío: 403` (dominio) | Dominio sin verificar en Resend             | Verificar `partops.autos` en Resend (DNS) **antes** de cambiar el remitente. |
+| Nada en el log y el correo no llega      | Spam o remitente `@gmail.com`               | Revisar spam; migrar a `resend` con dominio verificado.                      |
+
+**El remitente importa.** Con Gmail, `MAIL_FROM` debe ser la misma cuenta que `GMAIL_USER`: Gmail
+rechaza un `From` de otro dominio. Con el dominio propio, `MAIL_FROM="PartOps <no-reply@partops.autos>"`
+y el dominio verificado en Resend.
+
+**Cómo se confirma.** Invitar a un correo real propio desde `/app/equipo`, ver el correo, abrir el
+enlace en una ventana privada y canjear. Y una recuperación completa desde `/recuperar`.
+
+---
+
+## 8 · El despliegue automático no corre
+
+**Cómo se detecta.** Un push a `main` no dispara nada, o el run falla en el primer paso.
+
+El workflow `Deploy` tiene una compuerta (`preflight`) que **no toca la base** hasta confirmar que
+están los cinco secretos del entorno `production`. Si falta uno, el run falla en segundos y el
+resumen del run dice exactamente cuál. Eso es a propósito: antes, un secreto faltante se descubría a
+mitad del despliegue, con la migración ya aplicada y la API ya disparada.
+
+```bash
+# Ver qué hay (los valores no se muestran nunca)
+gh secret list -R joshi198815-byte/partops
+
+# Poner los cinco. El valor se pega en el prompt, no queda en el historial del shell.
+gh secret set PRODUCTION_DIRECT_DATABASE_URL -R joshi198815-byte/partops --env production
+gh secret set PRODUCTION_API_URL            -R joshi198815-byte/partops --env production
+gh secret set PRODUCTION_WEB_URL            -R joshi198815-byte/partops --env production
+gh secret set RENDER_API_DEPLOY_HOOK        -R joshi198815-byte/partops --env production
+gh secret set RENDER_WEB_DEPLOY_HOOK        -R joshi198815-byte/partops --env production
+```
+
+| Secreto                          | De dónde sale                                   | Ojo                                                                             |
+| -------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| `PRODUCTION_DIRECT_DATABASE_URL` | Neon → Connection string, rol **dueño**         | No el rol de la app: las migraciones crean tablas y políticas y fallan con RLS. |
+| `PRODUCTION_API_URL`             | `https://api.partops.autos`                     | Sin `/api` al final; el workflow lo añade.                                      |
+| `PRODUCTION_WEB_URL`             | `https://app.partops.autos`                     | Es la base del humo.                                                            |
+| `RENDER_API_DEPLOY_HOOK`         | Render → `partops-api` → Settings → Deploy Hook | Un hook por servicio; cruzarlos despliega lo viejo.                             |
+| `RENDER_WEB_DEPLOY_HOOK`         | Render → `partops-web` → Settings → Deploy Hook | Igual.                                                                          |
+
+**Probar sin migrar** (lo más seguro la primera vez):
+
+```bash
+gh workflow run deploy.yml -f skip_migrations=true
+gh run watch
+```
+
+**Cómo se confirma.** El run termina en verde y el paso "Humo de producción" pasa. La web sirve
+`x-partops-commit` con el SHA del push; la API lo devuelve en `/api/health/ready`.
+
+**Si el run se queda esperando el SHA.** Render puede tardar; el workflow espera 10 minutos y falla
+diciendo qué versión está sirviendo. Antes de relanzar, mirar el log del build en Render: casi
+siempre es un build roto, no un problema del workflow.
 
 ---
 

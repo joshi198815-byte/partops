@@ -1,10 +1,29 @@
 /**
  * Cliente HTTP de la web.
  *
- * Todo pasa por `/api/*` en el mismo origen: Next reescribe hacia la API (ver `next.config.mjs`).
- * Así la cookie de sesión viaja sola, sin CORS ni `credentials` en cada llamada, y el navegador no
- * necesita saber en qué puerto vive el backend.
+ * **Por defecto todo va por `/api/*` en el mismo origen**: Next reescribe hacia la API (ver
+ * `next.config.mjs`). Así la cookie de sesión viaja sola, sin CORS, y el navegador no necesita saber
+ * en qué host vive el backend. Este camino sigue siendo el respaldo cuando
+ * `NEXT_PUBLIC_API_URL` está vacía, que es lo que pasa en desarrollo.
+ *
+ * Cuando `NEXT_PUBLIC_API_URL` tiene valor (`https://api.partops.autos` en producción), las llamadas
+ * van **directo a la API** con `credentials: 'include'`. Eso saca la CPU de la web (0.1 CPU) del
+ * camino caliente: buscar una pieza ya no consume un proceso de Next para hacer de proxy. Requiere
+ * que la API ponga la cookie en `.partops.autos`; si no, el login se pierde en la pantalla
+ * siguiente.
  */
+
+/** Origen de la API. Vacío = mismo origen por el rewrite. Se resuelve al construir. */
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
+
+/** ¿Las llamadas salen del dominio de la web? Cambia `credentials` y el destino. */
+export const CROSS_ORIGIN_API = API_BASE !== '';
+
+/** Une la base con la ruta sin duplicar `/api`: el llamador siempre pasa `/api/...`. */
+export function apiUrl(path: string): string {
+  if (!API_BASE) return path;
+  return path.startsWith('/') ? `${API_BASE}${path}` : `${API_BASE}/${path}`;
+}
 
 export interface ApiIssue {
   path: string;
@@ -57,10 +76,10 @@ export async function apiUpload<T>(path: string, file: File, field = 'file'): Pr
   const form = new FormData();
   form.append(field, file);
 
-  const res = await fetch(path, {
+  const res = await fetch(apiUrl(path), {
     method: 'POST',
     body: form,
-    credentials: 'same-origin',
+    credentials: CROSS_ORIGIN_API ? 'include' : 'same-origin',
     cache: 'no-store',
   });
   if (!res.ok) await throwFromResponse(res);
@@ -71,10 +90,11 @@ export async function apiUpload<T>(path: string, file: File, field = 'file'): Pr
 export async function api<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, headers } = options;
 
-  const res = await fetch(path, {
+  const res = await fetch(apiUrl(path), {
     method,
-    // Mismo origen, pero explícito: si algún día la web y la API se separan, esto ya está bien.
-    credentials: 'same-origin',
+    // Con API en otro origen, `include` es lo que manda la cookie de `.partops.autos`. Con el
+    // rewrite, `same-origin` basta y evita mandar cookies a rutas que no las necesitan.
+    credentials: CROSS_ORIGIN_API ? 'include' : 'same-origin',
     headers: {
       ...(body === undefined ? {} : { 'content-type': 'application/json' }),
       ...headers,
