@@ -9,6 +9,11 @@ export interface AuthUser {
   image?: string | null;
   emailVerified: boolean;
   mustChangePassword: boolean;
+  /**
+   * Rol de plataforma (`admin`), no del negocio. Sin este campo el guard no puede distinguir al
+   * dueño de PartOps de un cliente, y `@PlatformAdmin()` rechazaría siempre.
+   */
+  role?: string | null;
 }
 
 export interface TenantContext {

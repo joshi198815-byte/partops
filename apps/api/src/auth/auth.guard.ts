@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -56,6 +57,7 @@ export class AuthGuard implements CanActivate {
         image: session.user.image ?? null,
         emailVerified: session.user.emailVerified,
         mustChangePassword: Boolean((session.user as { mustChangePassword?: boolean }).mustChangePassword),
+        role: (session.user as { role?: string | null }).role ?? null,
       },
       sessionId: session.session.id,
       activeTenantId: session.session.activeTenantId ?? null,
@@ -80,6 +82,18 @@ export class AuthGuard implements CanActivate {
 
     if (this.reflector.getAllAndOverride<boolean>(NO_TENANT, targets)) return true;
 
+    // El panel de plataforma va antes de resolver negocio: quien lo usa es el dueño de PartOps y
+    // puede no pertenecer a ningún negocio. Si se comprobara después, un admin sin membresía
+    // recibiría «termina de configurar tu negocio» en vez del panel.
+    const needsAdmin = this.reflector.getAllAndOverride<boolean>(PLATFORM_ADMIN, targets);
+    if (needsAdmin) {
+      if (!this.auth.isPlatformAdmin(ctx.user)) {
+        // 404 y no 403: el panel de plataforma no debe confirmar su existencia a un cliente.
+        throw new NotFoundException('No encontrado');
+      }
+      return true;
+    }
+
     const tenantId = await this.pickTenant(req, ctx);
     if (!tenantId) {
       throw new ForbiddenException({
@@ -90,12 +104,6 @@ export class AuthGuard implements CanActivate {
 
     ctx.tenant = await this.auth.resolveTenant(ctx.user.id, tenantId);
     ctx.activeTenantId = tenantId;
-
-    const needsAdmin = this.reflector.getAllAndOverride<boolean>(PLATFORM_ADMIN, targets);
-    if (needsAdmin && !this.auth.isPlatformAdmin(ctx.user)) {
-      // 404 y no 403: el panel de plataforma no debe confirmar su existencia a un cliente.
-      throw new ForbiddenException({ code: 'NOT_FOUND', message: 'No encontrado' });
-    }
 
     const required = this.reflector.getAllAndOverride<Permission[]>(PERMISSIONS, targets) ?? [];
     const missing = required.filter((p) => !ctx.tenant?.permissions.has(p));

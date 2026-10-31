@@ -90,6 +90,13 @@ export function createAuth(db: BaseClient, mail: MailService) {
         /** Fuerza el cambio de la contraseña temporal entregada en mano. Solo lo escribe el alta. */
         mustChangePassword: { type: 'boolean', required: false, defaultValue: false, input: false },
         phone: { type: 'string', required: false, input: true },
+        /**
+         * Rol de plataforma. Sin declararlo aquí, Better Auth no lo devuelve en `session.user`
+         * aunque exista la columna, y el guard nunca podría reconocer al dueño de PartOps:
+         * `@PlatformAdmin()` respondería 404 a todo el mundo, incluido a quien sí puede entrar.
+         * `input: false` porque nadie se asciende solo desde el formulario de registro.
+         */
+        role: { type: 'string', required: false, input: false },
       },
       // Borrar la cuenta pasa por /api/account/delete, que además limpia el negocio propio,
       // las bodegas asignadas y los tokens. El endpoint nativo deja residuos.

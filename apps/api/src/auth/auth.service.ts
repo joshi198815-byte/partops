@@ -43,7 +43,7 @@ export class AuthService {
 
   /** `user.role` es de plataforma, no del negocio: solo el panel interno lo usa. */
   isPlatformAdmin(user: AuthUser): boolean {
-    return (user as AuthUser & { role?: string | null }).role === 'admin';
+    return user.role === 'admin';
   }
 
   /** Primer negocio activo. Evita pedirle a alguien con un solo negocio que "elija" entre uno. */

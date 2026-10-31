@@ -40,6 +40,8 @@ import { OnboardingController } from './modules/onboarding/onboarding.controller
 import { OnboardingService } from './modules/onboarding/onboarding.service.js';
 import { OrdersController } from './modules/orders/orders.controller.js';
 import { OrdersService } from './modules/orders/orders.service.js';
+import { PlatformController } from './modules/platform/platform.controller.js';
+import { PlatformService } from './modules/platform/platform.service.js';
 import { PublicCatalogController } from './modules/public-catalog/public-catalog.controller.js';
 import { PublicCatalogService } from './modules/public-catalog/public-catalog.service.js';
 import { PublicGuardService } from './modules/public-catalog/public-guard.service.js';
@@ -81,6 +83,7 @@ import { TeamService } from './modules/team/team.service.js';
     DemandController,
     StockWatchController,
     FinanceController,
+    PlatformController,
   ],
   providers: [
     ...API_PROVIDERS,
@@ -112,6 +115,7 @@ import { TeamService } from './modules/team/team.service.js';
     FinanceService,
     FinanceExportService,
     MaintenanceService,
+    PlatformService,
     // Global: toda ruta es privada salvo que se marque `@Public()`. Al revés —privado por
     // omisión— un endpoint nuevo olvidado queda expuesto; así, un endpoint nuevo olvidado queda
     // cerrado y se nota en la primera prueba, no en la primera fuga.

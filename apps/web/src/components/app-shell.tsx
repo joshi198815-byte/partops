@@ -87,6 +87,16 @@ export function AppShell({ me, children }: { me: MeResponse; children: React.Rea
           <TenantSwitcher me={me} />
           <div className="flex items-center gap-1">
             <CommandPalette />
+            {/* Solo el dueño de PartOps ve esta puerta. Es un enlace, no un permiso: la API vuelve
+                a comprobar `user.role === 'admin'` y responde 404 a cualquier otro. */}
+            {me.isPlatformAdmin ? (
+              <Link
+                href={'/admin' as never}
+                className="rounded-[var(--radius-sm)] border border-[var(--border)] px-2 py-1 text-[11.5px] font-medium text-[var(--foreground-muted)] hover:bg-[var(--surface-sunken)] hover:text-[var(--foreground)]"
+              >
+                Plataforma
+              </Link>
+            ) : null}
             <span className="hidden max-w-[180px] truncate text-[12.5px] text-[var(--foreground-muted)] sm:inline">
               {me.user.name}
             </span>
