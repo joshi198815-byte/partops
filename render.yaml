@@ -1,0 +1,138 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PartOps en Render — API y worker desde la misma imagen.
+#
+# Dos servicios, un Dockerfile, un rol distinto cada uno:
+#   - partops-api:    atiende HTTPS, healthcheck en /api/health/ready (base + RLS).
+#   - partops-worker: sin dominio, sin puerto. Corre el mantenimiento diario.
+#
+# Por qué dos servicios del mismo repo: el mantenimiento tiene que seguir corriendo cuando la API se
+# reinicia por un despliegue, y la API no debe quedarse colgada esperando un rollup de ayer. Además,
+# separarlos deja al worker con una sola instancia, que es la condición que hace funcionar el
+# cerrojo en `background_job`.
+#
+# Los secretos van con `sync: false`: se cargan a mano en el panel y nunca viven en el repo. Render
+# los inyecta en los dos servicios.
+#
+# Para aplicar: Render → New → Blueprint → este repo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: partops-api
+    runtime: docker
+    plan: starter
+    # Región de la costa este: la base Neon y R2 quedan cerca, y la diferencia de latencia hacia
+    # Guatemala es de ~20 ms, menor que el costo de una región lejana.
+    region: virginia
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health/ready
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PROCESS_ROLE
+        value: api
+      - key: PORT
+        value: "4000"
+      # `RENDER_GIT_COMMIT` lo inyecta Render solo en los servicios construidos desde un repo; no se
+      # declara aquí. `/health/ready` lo lee y el smoke test lo compara contra el SHA esperado.
+      # ── Base de datos ──
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_DATABASE_URL
+        sync: false
+      - key: PG_POOL_MAX
+        value: "10"
+      # ── URLs ──
+      - key: API_PUBLIC_URL
+        value: https://api.partops.gt
+      - key: WEB_APP_URL
+        value: https://app.partops.gt
+      - key: CORS_ORIGINS
+        value: https://app.partops.gt,capacitor://localhost
+      # ── Secretos ──
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: BETTER_AUTH_URL
+        value: https://app.partops.gt
+      - key: MAIL_PROVIDER
+        value: gmail
+      - key: MAIL_FROM
+        value: PartOps <partopsgt@gmail.com>
+      - key: GMAIL_USER
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: partops
+      - key: R2_PUBLIC_URL
+        sync: false
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: FCM_PROJECT_ID
+        sync: false
+      - key: FCM_CLIENT_EMAIL
+        sync: false
+      - key: FCM_PRIVATE_KEY
+        sync: false
+
+  - type: worker
+    name: partops-worker
+    runtime: docker
+    plan: starter
+    region: virginia
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PROCESS_ROLE
+        value: worker
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_DATABASE_URL
+        sync: false
+      # Una conexión de menos que la API: el worker hace transacciones largas (rollup del día) y no
+      # compite por el pool con las peticiones del mostrador.
+      - key: PG_POOL_MAX
+        value: "4"
+      - key: API_PUBLIC_URL
+        value: https://api.partops.gt
+      - key: WEB_APP_URL
+        value: https://app.partops.gt
+      - key: CORS_ORIGINS
+        value: https://app.partops.gt
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: BETTER_AUTH_URL
+        value: https://app.partops.gt
+      - key: MAIL_PROVIDER
+        value: log
+      - key: R2_BUCKET
+        value: partops
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: SENTRY_DSN
+        sync: false

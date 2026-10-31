@@ -1,6 +1,8 @@
 import { All, Controller, Inject, Req, Res } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { Public } from '../common/context.js';
+import { AUTH_LIMIT, WINDOW_MS } from '../common/throttle.js';
 import { env } from '../config/env.js';
 import { AuthService } from './auth.service.js';
 
@@ -18,6 +20,9 @@ import { AuthService } from './auth.service.js';
  */
 @Controller('auth')
 @Public()
+// Los 10/min son el presupuesto de adivinar contraseñas, no del login legítimo: Better Auth tiene
+// su propio límite por ruta detrás. Aquí el techo es por IP, antes de tocar la base.
+@Throttle({ default: { limit: AUTH_LIMIT, ttl: WINDOW_MS } })
 export class AuthController {
   constructor(@Inject(AuthService) private readonly auth: AuthService) {}
 

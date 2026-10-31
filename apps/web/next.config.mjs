@@ -32,6 +32,13 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=()' },
+          // El CSP no vive aquí: se genera por petición con nonce en `src/proxy.ts`. Un CSP
+          // estático en este archivo y otro en el proxy se pisarían, y gana el último en escribirse.
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+          // Un año y `preload` sería el objetivo, pero solo cuando el dominio esté confirmado
+          // detrás de Cloudflare con TLS en todos los subdominios.
+          { key: 'Strict-Transport-Security', value: 'max-age=15552000; includeSubDomains' },
         ],
       },
     ];

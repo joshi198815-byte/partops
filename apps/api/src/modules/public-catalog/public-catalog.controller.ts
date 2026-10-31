@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Inject, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   type PublicCatalogQuery,
   type PublicOrderData,
@@ -9,6 +10,7 @@ import {
 import type { Request, Response } from 'express';
 import type { z } from 'zod';
 import { Public } from '../../common/context.js';
+import { CATALOG_LIMIT, WINDOW_MS } from '../../common/throttle.js';
 import { ZodBody } from '../../common/zod.js';
 import { PublicCatalogService } from './public-catalog.service.js';
 
@@ -30,6 +32,9 @@ const SHORT_CACHE = 'public, s-maxage=30, stale-while-revalidate=120';
 const LONG_CACHE = 'public, s-maxage=120, stale-while-revalidate=600';
 
 @Controller('public/catalog')
+// Vitrina anónima: el límite de Postgres por negocio ya frena la creación de pedidos; esto frena el
+// flood de listados y fichas, que son baratos de servir pero caros de multiplicar.
+@Throttle({ default: { limit: CATALOG_LIMIT, ttl: WINDOW_MS } })
 export class PublicCatalogController {
   constructor(@Inject(PublicCatalogService) private readonly catalog: PublicCatalogService) {}
 

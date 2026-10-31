@@ -40,9 +40,31 @@ packages/
   contracts/  Zod, dinero, búsqueda, permisos, estados — puro y probado
   db/         Prisma 7, migraciones RLS, cliente con contexto de tenant
   ui/         Tokens OKLCH y componentes de marca
-infra/        Postgres local, worker de keepalive
-scripts/      Generación de marca, verificación de secretos
+infra/        Postgres local, Worker de keepalive
+scripts/      Generación de marca, verificación de secretos, humo, respaldo y simulacro
 ```
+
+## Producción
+
+La API y el worker de mantenimiento salen de la misma imagen (`apps/api/Dockerfile`) y se despliegan
+en Render desde `render.yaml`. La web es Next.js; el dominio, el CSP con nonce y la caché de borde
+viven en `apps/web/src/proxy.ts`.
+
+```bash
+pnpm smoke        # dominio, salud, RLS, commit desplegado, CSP y sesión privada
+pnpm backup       # dump verificado a var/backups y a R2 (retención 14 días)
+pnpm restore:drill -- var/backups/partops-YYYY-MM-DD.dump   # simulacro en base limpia
+```
+
+Piezas que no se ven en el código:
+- **Sentry es opcional.** Sin `SENTRY_DSN` la API no carga el SDK ni hace una sola llamada de red.
+  Con DSN, errores al 100 % y trazas al 10 %, sin PII.
+- **La API y el worker son el mismo artefacto**, separados por `PROCESS_ROLE`. El worker no abre
+  puerto; su trabajo es el mantenimiento diario.
+- **El latido de Neon lo da un Worker de Cloudflare** cada 10 minutos (`infra/keepalive`), porque el
+  `setInterval` interno se congela si el proveedor duerme el proceso.
+
+Procedimientos de incidente: [`RUNBOOK.md`](RUNBOOK.md). Política de seguridad: [`SECURITY.md`](SECURITY.md).
 
 ## Verificación
 

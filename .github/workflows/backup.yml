@@ -1,0 +1,121 @@
+name: Backup
+
+# Respaldo diario y simulacro de restauración, en la misma corrida.
+#
+# El orden y la base efímera son el punto: el simulacro restaura en un Postgres que se destruye al
+# terminar el job, así que nunca se puede confundir con producción. Si el respaldo se sube pero el
+# simulacro falla, el workflow queda en rojo —y eso es correcto: un respaldo que no restaura no es
+# un respaldo.
+#
+# Corre a las 08:00 UTC (02:00 en Guatemala): después del cierre y antes de que abra la bodega, con
+# margen para reintentar a mano si algo falla.
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    services:
+      # La base del simulacro. Credenciales desechables: el job la borra al terminar.
+      scratch:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: scratch
+          POSTGRES_DB: partops_drill
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar cliente de PostgreSQL
+        # `pg_dump` del runner suele ser más viejo que el servidor; un dump de una versión mayor se
+        # niega a correr contra un cliente antiguo. Se instala el 18 explícito.
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] \
+            https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-client-18
+          pg_dump --version
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Respaldo a R2
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        # El dump se queda en `var/backups/` además de subirse: el simulacro restaura ese mismo
+        # archivo, no uno nuevo. Probar el archivo que se respaldó es el punto; probar otro del
+        # mismo minuto solo demuestra que `pg_dump` funciona.
+        run: pnpm backup
+
+      - name: Simulacro de restauración
+        env:
+          SCRATCH_DATABASE_URL: postgresql://postgres:scratch@localhost:5433/partops_drill
+          SOURCE_DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          # El respaldo ya se hizo: aquí solo se lee para comparar. Sin credenciales de R2 no hace
+          # falta nada más.
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          dump=$(ls -t var/backups/*.dump | head -1)
+          echo "Simulacro sobre $dump"
+          pnpm restore:drill -- "$dump"
+
+      - name: Publicar informe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-drill-${{ github.run_id }}
+          path: var/restore-drill.json
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo "### Respaldo y simulacro"
+            echo ""
+            if [ -f var/restore-drill.json ]; then
+              echo '```json'
+              cat var/restore-drill.json
+              echo '```'
+            else
+              echo "Sin informe: el simulacro no llegó a ejecutarse."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

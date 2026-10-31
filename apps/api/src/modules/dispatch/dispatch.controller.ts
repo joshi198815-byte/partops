@@ -1,4 +1,5 @@
 import { Controller, Get, HttpCode, Inject, Param, Post, Req } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   type DispatchQueueQuery,
   dispatchQueueQuerySchema,
@@ -13,6 +14,7 @@ import {
 import type { z } from 'zod';
 import type { AuthedRequest, Ctx } from '../../common/context.js';
 import { CurrentCtx, RequirePermissions } from '../../common/context.js';
+import { DISPATCH_LIMIT, WINDOW_MS } from '../../common/throttle.js';
 import { ZodBody, ZodQuery } from '../../common/zod.js';
 import { FcmService } from '../../infra/fcm.service.js';
 import { PushService } from '../../infra/push.service.js';
@@ -26,6 +28,9 @@ import { DispatchService } from './dispatch.service.js';
  * mover una línea desde el pasillo. El vendedor ve el mismo estado en Ventas, que es donde le toca.
  */
 @Controller('dispatch')
+// 600/min en `sync`: un teléfono que vuelve de una hora sin señal manda su cola de golpe, y varios
+// teléfonos de la misma bodega lo hacen a la vez. El límite existe para el bucle, no para el lunes.
+@Throttle({ default: { limit: DISPATCH_LIMIT, ttl: WINDOW_MS } })
 export class DispatchController {
   constructor(@Inject(DispatchService) private readonly dispatch: DispatchService) {}
 

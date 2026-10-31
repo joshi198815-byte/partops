@@ -21,9 +21,13 @@
     "db:studio": "pnpm --filter @partops/db studio",
     "brand": "node scripts/render-brand.mjs",
     "secrets:check": "node scripts/check-secrets.mjs",
+    "smoke": "node scripts/smoke-api.mjs",
+    "backup": "node scripts/backup-db.mjs",
+    "restore:drill": "node scripts/restore-drill.mjs",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "3.1155.0",
     "@biomejs/biome": "2.6.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.0",

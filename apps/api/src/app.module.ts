@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth/auth.controller.js';
 import { AuthGuard } from './auth/auth.guard.js';
 import { AuthService } from './auth/auth.service.js';
 import { InvitationController, MeController } from './auth/me.controller.js';
+import { ApiThrottlerGuard, DEFAULT_LIMIT, throttlingEnabled, WINDOW_MS } from './common/throttle.js';
 import { DatabaseModule } from './infra/database.module.js';
 import { FcmService } from './infra/fcm.service.js';
 import { MaintenanceService } from './infra/maintenance.service.js';
@@ -37,6 +39,7 @@ import { InventoryController } from './modules/inventory/inventory.controller.js
 import { InventoryQueryService } from './modules/inventory/inventory.query.service.js';
 import { InventoryService } from './modules/inventory/inventory.service.js';
 import { TransferService } from './modules/inventory/transfer.service.js';
+import { MaintenanceController } from './modules/maintenance/maintenance.controller.js';
 import { OnboardingController } from './modules/onboarding/onboarding.controller.js';
 import { OnboardingService } from './modules/onboarding/onboarding.service.js';
 import { OrdersController } from './modules/orders/orders.controller.js';
@@ -57,7 +60,15 @@ import { TeamController } from './modules/team/team.controller.js';
 import { TeamService } from './modules/team/team.service.js';
 
 @Module({
-  imports: [DatabaseModule, MailModule],
+  imports: [
+    DatabaseModule,
+    MailModule,
+    ThrottlerModule.forRoot({
+      throttlers: [{ name: 'default', ttl: WINDOW_MS, limit: DEFAULT_LIMIT }],
+      // La clave se arma en `ApiThrottlerGuard`; aquí solo se decide si se cuenta.
+      skipIf: () => !throttlingEnabled(),
+    }),
+  ],
   controllers: [
     ...API_CONTROLLERS,
     AuthController,
@@ -85,6 +96,7 @@ import { TeamService } from './modules/team/team.service.js';
     StockWatchController,
     FinanceController,
     PlatformController,
+    MaintenanceController,
   ],
   providers: [
     ...API_PROVIDERS,
@@ -122,6 +134,10 @@ import { TeamService } from './modules/team/team.service.js';
     // omisión— un endpoint nuevo olvidado queda expuesto; así, un endpoint nuevo olvidado queda
     // cerrado y se nota en la primera prueba, no en la primera fuga.
     { provide: APP_GUARD, useClass: AuthGuard },
+    // Segundo guard, después de AuthGuard. El orden importa: primero se sabe quién es y a qué
+    // negocio pertenece, y solo entonces se cuenta la petición. Si se contara antes, un atacante
+    // sin sesión podría gastar el presupuesto de un negocio ajeno con solo mandar su `x-tenant-id`.
+    { provide: APP_GUARD, useClass: ApiThrottlerGuard },
   ],
   exports: [AuthService],
 })

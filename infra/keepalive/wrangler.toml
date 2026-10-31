@@ -1,0 +1,22 @@
+name = "partops-keepalive"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Sin esto el Worker no se publica por accidente desde una máquina de desarrollo.
+workers_dev = false
+
+[vars]
+API_URL = "https://api.partops.gt"
+# Cuándo corre el mantenimiento, en hora de Guatemala (UTC-6, sin horario de verano).
+MAINTENANCE_HOUR_GT = "6"
+MAINTENANCE_MINUTE_GT = "10"
+
+# El secreto se carga con:
+#   npx wrangler secret put CRON_SECRET --config infra/keepalive/wrangler.toml
+# Nunca en `[vars]`: lo que se escribe ahí queda en el repo y en el panel.
+
+[triggers]
+# Cron de Cloudflare en UTC. Se corre cada 10 minutos porque su precisión es de minutos, no de
+# segundos, y porque el keepalive necesita latido frecuente: Neon suspende el cómputo tras 5 minutos
+# sin consultas y el primer request después de eso tarda segundos.
+crons = ["*/10 * * * *"]

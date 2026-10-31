@@ -1,6 +1,8 @@
 import { Controller, Get, Inject } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { z } from 'zod';
 import { type Ctx, CurrentCtx, RequirePermissions } from '../../common/context.js';
+import { SEARCH_LIMIT, WINDOW_MS } from '../../common/throttle.js';
 import { ZodQuery } from '../../common/zod.js';
 import { SearchService } from './search.service.js';
 
@@ -19,6 +21,9 @@ const searchQuery = z.object({
 });
 
 @Controller('search')
+// 90/min: la paleta de comandos dispara con debounce, así que una persona escribiendo rápido no se
+// acerca; un bucle sí. `demand` cae en el límite por defecto, que es más que suficiente.
+@Throttle({ default: { limit: SEARCH_LIMIT, ttl: WINDOW_MS } })
 export class SearchController {
   constructor(@Inject(SearchService) private readonly search: SearchService) {}
 

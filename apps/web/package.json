@@ -12,6 +12,7 @@
   "dependencies": {
     "@partops/contracts": "workspace:*",
     "@partops/ui": "workspace:*",
+    "@sentry/nextjs": "^11.10.0",
     "dexie": "^4.4.7",
     "next": "16.2.5",
     "react": "19.3.1",

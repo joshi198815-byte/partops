@@ -239,10 +239,11 @@ Convención: cada tarea cierra con `pnpm lint && pnpm typecheck && pnpm test` ve
 - Verificación: APK instalado en Android físico completa venta + despacho de punta a punta.
 
 **T17. Producción: despliegue, observabilidad, respaldos, hardening**
-- Archivos: `.github/workflows/{ci,deploy,backup}.yml`, `render.yaml`, `apps/api/Dockerfile`, `apps/web/wrangler.jsonc`, `infra/keepalive/*`, `scripts/{smoke-api,restore-drill}.mjs`, `SECURITY.md`, `RUNBOOK.md`.
+- Archivos: `.github/workflows/{ci,deploy,backup}.yml`, `render.yaml`, `apps/api/Dockerfile`, `apps/web/src/proxy.ts`, `infra/keepalive/*`, `scripts/{smoke-api,backup-db,restore-drill}.mjs`, `SECURITY.md`, `RUNBOOK.md`.
 - Pasos: pipeline en serie migrar→API→verificar commit en `/health/ready`→web→smoke; keepalive y cron diario en Worker; Sentry con trazas al 10%; headers y CSP con nonce; rate limits por ruta; `gitleaks` y `check-secrets`; respaldo nocturno a R2 con retención 14 días y simulacro de restauración; runbook de caídas (Neon suspendido, Render dormido, R2 sin dominio).
 - Test: smoke contra producción (dominio, salud, CSP, login); restauración desde un dump en base limpia y verificación de conteos; intento de fuga entre tenants en producción con dos cuentas reales.
 - Verificación: despliegue completo desde un commit vacío; `pnpm smoke` verde; restauración documentada con evidencia.
+- Estado: **código completo y probado en local**. El despliegue real, el APK publicado y la prueba con dos cuentas quedan como pasos manuales documentados en `RUNBOOK.md` (requieren cuentas y hardware).
 
 ---
 
@@ -253,6 +254,20 @@ Convención: cada tarea cierra con `pnpm lint && pnpm typecheck && pnpm test` ve
 - **Fin de Fase 2:** venta concurrente de la última pieza nunca sobrevende, despacho completo desde Android con escáner, recibo correcto al centavo.
 - **Fin de Fase 3:** catálogo público sin fuga de stock, Lighthouse móvil ≥ 90, panel de demanda con datos reales.
 - **Fin de Fase 4:** utilidad cuadra con export, APK distribuible, respaldo restaurado con evidencia, dos tenants reales aislados en producción.
+
+### Estado de las puertas de Fase 4
+
+| Puerta                             | Estado                    | Evidencia                                                                                                                                                    |
+| ---------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| La utilidad cuadra con el export   | **Cumplida**              | `finance.service.test.ts`: mismos totales en pantalla y xlsx, corte en America/Guatemala                                                                     |
+| Respaldo restaurado con evidencia  | **Cumplida en local**     | `var/restore-drill.json`: 47 tablas, conteos iguales al origen, RLS y ledger verificados. El workflow `Backup` lo repite cada noche en CI                    |
+| APK distribuible                   | **Pendiente de tag**      | El build firmado corre en `.github/workflows/android.yml`; el APK de depuración se generó e instaló. Falta publicar el tag de release (requiere el keystore) |
+| Dos tenants aislados en producción | **Pendiente de cuentas**  | `packages/db/src/rls.test.ts` y las e2e lo prueban contra base real; la prueba con dos cuentas en producción necesita el despliegue hecho                    |
+| Despliegue completo desde cero     | **Pendiente de secretos** | `deploy.yml` y `pnpm smoke` probados contra el build local; falta correr con Render, Neon y R2 reales                                                        |
+
+Lo que falta es ejecución con cuentas y hardware, no código: los pasos están en `RUNBOOK.md` y en
+`.github/workflows/`. Se deja escrito así para que nadie confunda "el test pasa" con "ya está en
+producción".
 
 ## 9. Riesgos y decisiones diferidas
 

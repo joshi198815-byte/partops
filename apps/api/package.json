@@ -21,6 +21,7 @@
     "@nestjs/websockets": "11.2.7",
     "@partops/contracts": "workspace:*",
     "@partops/db": "workspace:*",
+    "@sentry/node": "^11.10.0",
     "better-auth": "1.7.12",
     "exceljs": "4.4.0",
     "express": "^5.1.0",

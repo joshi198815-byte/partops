@@ -1,0 +1,132 @@
+name: Deploy
+
+# Despliegue en serie, con aprobación y verificación real.
+#
+# El orden importa y es el motivo de que esto sea un workflow y no dos botones:
+#   1. Migrar la base (el esquema tiene que aceptar el código nuevo antes de que corra).
+#   2. Construir y desplegar la API.
+#   3. Esperar a que `/health/ready` devuelva **nuestro** SHA. Un deploy que "ya disparó" no es un
+#      deploy hecho; Render puede tardar minutos o quedarse en la versión anterior.
+#   4. Desplegar la web.
+#   5. Humo completo.
+#
+# Si el paso 3 falla, la web no se toca: se queda sirviendo una versión que al menos habla con una
+# API que conoce. Desplegar la web contra una API a medio migrar es cómo se rompe un viernes.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - "apps/mobile/**"
+  workflow_dispatch:
+    inputs:
+      skip_migrations:
+        description: "Saltar migraciones (solo si ya corrieron a mano)"
+        type: boolean
+        default: false
+
+# Nunca dos despliegues a la vez, y nunca cancelar uno a medias: cancelar entre la migración y el
+# despliegue deja la base adelante del código.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile --filter @partops/db... --filter @partops/contracts...
+
+      # ── 1 · Esquema ──────────────────────────────────────────────────────────
+      - name: Migrar producción
+        if: ${{ !inputs.skip_migrations }}
+        env:
+          # Rol DUEÑO: las migraciones crean tablas y políticas. La API usa el rol sin privilegios.
+          DIRECT_DATABASE_URL: ${{ secrets.PRODUCTION_DIRECT_DATABASE_URL }}
+        run: pnpm --filter @partops/db migrate:deploy
+
+      # ── 2 · API ──────────────────────────────────────────────────────────────
+      - name: Disparar despliegue de la API
+        env:
+          HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Falta RENDER_API_DEPLOY_HOOK en los secretos del entorno production."
+            exit 1
+          fi
+          curl --fail --silent --show-error --request POST "$HOOK"
+
+      # ── 3 · Esperar el SHA ───────────────────────────────────────────────────
+      - name: Esperar a que la API sirva este commit
+        env:
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 600))
+          while [ $SECONDS -lt $deadline ]; do
+            body=$(curl --silent --max-time 10 "$API_URL/api/health/ready" || true)
+            # `grep -q` sobre el JSON en crudo: no hace falta un parser para buscar un SHA.
+            if echo "$body" | grep -q "\"commit\":\"${SHA:0:8}"; then
+              echo "La API ya sirve ${SHA:0:8}."
+              exit 0
+            fi
+            echo "Aún no: $(echo "$body" | head -c 200)"
+            sleep 15
+          done
+          echo "::error::La API no sirvió $SHA en 10 minutos. Revisar el log del servicio en Render."
+          exit 1
+
+      # ── 4 · Web ──────────────────────────────────────────────────────────────
+      - name: Disparar despliegue de la web
+        env:
+          HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Falta RENDER_WEB_DEPLOY_HOOK en los secretos del entorno production."
+            exit 1
+          fi
+          curl --fail --silent --show-error --request POST "$HOOK"
+          # La web tarda menos que la API, pero no es instantánea: sin esta pausa el humo corre
+          # contra la versión anterior y da un falso verde.
+          sleep 60
+
+      # ── 5 · Humo ─────────────────────────────────────────────────────────────
+      - name: Humo de producción
+        env:
+          SMOKE_BASE_URL: ${{ secrets.PRODUCTION_WEB_URL }}
+          SMOKE_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          SMOKE_EXPECTED_COMMIT: ${{ github.sha }}
+        run: node scripts/smoke-api.mjs
+
+      - name: Resumen
+        if: always()
+        run: |
+          {
+            echo "### Despliegue"
+            echo ""
+            echo "| Dato | Valor |"
+            echo "| --- | --- |"
+            echo "| Commit | \`${GITHUB_SHA:0:8}\` |"
+            echo "| Resultado | ${{ job.status }} |"
+            echo "| Ejecutado por | @${GITHUB_ACTOR} |"
+          } >> "$GITHUB_STEP_SUMMARY"
