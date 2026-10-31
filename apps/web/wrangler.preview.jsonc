@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // ── Ensayo de la web, separado del Worker de producción ──────────────────
+  //
+  // Archivo aparte y no `env.preview` dentro de `wrangler.jsonc` por una razón concreta: un
+  // entorno de wrangler **hereda** `routes` del nivel superior, así que desplegar el ensayo le
+  // habría quitado `app.partops.autos` al Worker de producción y el sitio real habría empezado a
+  // servir el código sin probar. Con archivo propio nada se hereda y nada se puede pisar.
+  //
+  // `preview.partops.autos` y no `*.workers.dev` porque la sesión es una cookie en `.partops.autos`:
+  // desde un dominio de workers.dev la cookie es de terceros y el login no se puede probar.
+  "name": "partops-web-preview",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web-preview" }],
+
+  // Bucket propio del ensayo. Compartir el de producción haría que una prueba escribiera entradas
+  // de caché que producción después sirve sin haberlas generado.
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "partops-web-preview-cache" }],
+
+  // Namespace propio: los Durable Objects no se comparten entre Workers.
+  "durable_objects": {
+    "bindings": [{ "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }],
+
+  "images": { "binding": "IMAGES" },
+
+  "routes": [{ "pattern": "preview.partops.autos", "custom_domain": true }],
+
+  "vars": {
+    "API_URL": "https://api.partops.autos",
+    // Vacío a propósito: el navegador llama a `/api/*` en el mismo origen y Next lo reescribe a la
+    // API. Así el ensayo no necesita que la API de producción acepte un origen nuevo en
+    // `CORS_ORIGINS`, y de paso se prueba el rewrite, que es el camino de respaldo en producción.
+    "NEXT_PUBLIC_API_URL": "",
+    "NEXT_PUBLIC_APP_URL": "https://preview.partops.autos",
+    "NODE_ENV": "production"
+  }
+}
