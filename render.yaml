@@ -147,33 +147,14 @@ services:
         sync: false
 
   # ── Web ────────────────────────────────────────────────────────────────────
-  # Next.js con `output: 'standalone'`. Se despliega DESPUÉS de la API y solo cuando la API ya
-  # sirve el mismo commit; ese orden lo impone `deploy.yml`, no este archivo.
+  # La web YA NO se sirve desde Render. Vive en Cloudflare Workers (`apps/web/wrangler.jsonc`,
+  # desplegada por `deploy.yml`), por dos razones que no se pueden sortear en el plan free:
   #
-  # El `API_URL` entra como build arg: el rewrite `/api/*` se hornea en la tabla de rutas del
-  # build. Cambiarlo aquí y redesplegar basta porque Render reconstruye la imagen; cambiarlo solo
-  # en el runtime no tendría efecto sobre el rewrite.
-  - type: web
-    name: partops-web
-    runtime: docker
-    plan: free
-    region: virginia
-    dockerfilePath: ./apps/web/Dockerfile
-    dockerContext: .
-    healthCheckPath: /entrar
-    autoDeploy: false
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: "3000"
-      - key: API_URL
-        value: https://api.partops.autos
-      # El navegador llama a la API directo. El rewrite queda como respaldo: si esta variable se
-      # vacía, todo vuelve a pasar por Next sin tocar código. Requiere `COOKIE_DOMAIN` en la API.
-      - key: NEXT_PUBLIC_API_URL
-        value: https://api.partops.autos
-      - key: NEXT_PUBLIC_APP_URL
-        value: https://app.partops.autos
-      - key: NEXT_PUBLIC_SENTRY_DSN
-        sync: false
+  #   1. Render duerme un servicio free a los 15 min sin tráfico y muestra **su** pantalla de
+  #      arranque ~1 min. Esa pantalla no es personalizable: el visitante ve "SERVICE WAKING UP",
+  #      no la app. En producción real eso es inaceptable.
+  #   2. El workspace free da 750 h de instancia al mes. Web y API despiertas 24/7 son 1,440 h:
+  #      no caben. Aunque se arreglara el keepalive de la web, se comería las horas de la API.
+  #
+  # Cloudflare Workers no duerme y no tiene ese tope. El servicio `partops-web` de Render debe
+  # borrarse del panel después de que el Worker tome `app.partops.autos`.

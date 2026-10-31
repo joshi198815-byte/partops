@@ -7,25 +7,30 @@
     "build": "next build",
     "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@partops/contracts": "workspace:*",
     "@partops/ui": "workspace:*",
     "@sentry/nextjs": "^11.10.0",
     "dexie": "^4.4.7",
-    "next": "16.2.5",
+    "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.15",
     "@tailwindcss/postcss": "4.2.4",
     "@types/node": "^22.15.0",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.4",
     "tailwindcss": "4.2.4",
     "typescript": "5.9.3",
-    "vitest": "3.2.4"
+    "vitest": "3.2.4",
+    "wrangler": "4.156.0"
   }
 }

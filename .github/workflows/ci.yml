@@ -85,3 +85,40 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # El build de la web para Cloudflare es el único paso que no se puede probar en Windows: esbuild
+  # no atraviesa los enlaces simbólicos de pnpm (`Cannot read directory ... Acceso denegado`). Si
+  # esto se rompe, se rompe en el despliegue, así que se vigila aquí y no allá.
+  #
+  # No necesita credenciales: `build` empaqueta y no publica. Los secretos sólo hacen falta en
+  # `deploy`.
+  cloudflare-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # `@partops/contracts` se publica desde `dist/`: sin compilarlo, el build de la web falla al
+      # resolver el paquete. El build de Next no lo arrastra por su cuenta.
+      - name: Compilar los paquetes del workspace
+        run: pnpm --filter @partops/contracts build
+
+      - name: Construir la web para Workers
+        env:
+          API_URL: https://api.partops.autos
+          NEXT_PUBLIC_API_URL: https://api.partops.autos
+          NEXT_PUBLIC_APP_URL: https://app.partops.autos
+          GITHUB_SHA: ${{ github.sha }}
+        run: pnpm --filter @partops/web cf:build

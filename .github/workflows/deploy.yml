@@ -60,7 +60,8 @@ jobs:
           API_URL: ${{ vars.PRODUCTION_API_URL }}
           WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
           API_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
-          WEB_HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -uo pipefail
           missing=()
@@ -68,7 +69,8 @@ jobs:
           [ -n "$API_URL" ]             || missing+=("variable PRODUCTION_API_URL")
           [ -n "$WEB_URL" ]             || missing+=("variable PRODUCTION_WEB_URL")
           [ -n "$API_HOOK" ]            || missing+=("secreto RENDER_API_DEPLOY_HOOK")
-          [ -n "$WEB_HOOK" ]            || missing+=("secreto RENDER_WEB_DEPLOY_HOOK")
+          [ -n "$CF_TOKEN" ]            || missing+=("secreto CLOUDFLARE_API_TOKEN")
+          [ -n "$CF_ACCOUNT" ]          || missing+=("secreto CLOUDFLARE_ACCOUNT_ID")
 
           # `is_missing` consulta el array sin expandirlo vacío (bash con `nounset` lo odia).
           is_missing() {
@@ -86,7 +88,7 @@ jobs:
             echo "| --- | --- | --- |"
             for name in "secreto PRODUCTION_DIRECT_DATABASE_URL" "variable PRODUCTION_API_URL" \
                         "variable PRODUCTION_WEB_URL" "secreto RENDER_API_DEPLOY_HOOK" \
-                        "secreto RENDER_WEB_DEPLOY_HOOK"; do
+                        "secreto CLOUDFLARE_API_TOKEN" "secreto CLOUDFLARE_ACCOUNT_ID"; do
               if is_missing "$name"; then
                 echo "| \`${name#* }\` | ${name%% *} | ❌ falta |"
               else
@@ -163,22 +165,36 @@ jobs:
           exit 1
 
       # ── 4 · Web ──────────────────────────────────────────────────────────────
-      - name: Desplegar la web
+      # La web vive en Cloudflare Workers (OpenNext), no en Render. Se construye aquí y no en la
+      # máquina de nadie: el adaptador empaqueta con esbuild y en Windows esbuild no atraviesa los
+      # enlaces simbólicos de pnpm (`Cannot read directory ... Acceso denegado`). Linux es la única
+      # vía soportada.
+      - name: Construir y desplegar la web en Cloudflare
         env:
-          HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Se hornea en el build: es el valor que `smoke` compara contra el SHA del despliegue.
+          GITHUB_SHA: ${{ github.sha }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.PRODUCTION_SENTRY_DSN }}
+          # Dependencias del monorepo: se construyen los paquetes del workspace antes que la web.
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
+          NEXT_PUBLIC_API_URL: ${{ vars.PRODUCTION_API_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.PRODUCTION_WEB_URL }}
+        run: |
+          # `@partops/contracts` se publica desde `dist/`; sin compilarlo el build de la web no lo
+          # resuelve. `cf:deploy` empaqueta y publica en una sola pasada.
+          pnpm --filter @partops/contracts build
+          pnpm --filter @partops/web cf:deploy
+
+      # Cloudflare tarda unos segundos en propagar la versión nueva a todos los nodos. Sin esta
+      # espera, el humo puede golpear el edge con la versión anterior y fallar por una razón falsa.
+      - name: Esperar a que la web sirva este commit
+        env:
           WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
           SHA: ${{ github.sha }}
         run: |
-          if [ -z "$HOOK" ]; then
-            echo "::error::Falta RENDER_WEB_DEPLOY_HOOK en los secretos del entorno production."
-            exit 1
-          fi
-          curl --fail --silent --show-error --request POST "$HOOK"
-
-          # La web se construye (Next compila en el deploy), así que tarda más que la API en
-          # arrancar pero menos que una migración. Se sondea la cabecera horneada en vez de dormir
-          # un tiempo fijo: `sleep 60` da verde contra el contenedor viejo si el build tarda más.
-          deadline=$((SECONDS + 600))
+          set -uo pipefail
+          deadline=$((SECONDS + 300))
           while [ $SECONDS -lt $deadline ]; do
             served=$(curl --silent --max-time 10 --head "$WEB_URL/entrar" 2>/dev/null \
               | tr -d '\r' | awk 'tolower($1)=="x-partops-commit:"{print $2}')
@@ -189,7 +205,7 @@ jobs:
             echo "Aún no: la web sirve '${served:-sin cabecera}'"
             sleep 10
           done
-          echo "::error::La web no sirvió $SHA en 10 minutos. Revisar el log del build en Render."
+          echo "::error::La web no sirvió $SHA en 5 minutos. Revisar el despliegue en Cloudflare."
           exit 1
 
       # ── 5 · Humo ─────────────────────────────────────────────────────────────

@@ -7,6 +7,10 @@ coverage/
 test-results/
 playwright-report/
 
+# Salida de OpenNext y estado local de wrangler para la web.
+.open-next/
+apps/web/.wrangler/
+
 .env
 .env.local
 .env.*.local

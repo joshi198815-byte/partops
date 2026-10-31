@@ -1,0 +1,41 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "partops-web",
+  "main": ".open-next/worker.js",
+  // Node y fecha recientes: sin `nodejs_compat` el adaptador no puede cargar Next, y las APIs que
+  // usa el servidor (streams, `AsyncLocalStorage`, `crypto`) dependen de la fecha de compatibilidad.
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  // El Worker sirve los assets estáticos de Workers Static Assets; el directorio lo llena OpenNext.
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+
+  // Auto-referencia: la cola de revalidación vuelve a entrar por el propio Worker.
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web" }],
+
+  // Caché incremental de ISR. El bucket lo crea `scripts/setup-web-worker.ps1`; el id lo pega
+  // `wrangler` al hacer `deploy` la primera vez, así que se rellena entonces, no a mano.
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "partops-web-cache" }],
+
+  // Cola de revalidación con deduplicación. `new_sqlite_classes` es lo que la hace persistente y
+  // barata en el plan free; con `new_classes` no podría guardar su estado.
+  "durable_objects": {
+    "bindings": [{ "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }],
+
+  // Optimización de imágenes de `next/image`. Sin esto, `<Image>` sirve el original y el catálogo
+  // de la bodega descarga fotos de varios MB por pieza en una conexión mala.
+  "images": { "binding": "IMAGES" },
+
+  // Dominio propio. La zona `partops.autos` ya vive en Cloudflare, así que el registro se crea
+  // solo al desplegar y el certificado lo emite Cloudflare.
+  "routes": [{ "pattern": "app.partops.autos", "custom_domain": true }],
+
+  "vars": {
+    "API_URL": "https://api.partops.autos",
+    "NEXT_PUBLIC_API_URL": "https://api.partops.autos",
+    "NEXT_PUBLIC_APP_URL": "https://app.partops.autos",
+    "NODE_ENV": "production"
+  }
+}

@@ -9,7 +9,12 @@ const API_URL = process.env.API_URL ?? 'http://localhost:4000';
  * probaría solo que la variable existe, no que el contenedor es nuevo. Se resuelve al construir
  * para que la cabecera sea prueba del artefacto, igual que `/api/health/ready` lo es de la API.
  */
-const BUILD_COMMIT = (process.env.RENDER_GIT_COMMIT ?? process.env.GITHUB_SHA ?? 'dev').slice(0, 8);
+const BUILD_COMMIT = (
+  process.env.CF_PAGES_COMMIT_SHA ??
+  process.env.RENDER_GIT_COMMIT ??
+  process.env.GITHUB_SHA ??
+  'dev'
+).slice(0, 8);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

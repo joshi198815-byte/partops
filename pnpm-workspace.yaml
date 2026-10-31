@@ -8,3 +8,6 @@ allowBuilds:
   esbuild: true
   prisma: true
   sharp: true
+  # Binario del runtime local de Workers (`wrangler dev` / build de OpenNext). Sin el script de
+  # instalación, wrangler no encuentra el runtime y el build de la web falla solo en CI.
+  workerd: true
