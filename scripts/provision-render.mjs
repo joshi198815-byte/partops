@@ -124,17 +124,35 @@ const services = [
   },
 ];
 
+/**
+ * Se sigue después de un fallo: un servicio que no se puede crear no debe impedir crear los demás.
+ *
+ * El caso concreto es el worker en plan `free`, que responde `only web services allowed for plan`.
+ * Abortar ahí dejaría la web sin crear y el despliegue a medias por un servicio que ya está cubierto
+ * por el cron de Cloudflare.
+ */
+let failed = 0;
 for (const svc of services) {
   if (existing.has(svc.name)) {
     console.log(`= ${svc.name} ya existe, se deja igual`);
     continue;
   }
-  const created = await call('POST', '/services', {
-    ...svc,
-    ownerID: OWNER,
-    repo: REPO,
-    branch: BRANCH,
-    autoDeployTrigger: 'off',
-  });
-  console.log(`+ ${svc.name} → ${created.service.id} (${created.service.dashboardUrl})`);
+  try {
+    const created = await call('POST', '/services', {
+      ...svc,
+      ownerID: OWNER,
+      repo: REPO,
+      branch: BRANCH,
+      autoDeployTrigger: 'off',
+    });
+    console.log(`+ ${svc.name} → ${created.service.id} (${created.service.dashboardUrl})`);
+  } catch (err) {
+    failed++;
+    console.error(`! ${svc.name}: ${err.message}`);
+  }
+}
+
+if (failed) {
+  console.error(`\n${failed} servicio(s) no se crearon. Revisar el mensaje de arriba.`);
+  process.exit(1);
 }
