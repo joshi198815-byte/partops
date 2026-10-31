@@ -30,6 +30,9 @@
 
   // Dominio propio. La zona `partops.autos` ya vive en Cloudflare, así que el registro se crea
   // solo al desplegar y el certificado lo emite Cloudflare.
+  //
+  // En el entorno `preview` (ver abajo) esto NO aplica: el Worker de prueba escucha en
+  // `partops-web-preview.*.workers.dev`, que es donde se valida antes de mover el DNS de producción.
   "routes": [{ "pattern": "app.partops.autos", "custom_domain": true }],
 
   "vars": {
@@ -37,5 +40,20 @@
     "NEXT_PUBLIC_API_URL": "https://api.partops.autos",
     "NEXT_PUBLIC_APP_URL": "https://app.partops.autos",
     "NODE_ENV": "production"
+  },
+
+  // ── Entorno de ensayo ───────────────────────────────────────────────────
+  // Corre el mismo código en un Worker aparte, sin dominio propio. Sirve para lo único que no se
+  // puede probar en local ni en CI: que Next arranque de verdad en el runtime de Workers, que el
+  // proxy del CSP emita el nonce y que el login funcione contra la API real. Si algo de eso falla,
+  // la página se ve pero React no hidrata; es el modo de falla que menos se nota desde fuera.
+  //
+  // Se despliega con `pnpm --filter @partops/web cf:deploy:preview`.
+  "env": {
+    "preview": {
+      "name": "partops-web-preview",
+      // Sin `routes`: así el dominio de producción no se toca ni se reclama.
+      "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web-preview" }]
+    }
   }
 }

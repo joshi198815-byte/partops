@@ -1,0 +1,70 @@
+name: Web preview
+
+# Despliegue manual de la web a un Worker de ensayo, sin dominio propio.
+#
+# Existe porque OpenNext no se puede empaquetar en Windows (esbuild no atraviesa los enlaces de
+# pnpm) y esta migración no se puede validar desde una máquina de desarrollo. El Worker de ensayo
+# contesta en `partops-web-preview.*.workers.dev`, no en `app.partops.autos`, así que correrlo
+# mil veces no afecta a nadie que esté usando el sistema.
+#
+# Qué se comprueba en esa URL antes de mover el DNS de producción (ver docs/cloudflare-web.md):
+#   · Que la portada responda y el HTML traiga los scripts de hidratación.
+#   · Que `/entrar` tenga `content-security-policy` con `nonce-`, es decir que el proxy corre.
+#   · Que el formulario de login haga POST contra la API real y guarde la cookie.
+#
+# No tiene trigger automático a propósito: cada corrida crea una versión nueva del Worker.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Compilar los paquetes del workspace
+        run: pnpm --filter @partops/contracts build
+
+      - name: Construir y desplegar el ensayo
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GITHUB_SHA: ${{ github.sha }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.PRODUCTION_SENTRY_DSN }}
+        run: pnpm --filter @partops/web cf:deploy:preview
+
+      - name: Pista de qué probar
+        run: |
+          {
+            echo "### Ensayo desplegado"
+            echo ""
+            echo "Abre la URL que imprimió \`wrangler\` arriba (termina en \`.workers.dev\`) y comprueba:"
+            echo ""
+            echo "1. La portada carga y el formulario del parser responde al escribir."
+            echo "2. \`curl -sI <url>/entrar | grep -i content-security-policy\` trae \`nonce-\`."
+            echo "3. El login entra y llega a \`/app\`."
+            echo ""
+            echo "Si el punto 1 se ve pero nada responde a clics, el proxy del CSP no está emitiendo"
+            echo "el nonce en Workers: **no muevas el DNS**."
+          } >> "$GITHUB_STEP_SUMMARY"
