@@ -330,29 +330,36 @@ enlace en una ventana privada y canjear. Y una recuperación completa desde `/re
 **Cómo se detecta.** Un push a `main` no dispara nada, o el run falla en el primer paso.
 
 El workflow `Deploy` tiene una compuerta (`preflight`) que **no toca la base** hasta confirmar que
-están los cinco secretos del entorno `production`. Si falta uno, el run falla en segundos y el
-resumen del run dice exactamente cuál. Eso es a propósito: antes, un secreto faltante se descubría a
-mitad del despliegue, con la migración ya aplicada y la API ya disparada.
+está la configuración del entorno `production`. Si falta algo, el run falla en segundos y el resumen
+del run dice exactamente qué. Eso es a propósito: antes, un valor faltante se descubría a mitad del
+despliegue, con la migración ya aplicada y la API ya disparada.
+
+**Tres secretos y dos variables.** Las URLs son públicas: guardarlas como secreto no protege nada y
+hace que nadie pueda leerlas al depurar un run. Los hooks sí son credenciales —quien tiene uno
+despliega— y la cadena de conexión también.
 
 ```bash
-# Ver qué hay (los valores no se muestran nunca)
-gh secret list -R joshi198815-byte/partops
+# Ver qué hay (los valores de los secretos no se muestran nunca)
+gh secret list --env production -R joshi198815-byte/partops
+gh variable list --env production -R joshi198815-byte/partops
 
-# Poner los cinco. El valor se pega en el prompt, no queda en el historial del shell.
+# Variables: no hay prompt, el valor va en el comando y es público.
+gh variable set PRODUCTION_API_URL --env production -R joshi198815-byte/partops --body "https://api.partops.autos"
+gh variable set PRODUCTION_WEB_URL --env production -R joshi198815-byte/partops --body "https://app.partops.autos"
+
+# Secretos: el valor se pega en el prompt, no queda en el historial del shell.
 gh secret set PRODUCTION_DIRECT_DATABASE_URL -R joshi198815-byte/partops --env production
-gh secret set PRODUCTION_API_URL            -R joshi198815-byte/partops --env production
-gh secret set PRODUCTION_WEB_URL            -R joshi198815-byte/partops --env production
 gh secret set RENDER_API_DEPLOY_HOOK        -R joshi198815-byte/partops --env production
 gh secret set RENDER_WEB_DEPLOY_HOOK        -R joshi198815-byte/partops --env production
 ```
 
-| Secreto                          | De dónde sale                                   | Ojo                                                                             |
-| -------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
-| `PRODUCTION_DIRECT_DATABASE_URL` | Neon → Connection string, rol **dueño**         | No el rol de la app: las migraciones crean tablas y políticas y fallan con RLS. |
-| `PRODUCTION_API_URL`             | `https://api.partops.autos`                     | Sin `/api` al final; el workflow lo añade.                                      |
-| `PRODUCTION_WEB_URL`             | `https://app.partops.autos`                     | Es la base del humo.                                                            |
-| `RENDER_API_DEPLOY_HOOK`         | Render → `partops-api` → Settings → Deploy Hook | Un hook por servicio; cruzarlos despliega lo viejo.                             |
-| `RENDER_WEB_DEPLOY_HOOK`         | Render → `partops-web` → Settings → Deploy Hook | Igual.                                                                          |
+| Dato                             | Tipo     | De dónde sale                                   | Ojo                                                                             |
+| -------------------------------- | -------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| `PRODUCTION_DIRECT_DATABASE_URL` | secreto  | Neon → Connection string, rol **dueño**         | No el rol de la app: las migraciones crean tablas y políticas y fallan con RLS. |
+| `PRODUCTION_API_URL`             | variable | `https://api.partops.autos`                     | Sin `/api` al final; el workflow lo añade.                                      |
+| `PRODUCTION_WEB_URL`             | variable | `https://app.partops.autos`                     | Es la base del humo.                                                            |
+| `RENDER_API_DEPLOY_HOOK`         | secreto  | Render → `partops-api` → Settings → Deploy Hook | Un hook por servicio; cruzarlos despliega lo viejo.                             |
+| `RENDER_WEB_DEPLOY_HOOK`         | secreto  | Render → `partops-web` → Settings → Deploy Hook | Igual.                                                                          |
 
 **Probar sin migrar** (lo más seguro la primera vez):
 

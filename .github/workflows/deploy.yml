@@ -37,11 +37,15 @@ permissions:
   contents: read
 
 jobs:
-  # Puerta de entrada: comprobar los secretos **antes** de tocar la base.
+  # Puerta de entrada: comprobar la configuración **antes** de tocar la base.
   #
-  # Sin esto, un secreto faltante se descubre a la mitad del despliegue: la migración ya corrió, la
+  # Sin esto, un valor faltante se descubre a la mitad del despliegue: la migración ya corrió, la
   # API ya se disparó y el fallo aparece como un `curl` con 403 que no dice qué falta. Aquí se
   # incumple una regla de dinero: una migración sin despliegue deja el esquema adelante del código.
+  #
+  # Dos clases de dato, a propósito:
+  #   · `vars.*`  → URLs públicas. No son secretas y se pueden leer en el log y en el repo.
+  #   · `secrets.*` → cadena de conexión y hooks. Un hook es una credencial: quien lo tiene despliega.
   preflight:
     runs-on: ubuntu-latest
     timeout-minutes: 3
@@ -49,22 +53,22 @@ jobs:
     outputs:
       ok: ${{ steps.check.outputs.ok }}
     steps:
-      - name: Revisar secretos requeridos
+      - name: Revisar configuración requerida
         id: check
         env:
           DIRECT_DATABASE_URL: ${{ secrets.PRODUCTION_DIRECT_DATABASE_URL }}
-          API_URL: ${{ secrets.PRODUCTION_API_URL }}
-          WEB_URL: ${{ secrets.PRODUCTION_WEB_URL }}
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
+          WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
           API_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
           WEB_HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
         run: |
           set -uo pipefail
           missing=()
-          [ -n "$DIRECT_DATABASE_URL" ] || missing+=("PRODUCTION_DIRECT_DATABASE_URL")
-          [ -n "$API_URL" ]             || missing+=("PRODUCTION_API_URL")
-          [ -n "$WEB_URL" ]             || missing+=("PRODUCTION_WEB_URL")
-          [ -n "$API_HOOK" ]            || missing+=("RENDER_API_DEPLOY_HOOK")
-          [ -n "$WEB_HOOK" ]            || missing+=("RENDER_WEB_DEPLOY_HOOK")
+          [ -n "$DIRECT_DATABASE_URL" ] || missing+=("secreto PRODUCTION_DIRECT_DATABASE_URL")
+          [ -n "$API_URL" ]             || missing+=("variable PRODUCTION_API_URL")
+          [ -n "$WEB_URL" ]             || missing+=("variable PRODUCTION_WEB_URL")
+          [ -n "$API_HOOK" ]            || missing+=("secreto RENDER_API_DEPLOY_HOOK")
+          [ -n "$WEB_HOOK" ]            || missing+=("secreto RENDER_WEB_DEPLOY_HOOK")
 
           # `is_missing` consulta el array sin expandirlo vacío (bash con `nounset` lo odia).
           is_missing() {
@@ -76,22 +80,23 @@ jobs:
           }
 
           {
-            echo "### Secretos de despliegue"
+            echo "### Configuración del despliegue"
             echo ""
-            echo "| Secreto | Estado |"
-            echo "| --- | --- |"
-            for name in PRODUCTION_DIRECT_DATABASE_URL PRODUCTION_API_URL PRODUCTION_WEB_URL \
-                        RENDER_API_DEPLOY_HOOK RENDER_WEB_DEPLOY_HOOK; do
+            echo "| Dato | Tipo | Estado |"
+            echo "| --- | --- | --- |"
+            for name in "secreto PRODUCTION_DIRECT_DATABASE_URL" "variable PRODUCTION_API_URL" \
+                        "variable PRODUCTION_WEB_URL" "secreto RENDER_API_DEPLOY_HOOK" \
+                        "secreto RENDER_WEB_DEPLOY_HOOK"; do
               if is_missing "$name"; then
-                echo "| \`$name\` | ❌ falta |"
+                echo "| \`${name#* }\` | ${name%% *} | ❌ falta |"
               else
-                echo "| \`$name\` | ✅ |"
+                echo "| \`${name#* }\` | ${name%% *} | ✅ |"
               fi
             done
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ ${#missing[@]} -gt 0 ]; then
-            echo "::error::Faltan ${#missing[@]} secretos en el entorno 'production': ${missing[*]}. Ver RUNBOOK.md § 8 · El despliegue automático no corre."
+            echo "::error::Falta configuración del entorno 'production': ${missing[*]}. Ver RUNBOOK.md § 8 · El despliegue automático no corre."
             echo "ok=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
@@ -139,7 +144,7 @@ jobs:
       # ── 3 · Esperar el SHA ───────────────────────────────────────────────────
       - name: Esperar a que la API sirva este commit
         env:
-          API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          API_URL: ${{ vars.PRODUCTION_API_URL }}
           SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
@@ -161,7 +166,7 @@ jobs:
       - name: Desplegar la web
         env:
           HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
-          WEB_URL: ${{ secrets.PRODUCTION_WEB_URL }}
+          WEB_URL: ${{ vars.PRODUCTION_WEB_URL }}
           SHA: ${{ github.sha }}
         run: |
           if [ -z "$HOOK" ]; then
@@ -190,8 +195,8 @@ jobs:
       # ── 5 · Humo ─────────────────────────────────────────────────────────────
       - name: Humo de producción
         env:
-          SMOKE_BASE_URL: ${{ secrets.PRODUCTION_WEB_URL }}
-          SMOKE_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+          SMOKE_BASE_URL: ${{ vars.PRODUCTION_WEB_URL }}
+          SMOKE_API_URL: ${{ vars.PRODUCTION_API_URL }}
           SMOKE_EXPECTED_COMMIT: ${{ github.sha }}
         run: node scripts/smoke-api.mjs
 
