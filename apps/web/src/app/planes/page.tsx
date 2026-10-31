@@ -1,4 +1,4 @@
-import { formatMoney, PLANS, type PlanTier } from '@partops/contracts';
+import { formatMoney, MULTI_LOCATION_PRICE_CENTS, PLANS, type PlanTier } from '@partops/contracts';
 import Link from 'next/link';
 import { SiteFooter, SiteHeader } from '../_landing/sections';
 
@@ -176,6 +176,11 @@ export default function PlanesPage() {
             ¿Varios locales con inventario separado? Hoy el sistema atiende una bodega con varias ubicaciones
             internas. La cuenta para cadenas con catálogos independientes está en diseño; si la necesitas,
             escríbenos y la conversamos antes de prometerte algo que no existe.
+          </p>
+          <p className="mt-3 text-[12.5px] leading-relaxed text-[var(--foreground-muted)]">
+            Cuando esa cuenta exista, su precio será de {formatMoney(MULTI_LOCATION_PRICE_CENTS, 'GTQ')} al
+            mes. Hoy no se ofrece: el producto todavía no separa catálogos por sucursal, y cobrarlo antes de
+            entregarlo sería vender lo que no hay.
           </p>
           <p className="mt-5 text-[13px]">
             <a

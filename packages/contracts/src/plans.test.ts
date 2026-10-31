@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { nextPlan, PLANS, planSpec, usageLabel } from './plans.js';
+import { MULTI_LOCATION_PRICE_CENTS, nextPlan, PLANS, planSpec, usageLabel } from './plans.js';
+import { PLAN_TIERS } from './platform.js';
 
 describe('planes', () => {
   it('el gratis es cero y los de pago suben en orden', () => {
@@ -46,5 +47,16 @@ describe('planes', () => {
     expect(usageLabel(1420, 2000, 'piezas')).toBe('1,420 de 2,000 piezas');
     expect(usageLabel(0, 150, 'piezas')).toBe('0 de 150 piezas');
     expect(usageLabel(1420, null, 'piezas')).toBe('1,420 piezas · sin tope');
+  });
+
+  /**
+   * El precio multi-sucursal está anunciado en `/planes` como «cuando exista». No es un plan y no
+   * debe confundirse con uno: si alguien lo metiera en `PLANS` sin el modelo que lo sostiene, la
+   * página cobraría un catálogo separado por sucursal que el código no entrega.
+   */
+  it('el precio multi-sucursal se anuncia por encima de Cadena y no es un tier', () => {
+    expect(MULTI_LOCATION_PRICE_CENTS).toBeGreaterThan(PLANS.TALLER.priceCentsPerMonth);
+    expect(PLAN_TIERS).toHaveLength(3);
+    expect(PLAN_TIERS).not.toContain('MULTI_SUCURSAL' as never);
   });
 });

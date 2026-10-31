@@ -99,6 +99,16 @@ export const PLANS: Record<PlanTier, PlanSpec> = {
   },
 };
 
+/**
+ * El precio de la cuenta multi-sucursal, cuando exista.
+ *
+ * No es un plan: no hay tier, no se puede conceder y el código no lo hace cumplir porque el modelo
+ * todavía no separa catálogos por sucursal. Vive aquí como constante para que el número que se
+ * anuncia en `/planes` sea el mismo que se cobrará, y para que no aparezca escrito a mano en dos
+ * sitios que luego se contradicen.
+ */
+export const MULTI_LOCATION_PRICE_CENTS = 79_900;
+
 /** Tier desconocido o nulo cae en FREE: un plan vencido nunca deja al negocio sin producto. */
 export function planSpec(tier: string | null | undefined): PlanSpec {
   const found = PLAN_TIERS.find((t) => t === tier);

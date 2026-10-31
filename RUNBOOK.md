@@ -1,8 +1,9 @@
 # Runbook
 
-Cinco cosas que se rompen. Cada una con cómo se detecta, qué se hace y cómo se confirma que quedó.
+Lo que se rompe en producción, con cómo se detecta, qué se hace y cómo se confirma que quedó.
 En ese orden: el error común es arreglar sin haber confirmado el síntoma y sin haber comprobado que
-de verdad se resolvió.
+de verdad se resolvió. La introducción dice «cinco» porque eran cinco; hoy son ocho, y las tres
+últimas —correo, despliegue automático y cambio de CDN— son las que más se van a usar el primer mes.
 
 Antes de tocar nada: **anotar la hora y qué se vio**. Un incidente sin línea de tiempo se repite.
 
