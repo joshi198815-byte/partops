@@ -1,0 +1,33 @@
+{
+  "name": "@partops/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cáscara Android de PartOps (Capacitor). La app carga la web publicada; sin conexión muestra un respaldo local.",
+  "scripts": {
+    "shell": "node scripts/build-mobile-shell.mjs",
+    "assets": "node scripts/sync-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "sync": "node scripts/build-mobile-shell.mjs && cap sync android",
+    "open": "cap open android",
+    "add:android": "cap add android",
+    "build:apk": "node scripts/build-mobile-shell.mjs && cap sync android && cd android && gradlew.bat assembleRelease -PversionName=%npm_package_version%",
+    "build:apk:unix": "node scripts/build-mobile-shell.mjs && cap sync android && cd android && ./gradlew assembleRelease -PversionName=$npm_package_version"
+  },
+  "dependencies": {
+    "@capacitor-mlkit/barcode-scanning": "^8.2.1",
+    "@capacitor-community/keep-awake": "^8.0.1",
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/camera": "^8.0.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@types/node": "^22.15.0",
+    "typescript": "5.9.3"
+  }
+}

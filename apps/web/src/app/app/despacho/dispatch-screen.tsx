@@ -12,9 +12,11 @@ import {
 import { Alert, Button, CodeChip, EmptyState, StatTile } from '@partops/ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
+import { vibrateShort } from '@/lib/native';
 import { type CueTone, playCue, primeAudio, subscribePush, vibrate } from '@/lib/notifications';
 import { cacheQueue, enqueue, flush, newOpId, pendingCount, readCachedQueue } from '@/lib/outbox';
 import { type ConnectionState, useRealtime } from '@/lib/realtime';
+import { canScan, scanCode } from '@/lib/scanner';
 
 /**
  * Despacho.
@@ -511,6 +513,14 @@ function OrderCard({
   const [code, setCode] = useState('');
   const [missed, setMissed] = useState<DispatchLine | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
+  // `canScan()` consulta el aparato; se evalúa hasta el montaje para no romper el render del
+  // servidor, donde `window` no existe.
+  const [scanner, setScanner] = useState(false);
+
+  useEffect(() => {
+    setScanner(canScan());
+  }, []);
 
   const next = order.lines.find((l) => l.status !== 'LISTO');
 
@@ -539,10 +549,32 @@ function OrderCard({
       return;
     }
 
+    // Vibración nativa además del tono: en una bodega ruidosa el pitido no se oye y el bodeguero
+    // tiene la vista en el estante, no en la pantalla. En web esto no hace nada.
+    void vibrateShort();
     onMark(order, match, 'LISTO', scanned);
     setFlash(`${match.sku} listo`);
     setTimeout(() => setFlash(null), 2200);
     scanRef?.current?.focus();
+  }
+
+  /**
+   * Abre la cámara del teléfono y escanea.
+   *
+   * El resultado entra por el mismo `onScan` que el tecleo y el lector Bluetooth: una sola ruta de
+   * validación. Si la cámara falla o se cancela, el campo recupera el foco en vez de quedarse
+   * mudo esperando.
+   */
+  async function onCameraScan() {
+    setScanning(true);
+    try {
+      const value = await scanCode();
+      if (value) onScan(value);
+      else setFlash('No se leyó ningún código');
+    } finally {
+      setScanning(false);
+      scanRef?.current?.focus();
+    }
   }
 
   return (
@@ -617,6 +649,19 @@ function OrderCard({
                 <Button size="lg" onClick={() => onScan(code)}>
                   Listo
                 </Button>
+                {scanner ? (
+                  // Solo aparece donde hay cámara que lea códigos. Un botón que no responde es
+                  // peor que no tener botón: el bodeguero lo toca y cree que la app falló.
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    onClick={() => void onCameraScan()}
+                    disabled={scanning}
+                    aria-label="Escanear con la cámara"
+                  >
+                    {scanning ? '…' : 'Cámara'}
+                  </Button>
+                ) : null}
               </div>
               <div className="mt-1.5 flex items-center justify-between gap-2">
                 <p className="text-[11.5px] text-[var(--foreground-muted)]">

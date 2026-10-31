@@ -14,6 +14,7 @@ import type { z } from 'zod';
 import type { AuthedRequest, Ctx } from '../../common/context.js';
 import { CurrentCtx, RequirePermissions } from '../../common/context.js';
 import { ZodBody, ZodQuery } from '../../common/zod.js';
+import { FcmService } from '../../infra/fcm.service.js';
 import { PushService } from '../../infra/push.service.js';
 import { RealtimeService } from '../../infra/realtime.service.js';
 import { DispatchService } from './dispatch.service.js';
@@ -74,6 +75,7 @@ export class RealtimeController {
   constructor(
     @Inject(RealtimeService) private readonly realtime: RealtimeService,
     @Inject(PushService) private readonly push: PushService,
+    @Inject(FcmService) private readonly fcm: FcmService,
   ) {}
 
   @Get('ticket')
@@ -96,7 +98,8 @@ export class RealtimeController {
   @Get('push/key')
   @RequirePermissions('orders.dispatch')
   pushKey() {
-    return { key: this.push.publicKey };
+    // `fcm` le dice al APK si puede pedir token. En web basta `key`: un navegador no usa Firebase.
+    return { key: this.push.publicKey, fcm: this.fcm.available };
   }
 
   /** Suscribe este aparato. */
@@ -112,6 +115,7 @@ export class RealtimeController {
       tenantId: ctx.tenant.tenantId,
       userId: ctx.user.id,
       token: body.endpoint,
+      platform: body.platform,
       p256dh: body.keys?.p256dh ?? null,
       auth: body.keys?.auth ?? null,
       userAgent: req.headers['user-agent'] ?? null,

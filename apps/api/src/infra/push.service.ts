@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import webpush from 'web-push';
 import { env } from '../config/env.js';
 import { DatabaseService } from './database.module.js';
+import { FcmService } from './fcm.service.js';
 
 /**
  * Avisos al teléfono cuando el socket no está.
@@ -11,8 +12,13 @@ import { DatabaseService } from './database.module.js';
  * pestaña está en segundo plano o la señal se cayó entre estanterías. Mandar push siempre gastaría
  * batería y cuota de notificaciones para algo que el usuario ya está viendo.
  *
- * Las llaves VAPID se generan una vez y se guardan en el entorno. Sin ellas Web Push no existe y el
- * servicio se apaga solo: el despacho sigue funcionando, solo se pierde el aviso fuera de pantalla.
+ * Dos transportes, una sola tabla: `push_token.platform` dice por dónde sale cada fila.
+ *
+ *  - `web` → Web Push con VAPID. Funciona sin instalar nada, con la PWA abierta en Chrome.
+ *  - `fcm` → Firebase, para el APK con la app **cerrada**. Web Push no despierta una app nativa.
+ *
+ * Cada transporte se apaga solo si le faltan sus llaves: un despliegue sin Firebase sigue avisando
+ * al navegador, y uno sin VAPID sigue avisando al teléfono.
  */
 
 export interface PushPayload {
@@ -37,7 +43,10 @@ export class PushService {
   private readonly logger = new Logger(PushService.name);
   private readonly enabled: boolean;
 
-  constructor(@Inject(DatabaseService) private readonly db: DatabaseService) {
+  constructor(
+    @Inject(DatabaseService) private readonly db: DatabaseService,
+    @Inject(FcmService) private readonly fcm: FcmService,
+  ) {
     const publicKey = process.env.VAPID_PUBLIC_KEY?.trim();
     const privateKey = process.env.VAPID_PRIVATE_KEY?.trim();
     const defaultSubject = `mailto:${env.MAIL_FROM.match(/<([^>]+)>/)?.[1] ?? 'partopsgt@gmail.com'}`;
@@ -50,7 +59,7 @@ export class PushService {
   }
 
   get available(): boolean {
-    return this.enabled;
+    return this.enabled || this.fcm.available;
   }
 
   /** Clave pública que el navegador necesita para suscribirse. `null` = avisos apagados. */
@@ -69,10 +78,15 @@ export class PushService {
     tenantId: string;
     userId: string;
     token: string;
+    platform?: 'web' | 'fcm';
     p256dh?: string | null;
     auth?: string | null;
     userAgent?: string | null;
   }) {
+    const platform = args.platform ?? 'web';
+    // Una fila `web` sin claves no puede entregarse nunca; una `fcm` no las usa. Se guardan como
+    // nulas en ambos casos y se filtra al enviar, en vez de rechazar la suscripción y dejar al
+    // bodeguero sin avisos.
     await this.db.system(async (tx) => {
       await tx.pushToken.upsert({
         where: { token: args.token },
@@ -80,7 +94,7 @@ export class PushService {
           tenantId: args.tenantId,
           userId: args.userId,
           token: args.token,
-          platform: 'web',
+          platform,
           p256dh: args.p256dh ?? null,
           auth: args.auth ?? null,
           userAgent: args.userAgent?.slice(0, 300) ?? null,
@@ -88,6 +102,7 @@ export class PushService {
         update: {
           tenantId: args.tenantId,
           userId: args.userId,
+          platform,
           p256dh: args.p256dh ?? null,
           auth: args.auth ?? null,
           userAgent: args.userAgent?.slice(0, 300) ?? null,
@@ -110,11 +125,13 @@ export class PushService {
    * tiene que recibir el aviso igual que el bodeguero de fábrica.
    */
   async notifyWarehouse(tenantId: string, warehouseId: string, payload: PushPayload): Promise<PushResult> {
-    if (!this.enabled) return { sent: 0, failed: 0, removed: 0 };
+    if (!this.available) return { sent: 0, failed: 0, removed: 0 };
 
     const recipients = await this.db.system(async (tx) => {
-      const rows = await tx.$queryRaw<Array<{ token: string; p256dh: string | null; auth: string | null }>>`
-        SELECT DISTINCT p."token", p."p256dh", p."auth"
+      const rows = await tx.$queryRaw<
+        Array<{ token: string; platform: string; p256dh: string | null; auth: string | null }>
+      >`
+        SELECT DISTINCT p."token", p."platform", p."p256dh", p."auth"
         FROM "push_token" p
         JOIN "member" m ON m."userId" = p."userId" AND m."tenantId" = p."tenantId" AND m."isActive"
         JOIN "role" r ON r."id" = m."roleId"
@@ -131,7 +148,20 @@ export class PushService {
 
     await Promise.all(
       recipients.map(async (row) => {
-        if (!row.p256dh || !row.auth) return;
+        // Cada aparato sale por su transporte. Una fila `fcm` sin claves VAPID es normal; una `web`
+        // sin ellas está rota y se salta sin marcar fallo, porque reintentar no la va a arreglar.
+        if (row.platform === 'fcm') {
+          if (!this.fcm.available) return;
+          const outcome = await this.fcm.send(row.token, payload);
+          if (outcome === 'ok') sent += 1;
+          else if (outcome === 'gone') {
+            removed += 1;
+            await this.fcm.removeToken(row.token);
+          } else failed += 1;
+          return;
+        }
+
+        if (!this.enabled || !row.p256dh || !row.auth) return;
         try {
           await webpush.sendNotification(
             { endpoint: row.token, keys: { p256dh: row.p256dh, auth: row.auth } },

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es-GT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex" />
+    <title>Sin conexión · PartOps</title>
+    <style>
+      /* Fondo claro de bodega, no el azul del cargador: aquí ya se sabe que algo falló y el
+         contraste alto ayuda a leer el aviso en un pasillo mal iluminado. */
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #f7f5f1;
+        color: #16324f;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 28px 22px;
+        text-align: center;
+        max-width: 380px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+      .mark {
+        width: 44px;
+        height: 44px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 19px;
+        line-height: 1.25;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 0;
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: #4a5b68;
+      }
+      .note {
+        border-top: 1px solid #ddd8cf;
+        padding-top: 14px;
+        font-size: 12.5px;
+        color: #6b7783;
+      }
+      button {
+        appearance: none;
+        width: 100%;
+        min-height: 46px;
+        border: 0;
+        border-radius: 6px;
+        background: #16324f;
+        color: #f7f5f1;
+        font: inherit;
+        font-size: 14.5px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:active {
+        background: #0e2233;
+      }
+      button[disabled] {
+        opacity: 0.5;
+        cursor: progress;
+      }
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background: #0e2233;
+          color: #f7f5f1;
+        }
+        p {
+          color: #b8c2ca;
+        }
+        .note {
+          border-top-color: #1f3a52;
+          color: #8fa0ad;
+        }
+        button {
+          background: #b4703a;
+          color: #12181c;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <svg class="mark" viewBox="0 0 48 48" role="img" aria-label="PartOps">
+        <path
+          d="M24 5.6 L39.9 14.8 L39.9 33.2 L24 42.4 L8.1 33.2 L8.1 14.8 Z"
+          fill="#16324F"
+        />
+        <path d="M39.9 33.2 L24 42.4 L28.2 29.4 Z" fill="#B4703A" />
+        <path d="M24 18.4 L31 22.4 L31 30.4 L24 34.4 L17 30.4 L17 22.4 Z" fill="#F7F5F1" />
+      </svg>
+
+      <h1>Sin conexión con la bodega</h1>
+      <p>
+        No pudimos alcanzar el servidor. Revisa que el teléfono tenga datos o wifi y vuelve a
+        intentar.
+      </p>
+
+      <button id="retry" type="button">Reintentar</button>
+
+      <p class="note">
+        Lo que alcances a guardar en el teléfono se envía solo cuando vuelva la señal. No cierres la
+        aplicación desde «recientes» hasta que veas la confirmación.
+      </p>
+    </main>
+
+    <script>
+      // Reintento manual con espera visible.
+      //
+      // Comprobar la red en el cliente no basta —`navigator.onLine` miente con wifi de bodega que
+      // tiene señal pero no salida— así que se pide lo mismo que al arrancar y se deja que el
+      // cargador decida, incluido su respaldo por tiempo.
+      var button = document.getElementById('retry');
+      var target = '__SERVER_URL__';
+
+      button.addEventListener('click', () => {
+        button.disabled = true;
+        button.textContent = 'Probando…';
+
+        var timer = setTimeout(() => {
+          button.disabled = false;
+          button.textContent = 'Reintentar';
+        }, 6000);
+
+        fetch(`${target}/health/live`, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
+          .then(() => {
+            clearTimeout(timer);
+            location.replace('index.html');
+          })
+          .catch(() => {
+            clearTimeout(timer);
+            button.disabled = false;
+            button.textContent = 'Sigue sin conexión · Reintentar';
+          });
+      });
+    </script>
+  </body>
+</html>

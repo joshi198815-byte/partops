@@ -20,11 +20,18 @@ Thumbs.db
 
 # Android / Capacitor
 apps/mobile/android/app/build/
+apps/mobile/android/build/
 apps/mobile/android/.gradle/
 apps/mobile/android/local.properties
+apps/mobile/android/.idea/
 apps/mobile/.capacitor/
+# HTML generado desde las plantillas (`pnpm --filter @partops/mobile shell`).
+apps/mobile/www/index.html
+apps/mobile/www/offline.html
+apps/mobile/www/build-info.json
 *.keystore
 *.jks
+*.aab
 
 # Artefactos de respaldo y claves
 *.pem

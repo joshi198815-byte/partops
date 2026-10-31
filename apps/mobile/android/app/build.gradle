@@ -1,0 +1,85 @@
+apply plugin: 'com.android.application'
+
+/**
+ * Firma de release.
+ *
+ * El keystore **no va en el repo** (`*.keystore` y `*.jks` están en `.gitignore`). Se lee de
+ * `keystore.properties`, que en CI se escribe desde secretos y en una máquina de desarrollo se copia
+ * a mano una vez. Sin ese archivo, `assembleRelease` produce un APK sin firmar en vez de fallar:
+ * quien solo quiere probar la cáscara en su teléfono no necesita llaves.
+ */
+def keystoreProperties = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystoreFile))
+}
+
+android {
+    namespace = "gt.partops.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "gt.partops.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // El CI pasa `-PversionName`/`-PversionCode` desde el tag. Sin ellos, los valores del
+        // scaffold: sirven para probar en un teléfono, no para publicar.
+        versionCode project.hasProperty('versionCode') ? project.versionCode.toInteger() : 1
+        versionName project.hasProperty('versionName') ? project.versionName : "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    signingConfigs {
+        release {
+            if (keystoreProperties['storeFile']) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+    // Se asigna después de declarar el bloque: dentro de `buildTypes` la referencia todavía no
+    // existe y Gradle falla con «Could not get unknown property».
+    if (keystoreProperties['storeFile']) {
+        buildTypes.release.signingConfig = signingConfigs.release
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

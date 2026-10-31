@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from './api';
+import { isNative, registerPush } from './native';
 
 /**
  * Avisos del navegador.
@@ -27,6 +28,17 @@ function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
 }
 
 export async function pushState(): Promise<PushState> {
+  // En el APK el permiso y el token los maneja FCM, no el Service Worker. Se pregunta al servidor
+  // si tiene Firebase configurado; si no, ofrecer «activar avisos» sería una promesa vacía.
+  if (isNative()) {
+    try {
+      const res = await api<{ fcm: boolean }>('/api/realtime/push/key');
+      return res.fcm ? 'activo' : 'sin-servidor';
+    } catch {
+      return 'sin-servidor';
+    }
+  }
+
   if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
     return 'no-soportado';
   }
@@ -53,8 +65,25 @@ export async function pushState(): Promise<PushState> {
  *
  * Debe llamarse desde un `onClick`: Chrome exige un gesto del usuario y, si se pide en el arranque,
  * marca el origen como "no molestar" para siempre.
+ *
+ * En el APK no hay Service Worker: se pide el token a FCM y se manda por el mismo endpoint con
+ * `platform: 'fcm'`. Un solo contrato en el servidor, dos formas de conseguir la dirección.
  */
 export async function subscribePush(): Promise<PushState> {
+  if (isNative()) {
+    const token = await registerPush();
+    if (!token) return 'denegado';
+    try {
+      await api('/api/realtime/push/subscribe', {
+        method: 'POST',
+        body: { endpoint: token, platform: 'fcm' },
+      });
+      return 'activo';
+    } catch {
+      return 'sin-servidor';
+    }
+  }
+
   if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
     return 'no-soportado';
   }

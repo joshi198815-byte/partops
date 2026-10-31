@@ -5,6 +5,8 @@ import { formatMoney } from '@partops/contracts';
 import { Alert, Button, CodeChip, EmptyState, StockPill } from '@partops/ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
+import { vibrateShort } from '@/lib/native';
+import { canScan, scanCode } from '@/lib/scanner';
 
 interface ScreenProps {
   canSeeDemand: boolean;
@@ -33,6 +35,13 @@ export function SearchScreen({ canSeeDemand, canSeeCost }: ScreenProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [scanner, setScanner] = useState(false);
+  const [scanning, setScanning] = useState(false);
+
+  // El aparato se consulta al montar, no en el render: en el servidor no hay `window`.
+  useEffect(() => {
+    setScanner(canScan());
+  }, []);
 
   // Cada consulta lleva el número de la última pedida: si llega una respuesta vieja después de
   // una nueva, se descarta. Sin esto, escribir rápido deja en pantalla el resultado de "capo"
@@ -100,11 +109,54 @@ export function SearchScreen({ canSeeDemand, canSeeCost }: ScreenProps) {
           aria-label="Buscar pieza"
           spellCheck={false}
           autoComplete="off"
-          className="h-12 w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] pl-3.5 pr-24 text-[15px] text-[var(--foreground)] placeholder:text-[var(--foreground-muted)]"
+          className={`h-12 w-full rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] pl-3.5 text-[15px] text-[var(--foreground)] placeholder:text-[var(--foreground-muted)] ${
+            scanner ? 'pr-40' : 'pr-24'
+          }`}
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] uppercase tracking-wide text-[var(--foreground-muted)]">
-          {loading ? 'Buscando…' : data ? `${data.total} ${data.total === 1 ? 'pieza' : 'piezas'}` : ''}
-        </span>
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+          <span className="text-[11px] uppercase tracking-wide text-[var(--foreground-muted)]">
+            {loading ? 'Buscando…' : data ? `${data.total} ${data.total === 1 ? 'pieza' : 'piezas'}` : ''}
+          </span>
+          {scanner ? (
+            // Rellenar `q` con el código leído es la misma ruta que teclearlo: el vendedor puede
+            // corregir lo que el escáner leyó mal, cosa que un "buscar y navegar" no permite.
+            <button
+              type="button"
+              disabled={scanning}
+              aria-label="Escanear código con la cámara"
+              onClick={async () => {
+                setScanning(true);
+                try {
+                  const value = await scanCode();
+                  if (value) {
+                    void vibrateShort();
+                    setQ(value);
+                  }
+                } finally {
+                  setScanning(false);
+                  inputRef.current?.focus();
+                }
+              }}
+              className="flex size-9 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground-muted)] hover:bg-[var(--surface-sunken)] hover:text-[var(--foreground)] disabled:opacity-40"
+            >
+              {scanning ? (
+                <span className="text-[11px]">…</span>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                  className="size-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                >
+                  <path d="M4 8V6a2 2 0 0 1 2-2h2M20 8V6a2 2 0 0 0-2-2h-2M4 16v2a2 2 0 0 0 2 2h2M20 16v2a2 2 0 0 1-2 2h-2" />
+                  <path d="M3 12h18" />
+                </svg>
+              )}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {!searched ? (

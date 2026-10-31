@@ -1,0 +1,126 @@
+name: Android
+
+# APK firmado por tag. Un tag `v0.2.0` publica el binario en GitHub Releases, que es de donde el
+# dueño de la bodega lo descarga y lo pasa por WhatsApp a su encargado. No hay Play Store en v1.
+on:
+  push:
+    tags: ["v*"]
+  # Botón manual para probar la firma sin publicar una versión: el trabajo de release se salta y
+  # solo se sube el artefacto.
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.0.9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # El número de versión del APK sale del tag: `v0.2.0` → `versionName 0.2.0` y `versionCode 2`.
+      # Android rechaza reinstalar si el `versionCode` no sube, así que derivarlo del tag evita el
+      # error «app no instalada» que nadie asocia con el empaquetado.
+      - name: Versión desde el tag
+        id: ver
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then TAG="0.0.0-dev"; fi
+          MAJOR=$(echo "$TAG" | cut -d. -f1)
+          MINOR=$(echo "$TAG" | cut -d. -f2)
+          PATCH=$(echo "$TAG" | cut -d. -f3)
+          CODE=$(( (${MAJOR:-0} * 10000) + (${MINOR:-0} * 100) + ${PATCH:-0} ))
+          echo "name=$TAG" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+
+      # El keystore nunca entra al repo. Se reconstruye desde un secreto en base64 y se borra al
+      # terminar el trabajo; el runner es efímero, pero un `cat` accidental en un log lo publicaría.
+      - name: Keystore
+        if: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > apps/mobile/android/release.keystore
+          cat > apps/mobile/android/keystore.properties <<EOF
+          storeFile=../release.keystore
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+
+      # Sin `google-services.json` la app compila igual, solo que sin push. No se hace fallar el
+      # trabajo: un APK sin notificaciones sigue sirviendo para despachar.
+      - name: Google Services (FCM)
+        if: ${{ secrets.FCM_GOOGLE_SERVICES_B64 != '' }}
+        env:
+          FCM_GOOGLE_SERVICES_B64: ${{ secrets.FCM_GOOGLE_SERVICES_B64 }}
+        run: echo "$FCM_GOOGLE_SERVICES_B64" | base64 -d > apps/mobile/android/app/google-services.json
+
+      - name: Sincronizar cáscara y assets
+        working-directory: apps/mobile
+        run: |
+          node scripts/build-mobile-shell.mjs
+          node scripts/sync-assets.mjs
+          npx cap sync android
+
+      - name: Compilar APK
+        working-directory: apps/mobile/android
+        env:
+          VERSION_NAME: ${{ steps.ver.outputs.name }}
+          VERSION_CODE: ${{ steps.ver.outputs.code }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon \
+            -PversionName="$VERSION_NAME" -PversionCode="$VERSION_CODE"
+
+      - name: Limpiar llaves
+        if: always()
+        run: rm -f apps/mobile/android/release.keystore apps/mobile/android/keystore.properties
+
+      - name: Renombrar artefacto
+        run: |
+          mkdir -p dist
+          cp apps/mobile/android/app/build/outputs/apk/release/app-release.apk \
+            "dist/PartOps-${{ steps.ver.outputs.name }}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: partops-apk
+          path: dist/*.apk
+          retention-days: 30
+
+      - name: Publicar en el release del tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --title "PartOps $GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" dist/*.apk --clobber

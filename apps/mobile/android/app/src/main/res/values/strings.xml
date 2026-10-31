@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PartOps</string>
+    <string name="title_activity_main">PartOps</string>
+    <string name="package_name">gt.partops.app</string>
+    <string name="custom_url_scheme">gt.partops.app</string>
+</resources>

@@ -323,10 +323,19 @@ export const pushSubscribeSchema = z.object({
       auth: z.string().max(100).optional(),
     })
     .optional(),
+  /**
+   * Transporte del aparato. `web` es la PWA con Web Push; `fcm` es el APK, que necesita Firebase
+   * para despertar con la app cerrada. Por defecto `web`: una suscripción vieja sin este campo
+   * sigue funcionando igual que antes.
+   *
+   * Un token de FCM es largo (~150–200 caracteres) pero no es una URL, así que el cliente nativo
+   * llama a este mismo endpoint con `endpoint: <token>` para no duplicar contrato.
+   */
+  platform: z.enum(['web', 'fcm']).default('web'),
 });
 export type PushSubscribeData = z.output<typeof pushSubscribeSchema>;
 
-export const pushUnsubscribeSchema = z.object({ endpoint: z.string().url().max(1200) });
+export const pushUnsubscribeSchema = z.object({ endpoint: z.string().max(1200) });
 export type PushUnsubscribeData = z.output<typeof pushUnsubscribeSchema>;
 
 /** Lo que devuelve `/api/realtime/ticket`. */

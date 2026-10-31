@@ -5,6 +5,7 @@ import { AuthGuard } from './auth/auth.guard.js';
 import { AuthService } from './auth/auth.service.js';
 import { InvitationController, MeController } from './auth/me.controller.js';
 import { DatabaseModule } from './infra/database.module.js';
+import { FcmService } from './infra/fcm.service.js';
 import { MaintenanceService } from './infra/maintenance.service.js';
 import { PushService } from './infra/push.service.js';
 import { RealtimeGateway } from './infra/realtime.gateway.js';
@@ -104,6 +105,7 @@ import { TeamService } from './modules/team/team.service.js';
     RealtimeService,
     RealtimeGateway,
     PushService,
+    FcmService,
     DispatchNotifier,
     OrdersService,
     DispatchService,

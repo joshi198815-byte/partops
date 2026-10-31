@@ -3,8 +3,9 @@
  *
  * Tres caminos, en orden de calidad:
  *
- *  1. **Nativo (`@capacitor-mlkit/barcode-scanning`)** dentro del APK: enfoca solo, funciona con poca
- *     luz y con etiquetas gastadas. Es el camino real del bodeguero.
+ *  1. **Nativo** (plugin ML Kit dentro del APK): enfoca solo, funciona con poca luz y con etiquetas
+ *     gastadas. Es el camino real del bodeguero, y vive en `native.ts` porque comparte el mismo
+ *     puente que la vibración y el despertar de pantalla.
  *  2. **`BarcodeDetector` del navegador**, donde exista (Chrome en Android). Sin plugins, sin
  *     descargas.
  *  3. **`null`**: no hay cámara disponible. Quien llama debe esconder el botón, no mostrar uno que
@@ -13,6 +14,7 @@
  * Nada de esto lanza: una cámara denegada o un permiso revocado son situaciones normales en una
  * bodega, no errores que deban romper la pantalla.
  */
+import { isNative, nativeScan } from './native';
 
 type BarcodeDetectorLike = {
   detect(source: CanvasImageSource): Promise<Array<{ rawValue: string }>>;
@@ -20,39 +22,7 @@ type BarcodeDetectorLike = {
 
 type BarcodeDetectorCtor = new (options?: { formats?: string[] }) => BarcodeDetectorLike;
 
-interface CapacitorGlobal {
-  isNativePlatform?: () => boolean;
-}
-
-interface ScannerPlugin {
-  scan(): Promise<{ barcodes: Array<{ rawValue?: string; displayValue?: string }> }>;
-}
-
-function capacitor(): CapacitorGlobal | undefined {
-  if (typeof window === 'undefined') return undefined;
-  return (window as unknown as { Capacitor?: CapacitorGlobal }).Capacitor;
-}
-
-/** ¿Estamos dentro del APK? En la web siempre es `false`. */
-export function isNative(): boolean {
-  return capacitor()?.isNativePlatform?.() === true;
-}
-
-/** Plugin nativo, si está instalado. Se importa dinámico para no meterlo en el bundle web. */
-async function nativeScanner(): Promise<ScannerPlugin | null> {
-  if (!isNative()) return null;
-  try {
-    // El especificador va en una variable a propósito: el paquete solo existe dentro del APK y un
-    // import literal haría fallar la compilación de la web, que nunca lo carga.
-    const specifier = '@capacitor-mlkit/barcode-scanning';
-    const mod = (await import(/* @vite-ignore */ specifier)) as unknown as {
-      BarcodeScanner?: ScannerPlugin;
-    };
-    return mod.BarcodeScanner ?? null;
-  } catch {
-    return null;
-  }
-}
+export { isNative };
 
 /** Un fotograma de la cámara trasera, si el navegador sabe leer códigos. */
 async function browserScan(): Promise<string | null> {
@@ -96,16 +66,8 @@ async function browserScan(): Promise<string | null> {
  * consigue que el bodeguero toque un botón que no responde.
  */
 export async function scanCode(): Promise<string | null> {
-  const native = await nativeScanner();
-  if (native) {
-    try {
-      const result = await native.scan();
-      const value = result.barcodes[0]?.rawValue ?? result.barcodes[0]?.displayValue;
-      return value?.trim() || null;
-    } catch {
-      return null;
-    }
-  }
+  const native = await nativeScan();
+  if (native) return native;
   return browserScan();
 }
 

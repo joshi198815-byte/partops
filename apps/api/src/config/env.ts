@@ -41,6 +41,12 @@ const schema = z.object({
   CRON_SECRET: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
 
+  /** Firebase Cloud Messaging. Sin las tres, el push al APK se apaga solo. */
+  FCM_PROJECT_ID: z.string().optional(),
+  FCM_CLIENT_EMAIL: z.string().optional(),
+  /** PEM con `\n` literales: en `.env` un salto de línea real rompe el archivo. */
+  FCM_PRIVATE_KEY: z.string().optional(),
+
   PG_POOL_MAX: z.coerce.number().int().positive().max(100).default(10),
   PROCESS_ROLE: z.enum(['api', 'worker']).default('api'),
 });

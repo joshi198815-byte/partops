@@ -11,6 +11,8 @@ import { canScan, isNative, scanCode } from './scanner';
 describe('scanner', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.doUnmock('./native');
+    vi.resetModules();
   });
 
   it('sin ventana no es nativo y no hay escáner', async () => {
@@ -41,5 +43,19 @@ describe('scanner', () => {
       mediaDevices: { getUserMedia: () => Promise.reject(new Error('NotAllowedError')) },
     });
     await expect(scanCode()).resolves.toBeNull();
+  });
+
+  it('si el camino nativo lee un código, no se abre la cámara del navegador', async () => {
+    // Un solo camino de validación para cámara, lector Bluetooth y tecleo: lo que devuelve el
+    // nativo entra tal cual, sin pasar por `BarcodeDetector`.
+    vi.doMock('./native', async () => {
+      const actual = await vi.importActual<typeof import('./native')>('./native');
+      return { ...actual, nativeScan: vi.fn().mockResolvedValue('TY-100') };
+    });
+    vi.stubGlobal('window', { Capacitor: { isNativePlatform: () => true } });
+    vi.resetModules();
+
+    const fresh = await import('./scanner');
+    await expect(fresh.scanCode()).resolves.toBe('TY-100');
   });
 });

@@ -9,6 +9,8 @@
       "!**/.next",
       "!**/.turbo",
       "!**/generated",
+      "!**/next-env.d.ts",
+      "!**/pnpm-lock.yaml",
       "!**/android",
       "!**/*.plan.md"
     ]
