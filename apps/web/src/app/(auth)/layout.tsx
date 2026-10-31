@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="relative max-w-sm">
           <p className="font-[family-name:var(--font-display)] text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-[var(--color-steel-50)]">
-            Escribe «cubierta corola 2009». Aparece la pieza, el estante y si hay.
+            Escribe «cubierta corolla 2009». Aparece la pieza, el estante y si hay.
           </p>
           <p className="mt-3 text-[13px] leading-relaxed text-[var(--color-steel-300)]">
             El mismo parser que ves en la portada. Existencias por bodega, reservas que vencen en 20 minutos y

@@ -57,7 +57,7 @@ export function Workflow() {
     {
       n: '01',
       title: 'Busca como habla el cliente',
-      body: '“cubierta”, “focos”, “balatas”, “el capó del corola 2009”. Separa pieza, marca, modelo y año sin pedirle al vendedor que traduzca nada.',
+      body: '“cubierta”, “focos”, “balatas”, “el capó del corolla 2009”. Separa pieza, marca, modelo y año sin pedirle al vendedor que traduzca nada.',
     },
     {
       n: '02',

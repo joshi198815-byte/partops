@@ -60,6 +60,10 @@ export default async function HomePage() {
  * Antes había aquí dos cifras grandes («4,812 piezas», «18,940 aplicaciones») que describían un
  * negocio que no existe. Se fueron. Lo que las reemplaza es el demo: la misma frase que el vendedor
  * escucha en el mostrador, partida en cuatro campos por el código que corre en producción.
+ *
+ * El titular escribe «corolla» con dos eles, que es como está en la tabla curada. «corola» también
+ * funciona —el parser la reconoce como errata y la ofrece—, pero el titular no puede empezar
+ * enseñando un error como si fuera lo correcto.
  */
 function Hero({ vocabulary }: { vocabulary: VehicleVocabulary | null }) {
   return (
@@ -75,7 +79,7 @@ function Hero({ vocabulary }: { vocabulary: VehicleVocabulary | null }) {
           </p>
 
           <h1 className="mt-5 font-[family-name:var(--font-display)] text-[clamp(2.1rem,4.6vw,3.35rem)] font-extrabold leading-[1.03] tracking-[-0.028em] text-[var(--foreground)]">
-            Escribe «cubierta corola 2009».
+            Escribe «cubierta corolla 2009».
             <br />
             <span className="text-[var(--color-copper-700)]">Aparece la pieza, el estante y si hay.</span>
           </h1>

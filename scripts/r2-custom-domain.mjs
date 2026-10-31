@@ -128,7 +128,7 @@ if (state !== 'active') {
 }
 
 console.log(`\n✓ ${DOMAIN} activo.`);
-console.log('  Siguiente paso: R2_PUBLIC_URL=https://' + DOMAIN + ' en el servicio de la API (Render).');
+console.log(`  Siguiente paso: R2_PUBLIC_URL=https://${DOMAIN} en el servicio de la API (Render).`);
 console.log(
   '  Deja `pub-*.r2.dev` activo una semana: las URLs ya guardadas en la base siguen saliendo por ahí.',
 );

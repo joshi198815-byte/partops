@@ -94,6 +94,18 @@ describe('parsePartQuery', () => {
     expect(r.term).toBe('capo');
   });
 
+  /**
+   * La corrección se ofrece, no se aplica sola. Pero quien la acepte tiene que poder reescribir
+   * **solo** la palabra mal escrita: si la interfaz adivinara cuál era, «capo corola 2009» podría
+   * terminar como «corolla» y perder la pieza y el año. El parser es el único que sabe cuál era.
+   */
+  it('dice de qué palabra salió cada sugerencia, para reescribir solo esa', () => {
+    const r = parsePartQuery('capo corola 2009', VOCAB);
+    expect(r.suggestionFixes).toContainEqual({ from: 'corola', to: 'corolla' });
+    // Nunca sugiere sobre el año ni sobre la pieza: solo sobre vehículos.
+    expect(r.suggestionFixes.every((f) => f.from !== '2009' && f.from !== 'capo')).toBe(true);
+  });
+
   it('canoniza sinónimos del habla local', () => {
     expect(parsePartQuery('cubierta nissan sentra 2015', VOCAB).term).toBe('capo');
     expect(parsePartQuery('balatas kia sportage', VOCAB).term).toBe('pastillas');

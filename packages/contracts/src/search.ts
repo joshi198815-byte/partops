@@ -211,6 +211,14 @@ export interface ParsedQuery {
   termFromSynonym: boolean;
   /** Candidatos de corrección ortográfica, para sugerir "quizá quisiste decir". */
   suggestions: string[];
+  /**
+   * De qué palabra salió cada sugerencia, para poder reescribir solo esa palabra en la interfaz.
+   *
+   * Se devuelve aquí y no se recalcula en la web porque solo el parser sabe cuál de los tokens era
+   * el vehículo mal escrito; adivinarlo otra vez en el cliente duplicaría la lógica y podría
+   * reemplazar la palabra equivocada.
+   */
+  suggestionFixes: { from: string; to: string }[];
 }
 
 function bestFuzzy(token: string, candidates: string[], maxDistance = 2): string | null {
@@ -317,6 +325,8 @@ export function parsePartQuery(raw: string, vocab: VehicleVocabulary): ParsedQue
    * Una sola edición para marcas/modelos de 5+ letras; dos para los largos (corolla, sportage).
    */
   const suggestions = new Set<string>();
+  /** Se llena junto con `suggestions`: el cliente reescribe solo el token que el parser identificó. */
+  const suggestionFixes: { from: string; to: string }[] = [];
   const brandNorms = brands.map((b) => b.norm);
   const modelNorms = models.map((m) => m.norm);
 
@@ -326,6 +336,7 @@ export function parsePartQuery(raw: string, vocab: VehicleVocabulary): ParsedQue
       const guess = bestFuzzy(t, brandNorms, maxD);
       if (guess) {
         suggestions.add(guess);
+        suggestionFixes.push({ from: t, to: guess });
         return true;
       }
     }
@@ -333,6 +344,7 @@ export function parsePartQuery(raw: string, vocab: VehicleVocabulary): ParsedQue
       const guess = bestFuzzy(t, modelNorms, maxD);
       if (guess) {
         suggestions.add(guess);
+        suggestionFixes.push({ from: t, to: guess });
         return true;
       }
     }
@@ -373,6 +385,7 @@ export function parsePartQuery(raw: string, vocab: VehicleVocabulary): ParsedQue
     free: leftover,
     termFromSynonym,
     suggestions: [...suggestions],
+    suggestionFixes,
   };
 }
 
