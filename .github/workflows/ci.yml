@@ -68,6 +68,12 @@ jobs:
       - name: Migrar base de datos
         run: pnpm --filter @partops/db migrate:deploy
 
+      # La referencia vehicular (marcas, modelos, años y sinónimos) NO son datos de demostración:
+      # es lo que hace que «capó corolla 2009» se resuelva. Sin sembrarla, los tests de búsqueda y
+      # de demanda fallan en CI aunque pasen en una máquina donde la semilla ya corrió. Es idempotente.
+      - name: Sembrar referencia vehicular
+        run: pnpm --filter @partops/db seed
+
       - name: Lint y formato
         run: pnpm lint
 

@@ -20,9 +20,17 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # `secrets` no se puede consultar dentro de un `if`: GitHub rechaza el archivo completo al
+    # arrancar y el run falla en 0 s sin jobs, que es lo que estaba pasando en cada push. Se copian
+    # al entorno del job y la condición mira `env`, que sí está permitido.
+    env:
+      ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      FCM_GOOGLE_SERVICES_B64: ${{ secrets.FCM_GOOGLE_SERVICES_B64 }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 11.0.9
@@ -60,7 +68,7 @@ jobs:
       # El keystore nunca entra al repo. Se reconstruye desde un secreto en base64 y se borra al
       # terminar el trabajo; el runner es efímero, pero un `cat` accidental en un log lo publicaría.
       - name: Keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+        if: env.ANDROID_KEYSTORE_B64 != ''
         env:
           ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -78,7 +86,7 @@ jobs:
       # Sin `google-services.json` la app compila igual, solo que sin push. No se hace fallar el
       # trabajo: un APK sin notificaciones sigue sirviendo para despachar.
       - name: Google Services (FCM)
-        if: ${{ secrets.FCM_GOOGLE_SERVICES_B64 != '' }}
+        if: env.FCM_GOOGLE_SERVICES_B64 != ''
         env:
           FCM_GOOGLE_SERVICES_B64: ${{ secrets.FCM_GOOGLE_SERVICES_B64 }}
         run: echo "$FCM_GOOGLE_SERVICES_B64" | base64 -d > apps/mobile/android/app/google-services.json
