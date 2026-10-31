@@ -88,14 +88,14 @@ describe('mensaje de WhatsApp del pedido', () => {
       { name: 'Filtro de aceite', variantTitle: '1.8L', sku: 'FIL-001', quantity: 2, totalCents: 25_000 },
     ],
     totalCents: 25_000,
-    catalogUrl: 'https://partops.gt/c/el-tornillo',
+    catalogUrl: 'https://partops.autos/c/el-tornillo',
   });
 
   it('lleva folio, piezas y total: la bodega no reconstruye la conversación', () => {
     expect(text).toContain('PD-0042');
     expect(text).toContain('FIL-001 × 2');
     expect(text).toContain('Repuestos El Tornillo');
-    expect(text).toContain('partops.gt/c/el-tornillo');
+    expect(text).toContain('partops.autos/c/el-tornillo');
   });
 
   it('no mete espacios duros en el total, que en WhatsApp se ven como huecos', () => {
@@ -133,7 +133,7 @@ describe('enlaces de WhatsApp', () => {
     const text = catalogInquiryMessage({
       shopName: 'El Tornillo',
       query: 'faro corolla 2009',
-      catalogUrl: 'https://partops.gt/c/el-tornillo',
+      catalogUrl: 'https://partops.autos/c/el-tornillo',
     });
     expect(text).toContain('faro corolla 2009');
     expect(text).toContain('no la encontré');

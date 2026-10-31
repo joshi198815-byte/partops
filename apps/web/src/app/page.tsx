@@ -102,7 +102,7 @@ function Hero() {
               <span className="size-2 rounded-full bg-[var(--border-strong)]" />
               <span className="size-2 rounded-full bg-[var(--border-strong)]" />
               <span className="ml-2 font-mono text-[11px] text-[var(--foreground-muted)]">
-                partops.gt/app/buscar
+                partops.autos/app/buscar
               </span>
             </div>
 

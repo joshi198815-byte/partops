@@ -35,7 +35,7 @@ que es el estado seguro— y también queda en el log.
 curl -s https://partops-keepalive.<cuenta>.workers.dev | jq
 
 # Disparar el mantenimiento sin esperar a las 06:10 (mismo header que usa el Worker).
-curl -s -X POST https://api.partops.gt/api/maintenance/run \
+curl -s -X POST https://api.partops.autos/api/maintenance/run \
   -H "x-cron-secret: $(op read op://partops/cron/secret)" -i | head -1
 # Esperado: HTTP/2 202
 ```

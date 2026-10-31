@@ -46,16 +46,16 @@ services:
         value: "10"
       # ── URLs ──
       - key: API_PUBLIC_URL
-        value: https://api.partops.gt
+        value: https://api.partops.autos
       - key: WEB_APP_URL
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: CORS_ORIGINS
-        value: https://app.partops.gt,capacitor://localhost
+        value: https://app.partops.autos,capacitor://localhost
       # ── Secretos ──
       - key: BETTER_AUTH_SECRET
         sync: false
       - key: BETTER_AUTH_URL
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: MAIL_PROVIDER
         value: gmail
       - key: MAIL_FROM
@@ -118,15 +118,15 @@ services:
       - key: PG_POOL_MAX
         value: "4"
       - key: API_PUBLIC_URL
-        value: https://api.partops.gt
+        value: https://api.partops.autos
       - key: WEB_APP_URL
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: CORS_ORIGINS
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: BETTER_AUTH_SECRET
         sync: false
       - key: BETTER_AUTH_URL
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: MAIL_PROVIDER
         value: log
       - key: R2_BUCKET
@@ -164,8 +164,8 @@ services:
       - key: PORT
         value: "3000"
       - key: API_URL
-        value: https://api.partops.gt
+        value: https://api.partops.autos
       - key: NEXT_PUBLIC_APP_URL
-        value: https://app.partops.gt
+        value: https://app.partops.autos
       - key: NEXT_PUBLIC_SENTRY_DSN
         sync: false

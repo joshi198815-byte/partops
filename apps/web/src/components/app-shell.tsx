@@ -174,7 +174,7 @@ function TenantSwitcher({ me }: { me: MeResponse }) {
       <div className="min-w-0">
         <p className="truncate text-[13px] font-semibold text-[var(--foreground)]">{me.tenant.name}</p>
         <p className="truncate font-mono text-[10.5px] text-[var(--foreground-muted)]">
-          partops.gt/{me.tenant.slug}
+          partops.autos/{me.tenant.slug}
         </p>
       </div>
     );

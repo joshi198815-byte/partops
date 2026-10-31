@@ -92,7 +92,7 @@ export default function NegocioPage() {
         >
           <div className="flex items-stretch">
             <span className="flex items-center rounded-l-[var(--radius-sm)] border border-r-0 border-[var(--border-strong)] bg-[var(--surface-sunken)] px-2.5 font-mono text-[12px] text-[var(--foreground-muted)]">
-              partops.gt/
+              partops.autos/
             </span>
             <Input
               id="slug"

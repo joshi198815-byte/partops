@@ -84,7 +84,7 @@ export default async function Dashboard({ me }: { me?: MeResponse }) {
         </h1>
         <p className="mt-1 text-[13px] text-[var(--foreground-muted)]">
           {session.tenant?.name} ·{' '}
-          <span className="font-mono text-[12px]">partops.gt/{session.tenant?.slug}</span>
+          <span className="font-mono text-[12px]">partops.autos/{session.tenant?.slug}</span>
         </p>
       </header>
 

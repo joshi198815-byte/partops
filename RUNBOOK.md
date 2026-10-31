@@ -9,7 +9,7 @@ Antes de tocar nada: **anotar la hora y qué se vio**. Un incidente sin línea d
 ```bash
 # Estado rápido, en un comando.
 pnpm smoke        # dominio, salud, RLS, CSP, sesión privada
-curl -s https://api.partops.gt/api/health/ready | jq
+curl -s https://api.partops.autos/api/health/ready | jq
 ```
 
 ---
@@ -32,7 +32,7 @@ npx wrangler tail --config infra/keepalive/wrangler.toml
 # Salida esperada cada 10 min: "latido: 200"
 
 # 2. Despertar la base a mano (un solo request, tarda lo que tarde).
-curl -s --max-time 60 https://api.partops.gt/api/health/ready | jq
+curl -s --max-time 60 https://api.partops.autos/api/health/ready | jq
 
 # 3. Si sigue dormida, el panel de Neon dice el estado real; despertarla desde ahí.
 ```
@@ -54,10 +54,10 @@ primer bloque. Cloudflare muestra error 521/522.
 
 ```bash
 # 1. ¿Es la API, es la web, o las dos? Son dos servicios distintos en Render.
-curl -s -o /dev/null -w "%{http_code}\n" https://api.partops.gt/api/health/live
-curl -s -o /dev/null -w "%{http_code}\n" https://app.partops.gt/entrar
+curl -s -o /dev/null -w "%{http_code}\n" https://api.partops.autos/api/health/live
+curl -s -o /dev/null -w "%{http_code}\n" https://app.partops.autos/entrar
 #    Si la web responde y la API no, la web sigue sirviendo login y assets: no la reinicies.
-curl -sI https://app.partops.gt/entrar | findstr /i "x-partops-commit"
+curl -sI https://app.partops.autos/entrar | findstr /i "x-partops-commit"
 
 # 2. Logs del servicio en Render → partops-api. Buscar "Configuración inválida" primero:
 #    un secreto faltante tumba el arranque y el log lo dice con el nombre del campo.
@@ -102,7 +102,7 @@ pnpm --filter @partops/api exec node -e "
   })"
 
 # 2. ¿El dominio responde?
-curl -sI https://cdn.partops.gt/parts/<id>.webp | head -3
+curl -sI https://cdn.partops.autos/parts/<id>.webp | head -3
 ```
 
 Si el objeto existe y el dominio no responde: revisar el DNS del dominio en Cloudflare (registro CNAME

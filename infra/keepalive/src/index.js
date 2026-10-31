@@ -54,7 +54,7 @@ async function request(url, init = {}) {
 
 export default {
   async scheduled(event, env, ctx) {
-    const apiUrl = (env.API_URL || 'https://api.partops.gt').replace(/\/+$/, '');
+    const apiUrl = (env.API_URL || 'https://api.partops.autos').replace(/\/+$/, '');
 
     ctx.waitUntil(
       (async () => {
@@ -104,7 +104,7 @@ export default {
    * Sirve para confirmar la configuración sin esperar diez minutos al cron.
    */
   async fetch(request, env) {
-    const apiUrl = (env.API_URL || 'https://api.partops.gt').replace(/\/+$/, '');
+    const apiUrl = (env.API_URL || 'https://api.partops.autos').replace(/\/+$/, '');
     let status = 'sin respuesta';
     try {
       const res = await request(`${apiUrl}/api/health/ready`);

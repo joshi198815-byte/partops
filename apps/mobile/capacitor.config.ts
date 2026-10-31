@@ -20,7 +20,7 @@ const config: CapacitorConfig = {
   appName: 'PartOps',
   webDir: 'www',
   server: {
-    url: process.env.CAP_SERVER_URL ?? 'https://app.partops.gt',
+    url: process.env.CAP_SERVER_URL ?? 'https://app.partops.autos',
     cleartext: false,
     androidScheme: 'https',
   },

@@ -390,7 +390,7 @@ Run: `pnpm --filter @partops/api test platform` → FAIL primero, PASS después.
 - [ ] **Step 2: Correr y verlo fallar** — `pnpm --filter @partops/web test native` → FAIL.
 - [ ] **Step 3: Scaffold**
 
-`capacitor.config.ts`: `appId: 'gt.partops.app'`, `appName: 'PartOps'`, `webDir: 'www'`, `server: { url: process.env.CAP_SERVER_URL ?? 'https://app.partops.gt', cleartext: false, androidScheme: 'https' }`, `plugins: { SplashScreen: { backgroundColor: '#16324F' }, StatusBar: { style: 'light' } }`.
+`capacitor.config.ts`: `appId: 'gt.partops.app'`, `appName: 'PartOps'`, `webDir: 'www'`, `server: { url: process.env.CAP_SERVER_URL ?? 'https://app.partops.autos', cleartext: false, androidScheme: 'https' }`, `plugins: { SplashScreen: { backgroundColor: '#16324F' }, StatusBar: { style: 'light' } }`.
 `www/index.html`: redirige a `CAP_SERVER_URL` y, si falla en 4 s, a `offline.html`.
 `www/offline.html`: marca, «Sin conexión con la bodega», botón «Reintentar» y texto de que los cambios guardados se envían solos. Sin JS de terceros.
 Paquetes: `@capacitor/core@8`, `@capacitor/cli@8`, `@capacitor/android@8`, `@capacitor/camera`, `@capacitor/push-notifications`, `@capacitor/share`, `@capacitor/haptics`, `@capacitor/keep-awake`.

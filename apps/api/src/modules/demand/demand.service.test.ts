@@ -270,7 +270,11 @@ describe.skipIf(skip)('DemandService: agrupación, rollup y retención', () => {
     const group = tray.groups.find((g) => g.variantId === variantId);
     expect(group).toMatchObject({ pending: 2, availableNow: true, sku: 'PAS-001' });
 
-    const notification = await watches.notification(ctx(), `variant:${variantId}`, 'https://partops.gt/c/x');
+    const notification = await watches.notification(
+      ctx(),
+      `variant:${variantId}`,
+      'https://partops.autos/c/x',
+    );
     expect(notification.customers).toHaveLength(2);
     expect(notification.customers[0]?.whatsappUrl).toContain('wa.me/50255550001');
     expect(notification.broadcastText).toContain('Pastillas de freno');

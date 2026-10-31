@@ -3,7 +3,7 @@ import { PART_CONDITIONS, type PartConditionKey } from './catalog.js';
 import { formatMoney } from './money.js';
 
 /**
- * Catálogo público: la vitrina del negocio en `partops.gt/c/<slug>`.
+ * Catálogo público: la vitrina del negocio en `partops.autos/c/<slug>`.
  *
  * Es la única superficie del producto que ve alguien que no trabaja en la bodega, y por eso las
  * reglas son distintas a las del mostrador:

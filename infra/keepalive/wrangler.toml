@@ -6,7 +6,7 @@ compatibility_date = "2026-01-01"
 workers_dev = false
 
 [vars]
-API_URL = "https://api.partops.gt"
+API_URL = "https://api.partops.autos"
 # Cuándo corre el mantenimiento, en hora de Guatemala (UTC-6, sin horario de verano).
 MAINTENANCE_HOUR_GT = "6"
 MAINTENANCE_MINUTE_GT = "10"

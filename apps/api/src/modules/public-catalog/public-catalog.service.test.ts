@@ -335,13 +335,13 @@ describe.skipIf(skip)('catálogo público: aislamiento, existencia y cola de bod
     await expect(
       service.order(slug, order({ items: [{ variantId: hidden.id, quantity: 1 }] }), {
         ip: ip(),
-        origin: 'https://partops.gt',
+        origin: 'https://partops.autos',
       }),
     ).rejects.toThrowError(/ya no está disponible/i);
   });
 
   it('el pedido web entra a la misma cola de bodega, con canal CATALOGO', async () => {
-    const result = await service.order(slug, order(), { ip: ip(), origin: 'https://partops.gt' });
+    const result = await service.order(slug, order(), { ip: ip(), origin: 'https://partops.autos' });
 
     expect(result.code).toMatch(/^PD-\d{4}$/);
     expect(result.allAvailable).toBe(true);
@@ -366,11 +366,11 @@ describe.skipIf(skip)('catálogo público: aislamiento, existencia y cola de bod
 
     const first = await service.order(slug, order({ idempotencyKey: key }), {
       ip: ip(),
-      origin: 'https://partops.gt',
+      origin: 'https://partops.autos',
     });
     const second = await service.order(slug, order({ idempotencyKey: key }), {
       ip: ip(),
-      origin: 'https://partops.gt',
+      origin: 'https://partops.autos',
     });
 
     expect(second.code).toBe(first.code);
@@ -398,7 +398,7 @@ describe.skipIf(skip)('catálogo público: aislamiento, existencia y cola de bod
     );
 
     await expect(
-      service.order(slug, order(), { ip: ip2, origin: 'https://partops.gt' }),
+      service.order(slug, order(), { ip: ip2, origin: 'https://partops.autos' }),
     ).rejects.toThrowError(/varios pedidos/i);
 
     const stockAfter = await tenantTx(base, tenantId, (tx) =>

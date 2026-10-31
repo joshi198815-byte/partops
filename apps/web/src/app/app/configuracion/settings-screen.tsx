@@ -61,7 +61,7 @@ export function SettingsScreen({
         </h1>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-[var(--foreground-muted)]">
           Tu rol: <span className="font-medium text-[var(--foreground)]">{tenant.role}</span>
-          <CodeChip>partops.gt/{settings.slug}</CodeChip>
+          <CodeChip>partops.autos/{settings.slug}</CodeChip>
         </p>
       </header>
 
@@ -274,7 +274,7 @@ function PublicCatalog({ settings, onSaved }: { settings: Settings; onSaved: (s:
         {error ? <Alert tone="error">{error}</Alert> : null}
         <Checkbox
           label="Publicar mi catálogo en el enlace del negocio"
-          description={`Los clientes verán piezas y precios en partops.gt/${settings.slug}. La existencia se muestra como disponibilidad, nunca como el número exacto.`}
+          description={`Los clientes verán piezas y precios en partops.autos/${settings.slug}. La existencia se muestra como disponibilidad, nunca como el número exacto.`}
           checked={enabled}
           disabled={pending}
           onChange={(e) => void toggle(e.target.checked)}

@@ -39,7 +39,7 @@ describe('importe en letras', () => {
 
 describe('enlaces del recibo', () => {
   it('la barra final de la web no duplica la ruta', () => {
-    expect(receiptUrls('https://partops.gt/', 'tok').publicUrl).toBe('https://partops.gt/r/tok');
+    expect(receiptUrls('https://partops.autos/', 'tok').publicUrl).toBe('https://partops.autos/r/tok');
   });
 
   it('el PDF sale por la API pública, no por una ruta con sesión', () => {
@@ -56,14 +56,14 @@ describe('mensaje de WhatsApp', () => {
     folio: 'R-0001',
     orderCode: 'BAR-0001',
     totalCents: 210_000,
-    publicUrl: 'https://partops.gt/r/tok',
+    publicUrl: 'https://partops.autos/r/tok',
   });
 
   it('lleva folio, total y enlace: lo que el cliente necesita para reclamar', () => {
     expect(text).toContain('BAR-0001');
     expect(text).toContain('R-0001');
     expect(text).toContain('2,100.00');
-    expect(text).toContain('https://partops.gt/r/tok');
+    expect(text).toContain('https://partops.autos/r/tok');
   });
 
   it('un teléfono inválido no produce enlace a medias', () => {

@@ -1,7 +1,7 @@
 # PartOps Android
 
 Cáscara Capacitor. **No es una copia de la aplicación**: el APK abre la web publicada
-(`CAP_SERVER_URL`, por defecto `https://app.partops.gt`). Lo que agrega sobre el navegador es lo que
+(`CAP_SERVER_URL`, por defecto `https://app.partops.autos`). Lo que agrega sobre el navegador es lo que
 el navegador no puede dar en una bodega:
 
 | Función                                            | Plugin                                |

@@ -10,26 +10,26 @@ import { redactUrl } from './observability.js';
  */
 describe('redactUrl', () => {
   it('borra el token del recibo público', () => {
-    expect(redactUrl('https://app.partops.gt/api/r/eyJhbGciOi-long-token')).toBe(
-      'https://app.partops.gt/api/r/:token',
+    expect(redactUrl('https://app.partops.autos/api/r/eyJhbGciOi-long-token')).toBe(
+      'https://app.partops.autos/api/r/:token',
     );
   });
 
   it('borra el slug de la vitrina', () => {
-    expect(redactUrl('https://app.partops.gt/api/public/catalog/repuestos-la-tuerca?page=2')).toBe(
-      'https://app.partops.gt/api/public/catalog/:slug',
+    expect(redactUrl('https://app.partops.autos/api/public/catalog/repuestos-la-tuerca?page=2')).toBe(
+      'https://app.partops.autos/api/public/catalog/:slug',
     );
   });
 
   it('colapsa los flujos de auth en un solo endpoint', () => {
-    expect(redactUrl('https://app.partops.gt/api/auth/sign-in/email')).toBe(
-      'https://app.partops.gt/api/auth/:flow',
+    expect(redactUrl('https://app.partops.autos/api/auth/sign-in/email')).toBe(
+      'https://app.partops.autos/api/auth/:flow',
     );
   });
 
   it('quita la query string de cualquier ruta (lleva búsquedas y filtros)', () => {
-    expect(redactUrl('https://app.partops.gt/api/search?q=balata+corolla')).toBe(
-      'https://app.partops.gt/api/search',
+    expect(redactUrl('https://app.partops.autos/api/search?q=balata+corolla')).toBe(
+      'https://app.partops.autos/api/search',
     );
   });
 

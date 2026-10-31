@@ -15,8 +15,8 @@
  *   5. `/app` sin sesión redirige. Si responde 200, hay una pantalla privada abierta.
  *
  * Uso:
- *   SMOKE_BASE_URL=https://app.partops.gt node scripts/smoke-api.mjs
- *   SMOKE_EXPECTED_COMMIT=abc1234 SMOKE_API_URL=https://api.partops.gt node scripts/smoke-api.mjs
+ *   SMOKE_BASE_URL=https://app.partops.autos node scripts/smoke-api.mjs
+ *   SMOKE_EXPECTED_COMMIT=abc1234 SMOKE_API_URL=https://api.partops.autos node scripts/smoke-api.mjs
  *
  * Sale con 1 y un listado de fallas; no se detiene en la primera para no arreglar una por vez.
  */

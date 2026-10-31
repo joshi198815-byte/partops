@@ -8,7 +8,7 @@
  * en dos archivos editados por separado garantiza que un día no coincidan.
  *
  * Uso:
- *   node scripts/build-mobile-shell.mjs                  → https://app.partops.gt
+ *   node scripts/build-mobile-shell.mjs                  → https://app.partops.autos
  *   CAP_SERVER_URL=http://10.0.2.2:3000 node …           → emulador contra el equipo local
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const www = join(root, 'www');
-const target = (process.env.CAP_SERVER_URL ?? 'https://app.partops.gt').replace(/\/+$/, '');
+const target = (process.env.CAP_SERVER_URL ?? 'https://app.partops.autos').replace(/\/+$/, '');
 
 /** Las plantillas y su salida. `index.html` se genera; `offline.html` es plantilla y también se genera. */
 const pages = [

@@ -69,7 +69,7 @@ export class StockWatchController {
     @Param('key') key: string,
     @ZodQuery(keyQuery) query: z.output<typeof keyQuery>,
   ) {
-    const base = query.catalogo ?? `https://partops.gt/c/${ctx.tenant.tenantSlug}`;
+    const base = query.catalogo ?? `https://partops.autos/c/${ctx.tenant.tenantSlug}`;
     return this.watch.notification(ctx, decodeURIComponent(key), base);
   }
 
