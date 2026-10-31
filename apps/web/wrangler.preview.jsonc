@@ -13,10 +13,11 @@
   "name": "partops-web-preview",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-01",
-  // Sin `global_fetch_strictly_public`: el rewrite `/api/*` apunta a `api.partops.autos`, misma
-  // zona. Con esa bandera la subpetición vuelve por el front door de Cloudflare, pierde el `Host`
-  // y responde 403 (error 1003). Ver `wrangler.jsonc`.
-  "compatibility_flags": ["nodejs_compat"],
+  // Sin `global_fetch_strictly_public`, y con `global_fetch_private_origin` puesta a propósito: el
+  // rewrite `/api/*` apunta a `api.partops.autos`, que vive en la MISMA zona. Con la bandera
+  // pública la subpetición vuelve a entrar por el front door de Cloudflare, pierde el `Host` y
+  // responde 403 (error 1003). Con esta, se enruta por dentro de la zona hasta el origen.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_private_origin"],
 
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "partops-web-preview" }],
