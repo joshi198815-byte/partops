@@ -71,6 +71,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GITHUB_SHA: ${{ github.sha }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.PRODUCTION_SENTRY_DSN }}
+        # `wrangler deploy` y no `opennextjs-cloudflare deploy`: el segundo precarga en R2 las
+        # páginas generadas en el build, y para eso levanta un Worker local y le pasa la red de
+        # Cloudflare por un proxy. En el runner eso expira a los 60 s y reintenta 15 veces. El
+        # resultado de omitirlo es el mismo: el Worker regenera esas páginas on-demand y las
+        # escribe él mismo en R2. La única diferencia es el primer request de cada una.
         run: pnpm --filter @partops/web cf:deploy:preview
 
       - name: Pista de qué probar

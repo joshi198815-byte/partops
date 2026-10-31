@@ -10,8 +10,8 @@
     "test": "vitest run --passWithNoTests",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf:deploy:preview": "opennextjs-cloudflare build --config wrangler.preview.jsonc && opennextjs-cloudflare deploy --config wrangler.preview.jsonc"
+    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "cf:deploy:preview": "opennextjs-cloudflare build --config wrangler.preview.jsonc && wrangler deploy --config wrangler.preview.jsonc"
   },
   "dependencies": {
     "@partops/contracts": "workspace:*",
