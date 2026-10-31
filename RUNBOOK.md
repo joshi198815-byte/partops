@@ -393,3 +393,13 @@ siempre es un build roto, no un problema del workflow.
 - Mensual: correr `pnpm restore:drill` contra un dump real y mirar el informe, no solo el color verde.
 - Al rotar un secreto: actualizar los dos lados (Render y GitHub / Render y Worker) en la misma hora.
 - Antes de cada despliegue grande: `pnpm smoke` contra producción para tener línea base.
+
+## Nota sobre los workflows que fallan solos
+
+Dos fallos se veían en cada push y no eran del producto, sino de la configuración del propio GitHub.
+Vale la pena reconocerlos porque volverán a aparecer con otro archivo:
+
+| Síntoma                                                        | Causa                                                                         | Arreglo                                                                   |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Un workflow aparece con `failure` en **0 s** y **sin jobs**.   | El YAML es inválido para Actions. Consultar `secrets` en un `if` lo invalida. | Copiar los secretos al `env` del job y condicionar sobre `env`.           |
+| La CI falla en los tests de búsqueda pero pasan en tu máquina. | Falta sembrar la referencia vehicular en la base del runner.                  | `pnpm --filter @partops/db seed` después de migrar (ya está en `ci.yml`). |
