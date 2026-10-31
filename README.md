@@ -34,7 +34,7 @@ Estas no son preferencias de estilo; cada una existe porque su ausencia rompe al
 ```
 apps/
   api/        NestJS 11 · REST + WebSocket
-  web/        Next.js 16 (App Router) · Cloudflare Workers en producción
+  web/        Next.js 16 (App Router) · Render con `output: 'standalone'`
   mobile/     Capacitor 8 · shell Android sobre la web
 packages/
   contracts/  Zod, dinero, búsqueda, permisos, estados — puro y probado
@@ -47,8 +47,9 @@ scripts/      Generación de marca, verificación de secretos, humo, respaldo y 
 ## Producción
 
 La API y el worker de mantenimiento salen de la misma imagen (`apps/api/Dockerfile`) y se despliegan
-en Render desde `render.yaml`. La web es Next.js; el dominio, el CSP con nonce y la caché de borde
-viven en `apps/web/src/proxy.ts`.
+en Render desde `render.yaml`. La web es Next.js con imagen propia (`apps/web/Dockerfile`,
+`output: 'standalone'`); el CSP con nonce y la cabecera que prueba el commit del build viven en
+`apps/web/src/proxy.ts` y `apps/web/next.config.mjs`.
 
 ```bash
 pnpm smoke        # dominio, salud, RLS, commit desplegado, CSP y sesión privada
@@ -63,6 +64,10 @@ Piezas que no se ven en el código:
   puerto; su trabajo es el mantenimiento diario.
 - **El latido de Neon lo da un Worker de Cloudflare** cada 10 minutos (`infra/keepalive`), porque el
   `setInterval` interno se congela si el proveedor duerme el proceso.
+- **La web se despliega después de la API y se verifica.** Render traduce las variables del servicio
+  a _build args_, así que `render.yaml` basta: no hay que pasar nada a mano en el build. La imagen
+  hornea `x-partops-commit` y el workflow no avanza al humo hasta que esa cabecera coincide con el
+  SHA, igual que hace `/api/health/ready` para la API.
 
 Procedimientos de incidente: [`RUNBOOK.md`](RUNBOOK.md). Política de seguridad: [`SECURITY.md`](SECURITY.md).
 

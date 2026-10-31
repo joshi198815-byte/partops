@@ -4,7 +4,7 @@
 
 **Base real estudiada:** `C:\nexoops` — `packages/db/prisma/schema.prisma`, `apps/api/src/modules/imports/imports.service.ts`, `apps/api/src/modules/inventory/inventory.service.ts`, `apps/api/src/infra/jobs.service.ts`, `apps/api/src/infra/realtime.gateway.ts`, `apps/api/src/modules/store/store.controller.ts`, `packages/ui/src/styles/tokens.css`, `ARCHITECTURE.md`. Se reutilizan los patrones probados; no se copia la marca ni la paleta.
 
-**Stack:** pnpm 11 + Turborepo · NestJS 11 · Prisma 7 + PostgreSQL 17 (Neon) · Next.js 16 (Cloudflare Workers) · Capacitor 8 (Android) · Socket.IO · cola durable en Postgres (sin Redis).
+**Stack:** pnpm 11 + Turborepo · NestJS 11 · Prisma 7 + PostgreSQL 17 (Neon) · Next.js 16 (Render, `output: 'standalone'`) · Capacitor 8 (Android) · Socket.IO · cola durable en Postgres (sin Redis).
 
 ---
 
@@ -69,7 +69,7 @@ flowchart TB
 
 - **DB:** Neon Free — 0.5 GB, ~190 h de cómputo/mes, suspensión por inactividad, historial 6 h. Un proyecto, ramas para preview.
 - **API:** Render Free — 512 MB / 0.1 CPU, duerme a los 15 min, 750 h/mes. Keepalive desde Cloudflare Worker cada 10 min (`infra/keepalive`).
-- **Web:** Cloudflare Workers Free — 100k req/día, sin egress. **No Vercel:** el plan Hobby prohíbe uso comercial.
+- **Web:** Render — misma cuenta y región que la API, imagen propia (`apps/web/Dockerfile`) con `output: 'standalone'`. **No Vercel:** el plan Hobby prohíbe uso comercial. **No Cloudflare Workers:** Next 16 no corre ahí sin un adaptador (`@opennextjs/cloudflare`), y ese adaptador no soporta el proxy que genera el CSP con nonce ni el rewrite hacia la API. Se prefirió un servidor Node real, que es el runtime contra el que se probó todo, antes que reescribir la app para un runtime distinto y descubrir las diferencias en producción.
 - **Archivos:** Cloudflare R2 Free — 10 GB, 1M escrituras, 10M lecturas, egress 0. Bucket privado; salida por `/api/files/:key` con caché hasta comprar dominio y pasar a `cdn.`.
 - **Correo:** Resend Free — 3,000/mes, 100/día, **exige dominio verificado**. Mientras no exista dominio: Gmail SMTP con app password de partopsgt@gmail.com (~500/día) detrás de una interfaz `MailProvider`, y se cambia a Resend con una variable.
 - **Push:** FCM, gratis.
@@ -81,7 +81,8 @@ flowchart TB
 **Lo que el free tier sí condiciona (y cómo se resuelve):**
 - Neon suspende y Render duerme → keepalive + arranque en frío asumido: primera petición del día puede tardar; el shell web muestra esqueleto, nunca error.
 - 0.5 GB → retención de `search_event` 30 días (agregados permanentes), imágenes re-codificadas a AVIF/WebP ≤1400px, PDFs comprimidos.
-- Workers free con 10 ms de CPU por invocación → páginas estáticas/cacheadas primero, `caches.default` en el catálogo público, islas de cliente para lo interactivo. Si el límite aprieta, plan B: mover web a Render (mismo repo, un job más de CI).
+- Render Free duerme a los 15 min → el keepalive lo mantiene despierto. Con la web en el mismo proveedor, el arranque en frío afecta a las dos: el esqueleto del shell cubre ese primer segundo. Si el plan sube, el mismo `render.yaml` sirve sin cambios.
+- Build de Next en 512 MB → por eso `output: 'standalone'` y un `pnpm install` filtrado por `@partops/web...`: construir los cuatro paquetes no cabe.
 
 ---
 
@@ -271,8 +272,7 @@ producción".
 
 ## 9. Riesgos y decisiones diferidas
 
-- **Workers free (10 ms CPU)** puede apretar en SSR pesado; mitigación: caché de borde y páginas estáticas; plan B documentado a Render.
-- **Render duerme** aunque haya keepalive si el Worker falla; mitigación: reintento del Worker, esqueleto en el cliente y alerta de uptime.
+- **Render duerme** aunque haya keepalive si el Worker falla; mitigación: reintento del Worker, esqueleto en el cliente y alerta de uptime. Con la web en el mismo proveedor, un servicio dormido arrastra a los dos; el esqueleto del shell cubre ese primer arranque.
 - **Correo sin dominio** limitado a Gmail SMTP; se cambia a Resend al comprar dominio (una variable y verificación DNS).
 - **WhatsApp automático** requiere Cloud API y verificación de Meta; v1 usa `wa.me` + bandeja de avisos. No se promete automatización que no existe.
 - **iOS** fuera de alcance free (US$99/año); la PWA cubre iPhone mientras tanto.

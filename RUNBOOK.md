@@ -53,9 +53,11 @@ primer bloque. Cloudflare muestra error 521/522.
 **Qué se hace.**
 
 ```bash
-# 1. ¿Es la API o es la web?
+# 1. ¿Es la API, es la web, o las dos? Son dos servicios distintos en Render.
 curl -s -o /dev/null -w "%{http_code}\n" https://api.partops.gt/api/health/live
 curl -s -o /dev/null -w "%{http_code}\n" https://app.partops.gt/entrar
+#    Si la web responde y la API no, la web sigue sirviendo login y assets: no la reinicies.
+curl -sI https://app.partops.gt/entrar | findstr /i "x-partops-commit"
 
 # 2. Logs del servicio en Render → partops-api. Buscar "Configuración inválida" primero:
 #    un secreto faltante tumba el arranque y el log lo dice con el nombre del campo.
@@ -64,12 +66,17 @@ curl -s -o /dev/null -w "%{http_code}\n" https://app.partops.gt/entrar
 curl -X POST "$RENDER_API_DEPLOY_HOOK"
 ```
 
+**Si lo que falló fue la web** (`partops-web`, Dockerfile en `apps/web/`), el síntoma típico es
+`/entrar` en 502 mientras la API está sana. Revisar el log del **build**, no el del runtime: casi
+siempre es un `API_URL` mal puesto o un `pnpm install` que no encontró el lockfile. El servicio
+tiene su propio hook (`RENDER_WEB_DEPLOY_HOOK`).
+
 **Si el arranque falla por configuración** —el caso más común después de rotar un secreto—: la API
 valida `env` al arrancar y se niega a correr sin `BETTER_AUTH_SECRET` o `DATABASE_URL`. Es a
 propósito. Corregir la variable en Render y redeploy; no "arreglar" relajando la validación.
 
 **Cómo se confirma.** `/health/live` en 200, `/health/ready` en 200 con el `commit` del último
-despliegue, y `pnpm smoke` verde completo.
+despliegue, la cabecera `x-partops-commit` de la web con el mismo SHA, y `pnpm smoke` verde completo.
 
 ---
 

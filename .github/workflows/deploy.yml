@@ -7,7 +7,7 @@ name: Deploy
 #   2. Construir y desplegar la API.
 #   3. Esperar a que `/health/ready` devuelva **nuestro** SHA. Un deploy que "ya disparó" no es un
 #      deploy hecho; Render puede tardar minutos o quedarse en la versión anterior.
-#   4. Desplegar la web.
+#   4. Desplegar la web y esperar a que su cabecera `x-partops-commit` diga lo mismo.
 #   5. Humo completo.
 #
 # Si el paso 3 falla, la web no se toca: se queda sirviendo una versión que al menos habla con una
@@ -97,18 +97,34 @@ jobs:
           exit 1
 
       # ── 4 · Web ──────────────────────────────────────────────────────────────
-      - name: Disparar despliegue de la web
+      - name: Desplegar la web
         env:
           HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+          WEB_URL: ${{ secrets.PRODUCTION_WEB_URL }}
+          SHA: ${{ github.sha }}
         run: |
           if [ -z "$HOOK" ]; then
             echo "::error::Falta RENDER_WEB_DEPLOY_HOOK en los secretos del entorno production."
             exit 1
           fi
           curl --fail --silent --show-error --request POST "$HOOK"
-          # La web tarda menos que la API, pero no es instantánea: sin esta pausa el humo corre
-          # contra la versión anterior y da un falso verde.
-          sleep 60
+
+          # La web se construye (Next compila en el deploy), así que tarda más que la API en
+          # arrancar pero menos que una migración. Se sondea la cabecera horneada en vez de dormir
+          # un tiempo fijo: `sleep 60` da verde contra el contenedor viejo si el build tarda más.
+          deadline=$((SECONDS + 600))
+          while [ $SECONDS -lt $deadline ]; do
+            served=$(curl --silent --max-time 10 --head "$WEB_URL/entrar" 2>/dev/null \
+              | tr -d '\r' | awk 'tolower($1)=="x-partops-commit:"{print $2}')
+            if [ "${served:0:8}" = "${SHA:0:8}" ]; then
+              echo "La web ya sirve ${SHA:0:8}."
+              exit 0
+            fi
+            echo "Aún no: la web sirve '${served:-sin cabecera}'"
+            sleep 10
+          done
+          echo "::error::La web no sirvió $SHA en 10 minutos. Revisar el log del build en Render."
+          exit 1
 
       # ── 5 · Humo ─────────────────────────────────────────────────────────────
       - name: Humo de producción

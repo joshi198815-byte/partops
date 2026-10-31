@@ -136,3 +136,31 @@ services:
         sync: false
       - key: SENTRY_DSN
         sync: false
+
+  # ── Web ────────────────────────────────────────────────────────────────────
+  # Next.js con `output: 'standalone'`. Se despliega DESPUÉS de la API y solo cuando la API ya
+  # sirve el mismo commit; ese orden lo impone `deploy.yml`, no este archivo.
+  #
+  # El `API_URL` entra como build arg: el rewrite `/api/*` se hornea en la tabla de rutas del
+  # build. Cambiarlo aquí y redesplegar basta porque Render reconstruye la imagen; cambiarlo solo
+  # en el runtime no tendría efecto sobre el rewrite.
+  - type: web
+    name: partops-web
+    runtime: docker
+    plan: starter
+    region: virginia
+    dockerfilePath: ./apps/web/Dockerfile
+    dockerContext: .
+    healthCheckPath: /entrar
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: API_URL
+        value: https://api.partops.gt
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://app.partops.gt
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false

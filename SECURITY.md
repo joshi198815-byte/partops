@@ -72,7 +72,10 @@ sobre lo preparado. El segundo es la red local; el primero, la de verdad.
 La web manda `content-security-policy` con nonce por petición (`apps/web/src/proxy.ts`):
 `default-src 'self'`, `script-src 'self' 'nonce-…' 'strict-dynamic'`, `frame-ancestors 'none'`,
 `object-src 'none'`, `base-uri 'self'`. Más `X-Content-Type-Options`, `Referrer-Policy`,
-`Permissions-Policy` (cámara solo propio origen, necesaria para el escáner) y HSTS.
+`Permissions-Policy` (cámara solo propio origen, necesaria para el escáner), HSTS, COOP y CORP.
+
+La cabecera `x-partops-commit` se hornea en el build (`apps/web/next.config.mjs`): no revela nada
+que no esté ya en el repo, y permite que el despliegue pruebe qué artefacto está sirviendo.
 
 La API no sirve HTML: su CSP es `default-src 'none'` y `frame-ancestors 'none'`.
 

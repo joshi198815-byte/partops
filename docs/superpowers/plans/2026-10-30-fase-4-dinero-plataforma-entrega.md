@@ -28,7 +28,7 @@
 - UI en español de Guatemala (`es-GT`). Cero cifras, usuarios o pedidos inventados: lo que no hay se dice, no se pinta en cero.
 - Cobre `#B4703A` solo como filete, muesca o serie de gráfica. Radios 4/8 px, sin blur, sin glow, sin botones píldora.
 - Los permisos se resuelven en el servidor; el menú es comodidad, no seguridad.
-- Planes gratuitos: Neon 0.5 GB, Render 512 MB y duerme a los 15 min, Workers 10 ms de CPU, R2 10 GB. Nada puede depender de Redis ni de un cron pago.
+- Planes gratuitos: Neon 0.5 GB, Render 512 MB y duerme a los 15 min, R2 10 GB. Nada puede depender de Redis ni de un cron pago.
 - Sin pasarela de pago en v1: los planes se conceden a mano desde `/admin`.
 
 ## Review Focus

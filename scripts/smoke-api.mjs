@@ -11,6 +11,7 @@
  *   3. El `commit` desplegado es el que se quería desplegar. Sin esto, un deploy viejo que sigue
  *      sirviendo se ve verde para siempre.
  *   4. La portada trae `content-security-policy` con `nonce-`. Si falta, el proxy no está montado.
+ *      Y `x-partops-commit`, horneado en el build, dice si la web es el artefacto nuevo.
  *   5. `/app` sin sesión redirige. Si responde 200, hay una pantalla privada abierta.
  *
  * Uso:
@@ -83,6 +84,17 @@ async function main() {
     check(csp.includes('nonce-'), 'la portada trae CSP con nonce');
     check(/frame-ancestors 'none'/.test(csp), 'CSP bloquea el encuadre (clickjacking)');
     check(/object-src 'none'/.test(csp), 'CSP bloquea plugins');
+
+    // La cabecera se hornea en el build, así que distingue un artefacto nuevo de uno viejo aun
+    // cuando `deploy.yml` ya disparó el hook y Render respondió con el contenedor anterior.
+    if (EXPECTED_COMMIT) {
+      const served = res.headers.get('x-partops-commit') ?? '';
+      check(
+        served.startsWith(EXPECTED_COMMIT),
+        'la web sirve el commit construido',
+        `esperado ${EXPECTED_COMMIT.slice(0, 8)}, servido ${served.slice(0, 8) || 'sin cabecera'}`,
+      );
+    }
   } catch (err) {
     check(false, 'la portada responde', err instanceof Error ? err.message : String(err));
   }

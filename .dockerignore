@@ -1,7 +1,7 @@
 # Se excluye todo y se incluye lo que el build necesita.
 #
-# Este archivo vive en la raíz porque el contexto es la raíz del monorepo: el Dockerfile de
-# `apps/api` no puede resolver el workspace si el contexto es su propia carpeta.
+# Este archivo vive en la raíz porque el contexto es la raíz del monorepo: los Dockerfiles no
+# pueden resolver el workspace si el contexto es su propia carpeta.
 *
 !package.json
 !pnpm-lock.yaml
@@ -12,6 +12,20 @@
 !apps/api/tsconfig.json
 !apps/api/tsconfig.build.json
 !apps/api/src/**
+
+!apps/web/package.json
+!apps/web/tsconfig.json
+!apps/web/next.config.mjs
+!apps/web/postcss.config.mjs
+!apps/web/next-env.d.ts
+!apps/web/instrumentation.ts
+!apps/web/src/**
+!apps/web/public/**
+
+!packages/config/package.json
+!packages/config/tsconfig.json
+!packages/config/tsconfig.build.json
+!packages/config/tsconfig.react.json
 
 !packages/contracts/package.json
 !packages/contracts/tsconfig.json
@@ -26,6 +40,8 @@
 !packages/db/prisma/**
 
 !packages/ui/package.json
+!packages/ui/tsconfig.json
+!packages/ui/src/**
 
 **/node_modules
 **/dist
@@ -38,3 +54,4 @@
 var
 apps/mobile
 apps/api/Dockerfile
+apps/web/Dockerfile
